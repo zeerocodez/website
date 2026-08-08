@@ -1,0 +1,27 @@
+{
+  "name": "zeerocodes",
+  "version": "1.0.0",
+  "description": "Zeerocodes Platform (Teach • Build • Protect) & VibeScan Security Scanner",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'Zeerocodes build ready for static & serverless deployment'"
+  },
+  "keywords": [
+    "zeerocodes",
+    "academy",
+    "automation-studio",
+    "vibescan",
+    "owasp-llm",
+    "security-audit",
+    "paystack",
+    "flutterwave"
+  ],
+  "author": "Nuel Effiong (Zeerocodes Automation Limited)",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "zod": "^3.22.4"
+  }
+}

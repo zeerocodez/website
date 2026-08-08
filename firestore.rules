@@ -1,0 +1,108 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =========================================================================
+    // HELPER FUNCTIONS & AUTH GUARDS
+    // =========================================================================
+    
+    // Checks if the request is from an authenticated user
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Checks if the authenticated user is the owner of the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Checks if the authenticated user has an 'admin' role in the users collection
+    function isAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // =========================================================================
+    // 1. USERS COLLECTION (`users/{userId}`)
+    // =========================================================================
+    // Regular users can read and update their own profiles.
+    // Role field cannot be elevated to 'admin' by a regular user.
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if (isOwner(userId) && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']))) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // =========================================================================
+    // 2. COURSES COLLECTION (`courses/{courseId}`)
+    // =========================================================================
+    // Public catalog can be viewed by anyone; only admins can create or edit courses.
+    match /courses/{courseId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // =========================================================================
+    // 3. ENROLLMENTS COLLECTION (`enrollments/{enrollmentId}`)
+    // =========================================================================
+    // Users can read/write their own enrollments & progress; admins have full access.
+    match /enrollments/{enrollmentId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // =========================================================================
+    // 4. STUDIO PROJECTS COLLECTION (`studioProjects/{projectId}`)
+    // =========================================================================
+    // Consulting client projects linked to accounts. Clients can view their own.
+    match /studioProjects/{projectId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // =========================================================================
+    // 5. VIBESCAN SUBMISSIONS COLLECTION (`vibescanSubmissions/{submissionId}`)
+    // =========================================================================
+    // Regular users create and view their submissions.
+    // Only admins can view the complete pending review queue and change review status.
+    match /vibescanSubmissions/{submissionId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // =========================================================================
+    // 6. AUDIT REPORTS COLLECTION (`auditReports/{reportId}`)
+    // =========================================================================
+    // Audit reports created by admin reviewers. Owner client can read; admin writes.
+    match /auditReports/{reportId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // =========================================================================
+    // 7. CERTIFICATIONS COLLECTION (`certifications/{certId}`)
+    // =========================================================================
+    // Issued VibeCert certifications are publicly verifiable; only admin writes.
+    match /certifications/{certId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // =========================================================================
+    // 8. PAYMENT EVENTS COLLECTION (`paymentEvents/{eventId}`)
+    // =========================================================================
+    // Paystack / Flutterwave transaction events.
+    // Client-side writes are strictly forbidden (webhook server-side only).
+    // Only admins can read for reconciliation.
+    match /paymentEvents/{eventId} {
+      allow read: if isAdmin();
+      allow write: if false; // Server-side webhook only
+    }
+  }
+}

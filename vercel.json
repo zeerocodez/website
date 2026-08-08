@@ -1,0 +1,51 @@
+{
+  "version": 2,
+  "name": "zeerocodes",
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/webhook/paystack",
+      "dest": "/api/webhook/paystack.js"
+    },
+    {
+      "src": "/api/webhook/flutterwave",
+      "dest": "/api/webhook/flutterwave.js"
+    },
+    {
+      "src": "/api/users/me",
+      "dest": "/api/users/me.js"
+    },
+    {
+      "src": "/api/auth/security-diagnostic",
+      "dest": "/api/auth/security-diagnostic.js"
+    },
+    {
+      "src": "/(styles.css|index.html|js/.*|images/.*)",
+      "dest": "/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
