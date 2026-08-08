@@ -1,88 +1,65 @@
 @echo off
-setlocal enabledelayedexpansion
-title Zeerocodes GitHub & Vercel Auto-Pusher
+setlocal
 cd /d "%~dp0"
+title Zeerocodes GitHub & Vercel Deployment
 
 echo ==========================================================
-echo   ZEEROCODES PLATFORM - GITHUB & VERCEL DEPLOYMENT
-echo   Target: https://github.com/zeerocodez/website
+echo   ZEEROCODES PLATFORM -^> GITHUB & VERCEL PUSHER
+echo   Repository: https://github.com/zeerocodez/website
 echo ==========================================================
 echo.
 
-:: 1. Locate Git executable
-set "GIT_EXE=git"
-where git >nul 2>nul
-if %errorlevel% equ 0 goto :RUN_GIT
+set "GIT=%~dp0git_bin\cmd\git.exe"
 
-if exist "%~dp0git_bin\cmd\git.exe" (
-    set "GIT_EXE=%~dp0git_bin\cmd\git.exe"
-    goto :RUN_GIT
-)
-if exist "C:\Program Files\Git\cmd\git.exe" (
-    set "GIT_EXE=C:\Program Files\Git\cmd\git.exe"
-    goto :RUN_GIT
-)
-if exist "%LOCALAPPDATA%\Programs\Git\cmd\git.exe" (
-    set "GIT_EXE=%LOCALAPPDATA%\Programs\Git\cmd\git.exe"
-    goto :RUN_GIT
+if not exist "%GIT%" (
+    where git >nul 2>nul
+    if %errorlevel% equ 0 (
+        set "GIT=git"
+    ) else (
+        echo [ERROR] git.exe was not found.
+        echo Please ensure Git is installed.
+        pause
+        exit /b 1
+    )
 )
 
-echo [1/4] Git not found. Downloading lightweight portable Git...
-powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri 'https://github.com/git-for-windows/git/releases/download/v2.44.0.windows.1/MinGit-2.44.0-64-bit.zip' -OutFile '%~dp0mingit.zip' -UseBasicParsing; Expand-Archive -Path '%~dp0mingit.zip' -DestinationPath '%~dp0git_bin' -Force; Remove-Item -Path '%~dp0mingit.zip' -Force"
-
-if exist "%~dp0git_bin\cmd\git.exe" (
-    set "GIT_EXE=%~dp0git_bin\cmd\git.exe"
-    goto :RUN_GIT
-)
-
-echo.
-echo [ERROR] Git could not be set up automatically.
-echo Please install Git from: https://git-scm.com/download/win
-pause
-exit /b 1
-
-:RUN_GIT
-echo [Found Git] %GIT_EXE%
+echo [1/5] Using Git from: "%GIT%"
 echo.
 
-:: Fix dubious ownership & configure user
-"%GIT_EXE%" config --global --add safe.directory "*" >nul 2>nul
-"%GIT_EXE%" config --global --add safe.directory "%~dp0." >nul 2>nul
+:: Configure safe directory
+"%GIT%" config --global --add safe.directory "*" 2>nul
+"%GIT%" config --global --add safe.directory "%~dp0." 2>nul
 
+:: Initialize repository if needed
 if not exist ".git" (
-    echo [2/4] Initializing Git repository...
-    "%GIT_EXE%" init
+    echo [2/5] Initializing Git repository...
+    "%GIT%" init
 )
 
-"%GIT_EXE%" config user.name "zeerocodez"
-"%GIT_EXE%" config user.email "nuel@zeerocodes.com"
+:: Configure user identity
+"%GIT%" config user.name "zeerocodez"
+"%GIT%" config user.email "nuel@zeerocodes.com"
 
-echo [3/4] Configuring remote origin (https://github.com/zeerocodez/website.git)...
-"%GIT_EXE%" remote remove origin 2>nul
-"%GIT_EXE%" remote add origin https://github.com/zeerocodez/website.git
+:: Set remote origin
+echo [3/5] Setting remote origin...
+"%GIT%" remote remove origin 2>nul
+"%GIT%" remote add origin https://github.com/zeerocodez/website.git
 
-echo [4/4] Staging and committing project files...
-"%GIT_EXE%" add -A -- ":!git_bin" ":!mingit.zip"
-"%GIT_EXE%" commit -m "feat: complete Zeerocodes platform, VibeScan security integration, and interactive UX suite"
+:: Clean staging & commit
+echo [4/5] Staging files...
+"%GIT%" add .
+"%GIT%" reset HEAD git_bin/ mingit.zip 2>nul
+"%GIT%" commit -m "feat: complete Zeerocodes platform, VibeScan security integration, and interactive UX suite"
+
+:: Push to main branch
+echo [5/5] Pushing to https://github.com/zeerocodez/website on branch main...
+"%GIT%" branch -M main
+"%GIT%" push -u origin main
 
 echo.
 echo ==========================================================
-echo   PUSHING TO GITHUB (MAIN BRANCH)...
+echo   PROCESS FINISHED!
+echo   Check your Vercel dashboard: your site is building!
 echo ==========================================================
-"%GIT_EXE%" branch -M main
-"%GIT_EXE%" push -u origin main
-
-if %errorlevel% equ 0 (
-    echo.
-    echo ==========================================================
-    echo   SUCCESS! Pushed to https://github.com/zeerocodez/website
-    echo   Vercel will now automatically build and deploy your site!
-    echo ==========================================================
-) else (
-    echo.
-    echo ==========================================================
-    echo   [NOTE] If GitHub requires login, please authenticate above.
-    echo ==========================================================
-)
-
+echo.
 pause
