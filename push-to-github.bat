@@ -4,7 +4,7 @@ cd /d "%~dp0"
 title Zeerocodes GitHub & Vercel Deployment
 
 echo ==========================================================
-echo   ZEEROCODES PLATFORM -^> GITHUB & VERCEL PUSHER
+echo   ZEEROCODES PLATFORM - GITHUB AND VERCEL PUSHER
 echo   Repository: https://github.com/zeerocodez/website
 echo ==========================================================
 echo.
