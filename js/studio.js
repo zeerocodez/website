@@ -12,12 +12,16 @@ class StudioManager {
   }
 
   init() {
-    // Bind direct external calendar booking triggers
-    document.querySelectorAll('.trigger-calendly-booking').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+    // Bind interactive in-app booking modal triggers
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.trigger-calendly-booking');
+      if (btn) {
         e.preventDefault();
-        window.open(CALENDLY_PLACEHOLDER_URL, '_blank', 'noopener,noreferrer');
-      });
+        const service = btn.getAttribute('data-service') || 'Custom Web App / Automation Studio';
+        if (window.modal) {
+          window.modal.openBooking(service);
+        }
+      }
     });
   }
 

@@ -705,6 +705,122 @@ class ZeerocodesApp {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
+
+  // =========================================================================
+  // 9. CLIENT WORKSPACE & ADMIN DASHBOARD RENDERERS
+  // =========================================================================
+  async renderUserDashboard() {
+    if (!window.auth || !window.auth.isAuthenticated()) return;
+    const user = window.auth.getUser();
+
+    // 1. Studio Projects List
+    const studioListEl = document.getElementById('dashStudioList');
+    if (studioListEl && window.db) {
+      const allProjects = window.db.getLocal('studioProjects') || [];
+      const userProjects = allProjects.filter(p => p.userId === user.uid || p.userEmail === user.email);
+
+      if (!userProjects.length) {
+        studioListEl.innerHTML = `
+          <p style="color:var(--text-cyber-muted); font-size:0.88rem; margin-bottom:1rem;">No active custom builds or automations yet.</p>
+          <button class="btn btn-primary btn-xs trigger-calendly-booking">
+            <i data-lucide="calendar"></i> Scope Your First Project
+          </button>
+        `;
+      } else {
+        studioListEl.innerHTML = userProjects.map(p => `
+          <div style="background:#080C14; padding:0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.08); margin-bottom:0.65rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+              <strong style="color:#FFF; font-size:0.88rem;">${p.title}</strong>
+              <span class="badge badge-teal" style="font-size:0.68rem;">${p.status.toUpperCase()}</span>
+            </div>
+            <div style="font-size:0.78rem; color:var(--emerald-light);">${p.milestone || 'In Discovery'}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // 2. Enrollments List
+    const enrollListEl = document.getElementById('dashEnrollmentsList');
+    if (enrollListEl && window.db) {
+      const enrollments = await window.db.getUserEnrollments(user.uid);
+      if (!enrollments.length) {
+        enrollListEl.innerHTML = `
+          <p style="color:var(--text-cyber-muted); font-size:0.88rem; margin-bottom:1rem;">Not enrolled in The VibeCode Labs cohort yet.</p>
+          <a href="#academy" class="btn btn-outline btn-xs">
+            <i data-lucide="graduation-cap"></i> Join Next Cohort
+          </a>
+        `;
+      } else {
+        enrollListEl.innerHTML = enrollments.map(e => `
+          <div style="background:#080C14; padding:0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.08); margin-bottom:0.65rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+              <strong style="color:#FFF; font-size:0.88rem;">${e.courseTitle}</strong>
+              <span class="badge badge-success" style="font-size:0.68rem;">ACTIVE</span>
+            </div>
+            <button class="btn btn-ghost btn-xs" style="color:var(--emerald-light); padding:0;" onclick="window.lms?.openCoursePlayer('${e.id}')">
+              Open LMS Player &rarr;
+            </button>
+          </div>
+        `).join('');
+      }
+    }
+
+    // 3. VibeScan Submissions List
+    const vibescanListEl = document.getElementById('dashVibescanList');
+    if (vibescanListEl && window.db) {
+      const subs = await window.db.getSubmissionsForUser(user.uid);
+      if (!subs.length) {
+        vibescanListEl.innerHTML = `
+          <p style="color:var(--text-cyber-muted); font-size:0.88rem; margin-bottom:1rem;">0 repositories audited for this account.</p>
+          <a href="#vibescan" class="btn btn-outline btn-xs">
+            <i data-lucide="shield-check"></i> Submit Repo for Audit
+          </a>
+        `;
+      } else {
+        vibescanListEl.innerHTML = subs.map(s => `
+          <div style="background:#080C14; padding:0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.08); margin-bottom:0.65rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+              <strong style="color:#FFF; font-size:0.88rem;">${s.appName}</strong>
+              <span class="badge badge-cyber" style="font-size:0.68rem;">${s.status.toUpperCase()}</span>
+            </div>
+            <div style="font-size:0.75rem; color:var(--text-cyber-muted);">${s.certificationId || 'Pending Review'}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  async renderAdminDashboard() {
+    const queueEl = document.getElementById('adminReviewQueue');
+    if (!queueEl || !window.db) return;
+
+    const subs = await window.db.getAllPendingSubmissions();
+    if (!subs.length) {
+      queueEl.innerHTML = `<div style="padding:2rem; text-align:center; color:var(--text-cyber-muted); background:#080D16; border-radius:var(--radius-md); border:1px solid var(--obsidian-border);">All audits and reviews are up to date!</div>`;
+      return;
+    }
+
+    queueEl.innerHTML = subs.map(s => `
+      <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-md); padding:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <h4 style="color:#FFF; font-size:1.1rem; margin:0;">${s.appName}</h4>
+          <span class="badge badge-warn">${s.status.toUpperCase()}</span>
+        </div>
+        <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin-bottom:0.75rem;">
+          <strong>Submitter:</strong> ${s.userName} (${s.userEmail}) • <strong>Repo:</strong> <a href="${s.appUrl}" target="_blank" style="color:var(--emerald-light);">${s.appUrl}</a>
+        </p>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <button class="btn btn-primary btn-xs" onclick="window.vibescanReview?.openReviewDrawer('${s.id}')">
+            Perform Code Audit & Issue Cert
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+    if (window.lucide) window.lucide.createIcons();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
