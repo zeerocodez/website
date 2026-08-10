@@ -13,10 +13,67 @@ class PaymentManager {
   constructor() {
     this.activeTransaction = null;
     this.pollingInterval = null;
+    this.activeCurrency = 'NGN';
+    this.exchangeRates = {
+      NGN: 1,
+      USD: 1 / 1500,
+      GBP: 1 / 1900
+    };
+  }
+
+  /**
+   * Currency switcher handler (NGN / USD / GBP)
+   */
+  setCurrency(curr) {
+    if (!this.exchangeRates[curr]) return;
+    this.activeCurrency = curr;
+
+    // Update active state on currency buttons
+    document.querySelectorAll('.currency-btn').forEach(b => {
+      if (b.getAttribute('data-currency') === curr) {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+
+    // Re-render courses and update static pricing amounts
+    if (window.app && window.app.renderCourses) {
+      window.app.renderCourses();
+    }
+    this.updateStaticPricingDisplay();
+
+    if (window.toast) {
+      window.toast.info(`Display currency changed to ${curr}`);
+    }
+  }
+
+  formatPrice(amountNGN) {
+    if (this.activeCurrency === 'USD') {
+      const val = Math.round(amountNGN * this.exchangeRates.USD);
+      return `$${val.toLocaleString()}`;
+    }
+    if (this.activeCurrency === 'GBP') {
+      const val = Math.round(amountNGN * this.exchangeRates.GBP);
+      return `£${val.toLocaleString()}`;
+    }
+    return `₦${amountNGN.toLocaleString()}`;
+  }
+
+  updateStaticPricingDisplay() {
+    // VibeScan Tiers
+    const starterPrice = document.querySelector('#pricing-vibescan .pricing-card:nth-child(1) .pricing-amount');
+    const compPrice = document.querySelector('#pricing-vibescan .pricing-card:nth-child(2) .pricing-amount');
+    const entPrice = document.querySelector('#pricing-vibescan .pricing-card:nth-child(3) .pricing-amount');
+
+    if (starterPrice) starterPrice.innerHTML = `${this.formatPrice(45000)} <span style="font-size:0.85rem; color:var(--text-muted);">(${this.activeCurrency})</span>`;
+    if (compPrice) compPrice.innerHTML = `${this.formatPrice(120000)} <span style="font-size:0.85rem; color:var(--text-muted);">(${this.activeCurrency})</span>`;
+    if (entPrice) entPrice.innerHTML = `${this.formatPrice(350000)} <span style="font-size:0.85rem; color:var(--text-muted);">(${this.activeCurrency}) / qtr</span>`;
   }
 
   /**
    * Opens the payment provider choice modal (Paystack vs Flutterwave)
+   * 1-Click frictionless checkout: Auto-creates student session if not logged in.
    */
   openCheckoutModal(options) {
     const {
@@ -28,18 +85,25 @@ class PaymentManager {
       metadata = {}
     } = options;
 
-    if (!window.auth || !window.auth.isAuthenticated()) {
-      if (window.toast) window.toast.info("Please sign in to proceed with checkout.");
-      if (window.modal) window.modal.openAuth('signup');
-      return;
+    let currentUser = window.auth ? window.auth.getUser() : null;
+    if (!currentUser) {
+      const guestEmail = prompt("Enter your email address to receive your enrollment access & receipt:", "student@example.com");
+      if (!guestEmail) return;
+      currentUser = {
+        uid: `user-guest-${Date.now().toString(36)}`,
+        email: guestEmail.trim(),
+        displayName: guestEmail.split('@')[0],
+        role: 'user'
+      };
+      if (window.auth) window.auth.user = currentUser;
     }
 
     const modal = document.getElementById('modal-payment-checkout');
     if (!modal) return;
 
     document.getElementById('payItemTitle').textContent = itemTitle;
-    document.getElementById('payAmountNGN').textContent = `₦${amountNGN.toLocaleString()}`;
-    document.getElementById('payAmountUSD').textContent = `$${amountUSD}`;
+    document.getElementById('payAmountNGN').textContent = this.formatPrice(amountNGN);
+    document.getElementById('payAmountUSD').textContent = `$${amountUSD || Math.round(amountNGN / 1500)}`;
     
     // Store current checkout context
     this.currentCheckout = {
@@ -47,9 +111,9 @@ class PaymentManager {
       itemId,
       itemTitle,
       amountNGN,
-      amountUSD,
+      amountUSD: amountUSD || Math.round(amountNGN / 1500),
       metadata,
-      user: window.auth.getUser()
+      user: currentUser
     };
 
     window.modal.open('modal-payment-checkout');

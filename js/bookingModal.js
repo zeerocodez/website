@@ -162,16 +162,32 @@ class ModalController {
 
         this.closeAll();
 
+        // Create Google Calendar & WhatsApp Quick Action Links
+        const titleEncoded = encodeURIComponent(`Zeerocodes Studio Discovery: ${service}`);
+        const detailsEncoded = encodeURIComponent(`Zeerocodes Automation Studio Discovery Session with ${name}.\nService: ${service}\nScope Notes: ${notes}\nPhone: ${phone}`);
+        const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titleEncoded}&details=${detailsEncoded}&dates=${date.replace(/-/g, '')}T100000Z/${date.replace(/-/g, '')}T110000Z`;
+        const waMsgEncoded = encodeURIComponent(`Hello Nuel & Zeerocodes Team, I have booked a Studio Discovery Call for ${date} at ${this.selectedTimeSlot} regarding ${service}. Looking forward to our session!`);
+        const waUrl = `https://wa.me/2348120000000?text=${waMsgEncoded}`;
+
         if (window.toast) {
-          window.toast.success(`🎉 Discovery Session Booked for ${date} at ${this.selectedTimeSlot}! Project added to your dashboard.`);
+          window.toast.success(`🎉 Discovery Session Booked for ${date} at ${this.selectedTimeSlot}!`);
         }
+
+        // Open quick action confirm alert
+        setTimeout(() => {
+          if (confirm(`Your Discovery Call is confirmed for ${date} at ${this.selectedTimeSlot}!\n\nWould you like to add this session to your Google Calendar?`)) {
+            window.open(gcalUrl, '_blank');
+          }
+        }, 600);
 
         // Notify
         if (window.notifications) {
           window.notifications.dispatch('discovery_call_booked', {
             email,
             service,
-            slot: this.selectedTimeSlot
+            slot: this.selectedTimeSlot,
+            gcalUrl,
+            waUrl
           });
         }
 

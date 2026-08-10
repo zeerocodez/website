@@ -21,6 +21,20 @@ class ZeerocodesApp {
     // Render public courses
     await this.renderAcademyCourses();
 
+    // Bind Currency Switcher Buttons
+    document.addEventListener('click', (e) => {
+      const currencyBtn = e.target.closest('.currency-btn');
+      if (currencyBtn && window.payments) {
+        const curr = currencyBtn.getAttribute('data-currency');
+        window.payments.setCurrency(curr);
+      }
+    });
+
+    // Initialize Cyber Terminal Simulator
+    if (window.vibescanEngine && window.vibescanEngine.initCyberTerminal) {
+      window.vibescanEngine.initCyberTerminal();
+    }
+
     // Initial auth UI update
     if (window.auth) {
       window.auth.updateNavigationUI();
@@ -39,36 +53,41 @@ class ZeerocodesApp {
     if (!container || !window.db) return;
 
     const courses = await window.db.getCourses();
-    container.innerHTML = courses.map(course => `
-      <div class="course-card">
-        <div class="course-card-header">
-          <div class="course-badge">${course.level}</div>
-          <div class="course-duration"><i data-lucide="clock"></i> ${course.duration}</div>
-        </div>
-        <h3 class="course-title">${course.title}</h3>
-        <p class="course-short-desc">${course.shortDesc}</p>
-        
-        <div class="curriculum-preview">
-          <div class="curriculum-toggle" onclick="this.nextElementSibling.classList.toggle('active')">
-            <span><i data-lucide="layers"></i> Curriculum Outline (${course.modules.length} Modules)</span>
-            <i data-lucide="chevron-down"></i>
-          </div>
-          <ul class="curriculum-list">
-            ${course.modules.map(mod => `<li><i data-lucide="check-circle-2"></i> ${mod}</li>`).join('')}
-          </ul>
-        </div>
+    const curr = window.payments ? window.payments.activeCurrency : 'NGN';
 
-        <div class="course-card-footer">
-          <div class="course-pricing">
-            <span class="price-ngn">₦${course.priceNGN.toLocaleString()}</span>
-            <span class="price-usd">($${course.priceUSD})</span>
+    container.innerHTML = courses.map(course => {
+      const formattedPrice = window.payments ? window.payments.formatPrice(course.priceNGN) : `₦${course.priceNGN.toLocaleString()}`;
+      return `
+        <div class="course-card">
+          <div class="course-card-header">
+            <div class="course-badge">${course.level}</div>
+            <div class="course-duration"><i data-lucide="clock"></i> ${course.duration}</div>
           </div>
-          <button class="btn btn-primary btn-sm" onclick="window.app.handleEnrollCourse('${course.id}')">
-            <i data-lucide="credit-card"></i> Enroll & Checkout
-          </button>
+          <h3 class="course-title">${course.title}</h3>
+          <p class="course-short-desc">${course.shortDesc}</p>
+          
+          <div class="curriculum-preview">
+            <div class="curriculum-toggle" onclick="this.nextElementSibling.classList.toggle('active')">
+              <span><i data-lucide="layers"></i> Curriculum Outline (${course.modules.length} Modules)</span>
+              <i data-lucide="chevron-down"></i>
+            </div>
+            <ul class="curriculum-list">
+              ${course.modules.map(mod => `<li><i data-lucide="check-circle-2"></i> ${mod}</li>`).join('')}
+            </ul>
+          </div>
+
+          <div class="course-card-footer">
+            <div class="course-pricing">
+              <span class="price-ngn" style="font-size:1.15rem; font-weight:800; color:var(--teal-primary);">${formattedPrice}</span>
+              <span class="price-usd" style="font-size:0.8rem; color:var(--text-muted);">(${curr})</span>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="window.app.handleEnrollCourse('${course.id}')">
+              <i data-lucide="credit-card"></i> Instant Enroll
+            </button>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
     if (window.lucide) window.lucide.createIcons();
   }

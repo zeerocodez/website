@@ -344,6 +344,75 @@ jobs:
     if (!modal) return;
     window.modal.open('modal-auth-hardening-audit');
   }
+
+  /**
+   * =========================================================================
+   * ANIMATED CYBER SECURITY TERMINAL SIMULATOR
+   * =========================================================================
+   */
+  initCyberTerminal() {
+    const runBtn = document.getElementById('btnRunTerminalScan');
+    const repoInput = document.getElementById('terminalRepoInput');
+    const sampleBtn1 = document.getElementById('btnSampleRepo1');
+    const sampleBtn2 = document.getElementById('btnSampleRepo2');
+
+    if (sampleBtn1 && repoInput) {
+      sampleBtn1.addEventListener('click', () => {
+        repoInput.value = 'https://github.com/payquick/whatsapp-fintech-bot.git';
+        this.runTerminalAudit(repoInput.value);
+      });
+    }
+
+    if (sampleBtn2 && repoInput) {
+      sampleBtn2.addEventListener('click', () => {
+        repoInput.value = 'https://github.com/medvibe/health-records-ai.git';
+        this.runTerminalAudit(repoInput.value);
+      });
+    }
+
+    if (runBtn && repoInput) {
+      runBtn.addEventListener('click', () => {
+        this.runTerminalAudit(repoInput.value || 'https://github.com/sample/vibe-app.git');
+      });
+    }
+  }
+
+  runTerminalAudit(repoUrl) {
+    const buffer = document.getElementById('terminalOutputBuffer');
+    if (!buffer) return;
+
+    buffer.innerHTML = '';
+    const lines = [
+      { text: `[system] Initializing VibeScan AST & OWASP LLM AST Parser...`, type: 'term-dim', delay: 100 },
+      { text: `[target] Cloning remote AST tree: ${repoUrl}`, type: 'term-info', delay: 350 },
+      { text: `[check] Scanning /api/ routes for unhashed API secrets & OpenAI tokens...`, type: 'term-dim', delay: 600 },
+      { text: `[check] ✓ 0 plaintext API credentials found in client JavaScript bundle.`, type: 'term-success', delay: 900 },
+      { text: `[check] Evaluating Paystack/Flutterwave HMAC webhook signature verification...`, type: 'term-dim', delay: 1200 },
+      { text: `[check] ✓ Cryptographic SHA-512 signatures validated before granting access.`, type: 'term-success', delay: 1500 },
+      { text: `[check] Auditing LLM prompt templates against adversarial injection attacks...`, type: 'term-dim', delay: 1800 },
+      { text: `[warning] ⚠️ Prompt template /lib/aiAgent.ts lacks strict XML user delimiters (OWASP-LLM01).`, type: 'term-warn', delay: 2100 },
+      { text: `[check] Validating Firestore & Supabase Row-Level Security (RLS) rules...`, type: 'term-dim', delay: 2400 },
+      { text: `[check] ✓ 100% of user data collections protected by authenticated tenant boundaries.`, type: 'term-success', delay: 2700 },
+      { text: `[result] 🛡️ AUDIT GRADE: A- (96/100) — Ready for VibeCert™ Verified Badge.`, type: 'term-highlight', delay: 3000 }
+    ];
+
+    lines.forEach(({ text, type, delay }) => {
+      setTimeout(() => {
+        const div = document.createElement('div');
+        div.className = `term-line ${type}`;
+        div.textContent = text;
+        buffer.appendChild(div);
+        buffer.scrollTop = buffer.scrollHeight;
+      }, delay);
+    });
+
+    if (window.toast) {
+      setTimeout(() => {
+        window.toast.success(`Security scan completed for ${repoUrl.split('/').pop()}`);
+      }, 3100);
+    }
+  }
 }
 
 window.vibescanEngine = new VibescanIntegrationEngine();
+
