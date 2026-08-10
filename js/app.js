@@ -21,6 +21,31 @@ class ZeerocodesApp {
     // Render public courses
     await this.renderAcademyCourses();
 
+    // Bind Wiz-Style 3-Pillar Hero Stage Switcher
+    document.addEventListener('click', (e) => {
+      const stageBtn = e.target.closest('.wiz-tab-btn');
+      if (stageBtn) {
+        const stageId = stageBtn.getAttribute('data-stage');
+        document.querySelectorAll('.wiz-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.wiz-stage-card').forEach(c => c.classList.remove('active'));
+        stageBtn.classList.add('active');
+        const targetCard = document.getElementById(stageId);
+        if (targetCard) targetCard.classList.add('active');
+        if (window.lucide) window.lucide.createIcons();
+      }
+    });
+
+    // Bind Equinet-Style FAQ Accordions
+    document.addEventListener('click', (e) => {
+      const faqBtn = e.target.closest('.faq-question-btn');
+      if (faqBtn) {
+        const card = faqBtn.closest('.faq-card');
+        if (card) {
+          card.classList.toggle('active');
+        }
+      }
+    });
+
     // Bind Currency Switcher Buttons
     document.addEventListener('click', (e) => {
       const currencyBtn = e.target.closest('.currency-btn');
@@ -46,7 +71,7 @@ class ZeerocodesApp {
   }
 
   // =========================================================================
-  // 1. PUBLIC ACADEMY COURSE CATALOG
+  // 1. PUBLIC ACADEMY COURSE CATALOG (EQUINET-STYLE PEDAGOGY)
   // =========================================================================
   async renderAcademyCourses() {
     const container = document.getElementById('academyCoursesGrid');
@@ -66,23 +91,37 @@ class ZeerocodesApp {
           <h3 class="course-title">${course.title}</h3>
           <p class="course-short-desc">${course.shortDesc}</p>
           
-          <div class="curriculum-preview">
-            <div class="curriculum-toggle" onclick="this.nextElementSibling.classList.toggle('active')">
-              <span><i data-lucide="layers"></i> Curriculum Outline (${course.modules.length} Modules)</span>
-              <i data-lucide="chevron-down"></i>
+          <div class="course-tools-strip">
+            <span class="tool-tag">n8n</span>
+            <span class="tool-tag">WhatsApp API</span>
+            <span class="tool-tag">Paystack</span>
+            <span class="tool-tag">Claude 3.7</span>
+            <span class="tool-tag">OWASP Top 10</span>
+          </div>
+
+          <!-- Equinet-Style Curriculum Accordion Drawer -->
+          <div class="curriculum-accordion">
+            <button type="button" class="curriculum-header-btn" onclick="this.nextElementSibling.classList.toggle('active')">
+              <span><i data-lucide="book-open" style="width:14px; height:14px; display:inline; vertical-align:middle;"></i> View Detailed Syllabus (${course.modules.length} Modules)</span>
+              <i data-lucide="chevron-down" style="width:14px; height:14px;"></i>
+            </button>
+            <div class="curriculum-modules-drawer">
+              ${course.modules.map(mod => `
+                <div class="module-item">
+                  <i data-lucide="check-circle-2"></i>
+                  <span>${mod}</span>
+                </div>
+              `).join('')}
             </div>
-            <ul class="curriculum-list">
-              ${course.modules.map(mod => `<li><i data-lucide="check-circle-2"></i> ${mod}</li>`).join('')}
-            </ul>
           </div>
 
           <div class="course-card-footer">
             <div class="course-pricing">
-              <span class="price-ngn" style="font-size:1.15rem; font-weight:800; color:var(--teal-primary);">${formattedPrice}</span>
+              <span class="price-ngn" style="font-size:1.25rem; font-weight:800; color:var(--teal-primary);">${formattedPrice}</span>
               <span class="price-usd" style="font-size:0.8rem; color:var(--text-muted);">(${curr})</span>
             </div>
             <button class="btn btn-primary btn-sm" onclick="window.app.handleEnrollCourse('${course.id}')">
-              <i data-lucide="credit-card"></i> Instant Enroll
+              <i data-lucide="credit-card"></i> Enroll in Cohort
             </button>
           </div>
         </div>
