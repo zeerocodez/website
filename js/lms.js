@@ -52,9 +52,38 @@ class AcademyLMS {
    * Generates mock structured lessons for the modules
    */
   getStructuredLessons(course) {
-    const modules = course.modules || [];
     const lessons = [];
 
+    if (course.levels && course.levels.length > 0) {
+      course.levels.forEach((lvl) => {
+        lvl.modules.forEach((mod) => {
+          mod.lessons.forEach((lesTitle, lesIdx) => {
+            lessons.push({
+              id: `lvl_${lvl.levelNumber}_mod_${mod.number}_les_${lesIdx}`,
+              title: lesTitle,
+              module: `Level ${lvl.levelNumber}: ${mod.title}`,
+              duration: '22 min',
+              type: lesIdx % 2 === 0 ? 'video' : 'lab',
+              content: `
+                <h4>${lesTitle}</h4>
+                <p>In this lesson from <strong>${lvl.title}</strong>, we dive deep into production-ready implementation, security guardrails, and practical applications tailored for African builders.</p>
+                <div class="stage-preview-box" style="margin: 1.5rem 0;">
+                  <div style="color:var(--brand-green); margin-bottom:0.5rem;">// Lesson Blueprint: ${lesTitle}</div>
+                  <div style="color:var(--brand-mint); font-size:0.85rem; line-height:1.6;">
+                    • Practical Lab Objective: Build & verify this component.<br>
+                    • Toolchain: Google Stitch / AI Studio / Antigravity / n8n / VibeScan.<br>
+                    • OWASP LLM Guardrail: Verified against unauthorized leaks.
+                  </div>
+                </div>
+              `
+            });
+          });
+        });
+      });
+      return lessons;
+    }
+
+    const modules = course.modules || [];
     modules.forEach((modTitle, modIdx) => {
       lessons.push({
         id: `mod_${modIdx}_les_1`,

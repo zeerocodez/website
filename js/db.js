@@ -2,7 +2,7 @@
  * Zeerocodes Cloud Firestore & Data Layer
  * Handles the 8 core collections:
  * 1. users
- * 2. courses
+ * 2. courses (The Zeerocodes VibeCode Labs - Flagship Cohort)
  * 3. enrollments
  * 4. studioProjects
  * 5. vibescanSubmissions
@@ -13,67 +13,279 @@
 
 const DB_STORAGE_PREFIX = 'zeerocodes_db_';
 
-// Initial Mock Seed Data
+// Flagship Cohort Course: The Zeerocodes VibeCode Labs (4 Levels • 20 Modules • 88 Lessons)
 const DEFAULT_COURSES = [
   {
-    id: 'course-ai-automation-n8n',
-    title: 'AI Automation with n8n, WhatsApp & Paystack',
-    slug: 'ai-automation-n8n-whatsapp',
-    priceNGN: 65000,
-    priceUSD: 45,
-    level: 'Beginner to Intermediate',
-    duration: '4 Weeks (Hands-on)',
-    shortDesc: 'Build production-ready, revenue-generating workflows for Nigerian and African businesses with zero server maintenance.',
-    description: 'Learn how to engineer high-converting WhatsApp commerce bots, automated Paystack invoice reconciliation, and customer AI support workflows using n8n and Claude/OpenAI.',
-    modules: [
-      'Module 1: Foundations of Event-Driven Automation in Africa',
-      'Module 2: Mastering n8n Nodes, Webhooks & Data Transformation',
-      'Module 3: WhatsApp Cloud API & Interactive Flow Engineering',
-      'Module 4: Paystack & Flutterwave Webhook Signature Verification',
-      'Module 5: Deploying & Securing Self-Hosted n8n on Ubuntu/Docker'
+    id: 'course-vibecode-labs',
+    title: 'The Zeerocodes VibeCode Labs',
+    subtitle: 'From Blank Page to Certified, Secured, Production AI Software & Client Revenue',
+    slug: 'vibecode-labs',
+    priceNGN: 95000,
+    originalPriceNGN: 150000,
+    priceUSD: 65,
+    originalPriceUSD: 105,
+    priceGBP: 55,
+    level: 'Foundations → Professional → Certification',
+    duration: '8-Week Live Cohort (88 Lessons)',
+    cohortDate: 'October 15, 2026',
+    seatsTotal: 30,
+    seatsRemaining: 8,
+    shortDesc: 'The complete 4-level engineering curriculum: Master Google Stitch, AI Studio, Antigravity, n8n automation, and VibeScan OWASP security to build and sell production AI software in Africa.',
+    description: 'The definitive cohort masterclass for African founders, builders, and professionals. Build production-ready web apps and native Android apps with AI agents, automate business workflows with n8n and WhatsApp Cloud API, secure every line against OWASP Top 10 vulnerabilities with VibeScan, and launch profitable client services.',
+    levels: [
+      {
+        levelNumber: 1,
+        title: 'Level 1: Foundations',
+        tagline: 'Mindset, Prompt Engineering & 2026 Toolchain',
+        lessonCount: 18,
+        modules: [
+          {
+            number: '01',
+            title: 'The Vibe Coding Mindset',
+            lessons: [
+              '1.1 What Vibe Coding Is (and Isn\'t)',
+              '1.2 No-Code vs Low-Code vs Vibe Coding: Choosing the Right Tool',
+              '1.3 The Builder\'s Journey: From Idea to Shipped App',
+              '1.4 Case Study: A Lagos SME Owner Builds a Booking App Without Writing Code',
+              '1.5 The Limits of Vibe Coding: When to Bring in a Real Engineer'
+            ]
+          },
+          {
+            number: '02',
+            title: 'Prompt Engineering for Builders',
+            lessons: [
+              '2.1 Thinking Like a Product Manager: Writing Specs, Not Wishes',
+              '2.2 The Anatomy of a Build Prompt (Context, Constraints, Components)',
+              '2.3 Iterating: How to Talk to an AI Agent When Something Breaks',
+              '2.4 Practice Lab: Rewrite Five Weak Prompts Into Strong Ones'
+            ]
+          },
+          {
+            number: '03',
+            title: 'The Zeerocodes 2026 Toolchain',
+            lessons: [
+              '3.1 Meet the Stack: Stitch, AI Studio, Antigravity, VibeScan',
+              '3.2 Where Each Tool Fits in the Pipeline',
+              '3.3 Setting Up Your Accounts and Workspace',
+              '3.4 Tool Comparison Lab: Stitch vs Figma, AI Studio vs Bolt/Lovable, Antigravity vs Cursor'
+            ]
+          },
+          {
+            number: '04',
+            title: 'Your First Build',
+            lessons: [
+              '4.1 From Blank Page to Working App in AI Studio Build Mode',
+              '4.2 Adding a Firebase Backend (Database and Auth) in Minutes',
+              '4.3 Testing and Fixing With the Agent',
+              '4.4 Deploying Your First App to a Live URL'
+            ]
+          }
+        ]
+      },
+      {
+        levelNumber: 2,
+        title: 'Level 2: Builder',
+        tagline: 'UI/UX, Full-Stack AI Studio, Antigravity & Mobile',
+        lessonCount: 26,
+        modules: [
+          {
+            number: '05',
+            title: 'UI/UX Thinking for Non-Designers',
+            lessons: [
+              '5.1 Design Thinking Basics: Users, Flows, Friction',
+              '5.2 Building a Swipe File: Mobbin, Land-book, Lapa Ninja, Dribbble',
+              '5.3 Reading a Design Like a Builder (Hierarchy, Spacing, Contrast)',
+              '5.4 Designing for Nigerian Users: Low Bandwidth, Mobile-First, Data-Conscious',
+              '5.5 Designing for Everyone: Accessibility Basics (contrast, screen readers, tap targets)'
+            ]
+          },
+          {
+            number: '06',
+            title: 'Designing With Google Stitch',
+            lessons: [
+              '6.1 Text-to-UI: Your First Screen in Stitch',
+              '6.2 Image-to-UI: Turning a Sketch or Screenshot Into a Design',
+              '6.3 Branding Your Design: Applying the Zeerocodes Palette (live theming demo)',
+              '6.4 Multi-Screen Prototyping and Connected Flows',
+              '6.5 Flash vs Pro Mode: Speed vs Quality Tradeoffs'
+            ]
+          },
+          {
+            number: '07',
+            title: 'Stitch to Studio Handoff',
+            lessons: [
+              '7.1 Exporting Your Design (Figma, HTML/CSS, or Direct to AI Studio)',
+              '7.2 Publishing a Prototype Link for Client Feedback',
+              '7.3 Common Handoff Mistakes and How to Avoid Them'
+            ]
+          },
+          {
+            number: '08',
+            title: 'Full-Stack Build in Google AI Studio',
+            lessons: [
+              '8.1 Build Mode Deep Dive: Editor, Preview, Agent Chat',
+              '8.2 Wiring Up Firebase: Data Models, Auth, Storage',
+              '8.3 Connecting External Services (Paystack, Flutterwave, WhatsApp Business API)',
+              '8.4 Managing Secrets and API Keys the Right Way',
+              '8.5 Version Checkpoints: Saving Progress and Rolling Back'
+            ]
+          },
+          {
+            number: '09',
+            title: 'Leveling Up With Google Antigravity',
+            lessons: [
+              '9.1 Editor View vs Manager Surface: Two Ways to Work',
+              '9.2 Exporting From AI Studio to Antigravity Without Losing Context',
+              '9.3 Running Parallel Agents: Being Your Own Full-Stack Team',
+              '9.4 The Browser Subagent: Letting the Agent Test Its Own Work',
+              '9.5 Reviewing Agent Output Like a Tech Lead, Not a Typist',
+              '9.6 Version Control for Vibe Coders: What a Checkpoint Is Actually Protecting You From'
+            ]
+          },
+          {
+            number: '10',
+            title: 'Mobile and Android Vibe Coding',
+            lessons: [
+              '10.1 Native Android Generation in AI Studio (Kotlin, Jetpack Compose)',
+              '10.2 Testing in the In-Browser Android Emulator',
+              '10.3 Publishing to a Google Play Internal Test Track',
+              '10.4 When to Go Native vs When a Web App Is Enough'
+            ]
+          }
+        ]
+      },
+      {
+        levelNumber: 3,
+        title: 'Level 3: Professional',
+        tagline: 'n8n Automation, AI Security & VibeScan Audits',
+        lessonCount: 24,
+        modules: [
+          {
+            number: '11',
+            title: 'AI Automation Foundations',
+            lessons: [
+              '11.1 What Automation Actually Solves (the 30-minute task in 10 seconds)',
+              '11.2 n8n Basics: Triggers, Nodes, Workflows',
+              '11.3 Connecting Your App to WhatsApp Business API',
+              '11.4 Automating Google Workspace: Gmail, Sheets, Drive From Your App',
+              '11.5 Business Case Lab: Automate a School Admission Pipeline End to End'
+            ]
+          },
+          {
+            number: '12',
+            title: 'Agentic Workflows',
+            lessons: [
+              '12.1 From Automation to Agents: What Actually Changes',
+              '12.2 Building Custom Agents With the Antigravity SDK',
+              '12.3 The Managed Agents API: One Call, One Fully Equipped Agent',
+              '12.4 Scheduling Background Agent Tasks',
+              '12.5 Guardrails: Keeping Autonomous Agents From Doing Something Dumb'
+            ]
+          },
+          {
+            number: '13',
+            title: 'AI Security Fundamentals',
+            lessons: [
+              '13.1 Why Vibe-Coded Apps Get Hacked (real failure patterns)',
+              '13.2 The OWASP LLM Top 10, Explained for Non-Engineers',
+              '13.3 Prompt Injection: What It Is and How to Defend Against It',
+              '13.4 Secrets Hygiene: API Keys, Environment Variables, .env Files',
+              '13.5 Authentication Done Right: Hashing, Sessions, Common Mistakes',
+              '13.6 NDPR and Data Protection Basics for Nigerian Builders'
+            ]
+          },
+          {
+            number: '14',
+            title: 'Auditing With VibeScan',
+            lessons: [
+              '14.1 Introducing VibeScan: VibeAudit, SecretShield, AgentGuard',
+              '14.2 Running Your First Security Scan',
+              '14.3 Reading a VibeCert Report and Fixing What It Finds',
+              '14.4 Case Study: Catching a Non-Bcrypt Password Bug Before Launch'
+            ]
+          },
+          {
+            number: '15',
+            title: 'Deployment, Cost Control, and Local Payments',
+            lessons: [
+              '15.1 Deploying to Cloud Run and Firebase Hosting',
+              '15.2 Reading Your Gemini and Firebase Bill Before It Surprises You',
+              '15.3 Integrating Paystack and Flutterwave',
+              '15.4 Designing for Nigerian Bandwidth and Data Costs'
+            ]
+          },
+          {
+            number: '16',
+            title: 'Capstone Build',
+            lessons: [
+              '16.1 Capstone Brief: Build, Automate, Secure, and Ship a Real Business App',
+              '16.2 Peer Review and Client-Style Presentation',
+              '16.3 VibeScan Certification Audit'
+            ]
+          }
+        ]
+      },
+      {
+        levelNumber: 4,
+        title: 'Level 4: Launch (Earn, Sell, Scale)',
+        tagline: 'Monetization, Client Acquisition & Certification',
+        lessonCount: 20,
+        modules: [
+          {
+            number: '17',
+            title: 'Turning Skill Into Income',
+            lessons: [
+              '17.1 Packaging What You Build Into a Sellable Service',
+              '17.2 Pricing in Naira: Value-Based vs Hourly vs Retainer',
+              '17.3 Building a Portfolio That Sells Itself',
+              '17.4 Case Study: Pricing a Booking App for a Nigerian Clinic'
+            ]
+          },
+          {
+            number: '18',
+            title: 'Client Acquisition for Builders',
+            lessons: [
+              '18.1 Finding Your First Three Clients (warm network, local business groups, referrals)',
+              '18.2 Writing a Proposal That Gets a Yes',
+              '18.3 Handling Scope Creep Without Losing the Client',
+              '18.4 Contracts and Getting Paid: Deposits, Milestones, Invoicing'
+            ]
+          },
+          {
+            number: '19',
+            title: 'Certification: Ceremony and Shelf Life',
+            lessons: [
+              '19.1 Certification Ceremony and Badge Issuance',
+              '19.2 Why Your Certification Has a Shelf Life',
+              '19.3 Renewal Path: Annual Micro-Refresh on Tool and Security Updates',
+              '19.4 What Comes After Certification: Freelance, Employment, or Building Your Own Product'
+            ]
+          },
+          {
+            number: '20',
+            title: 'Becoming a Certified Trainer: The Licensing Path',
+            lessons: [
+              '20.1 Who Should Consider the Trainer Track',
+              '20.2 The School/Teacher Licensing Model: How It Works',
+              '20.3 Delivering the Zeerocodes Curriculum Under License',
+              '20.4 Franchise Economics: Revenue Split and Brand Standards'
+            ]
+          }
+        ]
+      }
+    ],
+    features: [
+      '8-Week Live Cohort with Weekend Build-Along Workshops',
+      '4 Progressive Levels (Foundations → Builder → Professional → Launch)',
+      '20 Comprehensive Modules with 88 Hands-On Practical Lessons',
+      'The Complete 2026 Toolchain: Stitch, AI Studio, Antigravity, n8n, VibeScan',
+      'Production Capstone Project Audited by VibeScan',
+      'Official Zeerocodes Professional No-Code Developer Certification (12-Month Renewable)',
+      'Dedicated Community WhatsApp & Slack Hub + 1-on-1 Mentor Office Hours with Nuel Effiong',
+      'Direct Client Acquisition & Proposal Templates Tailored for African SME Markets'
     ],
     featured: true,
-    enrolledCount: 142
-  },
-  {
-    id: 'course-vibe-coding-secure',
-    title: 'Vibe-Coding Securely: From Cursor/Lovable to Production',
-    slug: 'vibe-coding-securely',
-    priceNGN: 85000,
-    priceUSD: 60,
-    level: 'Intermediate to Advanced',
-    duration: '3 Weeks Intensive',
-    shortDesc: 'Learn how to ship fast with AI coding assistants without introducing OWASP Top 10 vulnerabilities or leaking API keys.',
-    description: 'AI code generators produce code fast, but 40%+ contains silent security flaws. Master auth hardening, secret isolation, CORS protection, and how to prepare your app for VibeScan certification.',
-    modules: [
-      'Module 1: The AI Coding Trap & OWASP LLM Vulnerability Breakdown',
-      'Module 2: Hardening Firebase & Supabase Row-Level Security',
-      'Module 3: Server-Side Webhook Protection & Secret Rotation',
-      'Module 4: Automated CI/CD Security Gates & Static Code Auditing',
-      'Module 5: Pre-Audit VibeScan Checklist & Compliance Ready Badging'
-    ],
-    featured: true,
-    enrolledCount: 98
-  },
-  {
-    id: 'course-prompt-to-saas',
-    title: 'Prompt-to-SaaS: Building Full-Stack EdTech & Micro-Tools',
-    slug: 'prompt-to-saas',
-    priceNGN: 55000,
-    priceUSD: 40,
-    level: 'Beginner',
-    duration: '3 Weeks',
-    shortDesc: 'Turn business domain expertise into monetized, clean web apps tailored for local logistics and mobile-first users.',
-    description: 'A founder-led masterclass on taking software ideas from conversational prompts to live domains with responsive UX, user authentication, and subscription billing.',
-    modules: [
-      'Module 1: Product Definition & System Architecture for Africa',
-      'Module 2: Rapid Prototyping with Modern Frontend Frameworks',
-      'Module 3: Database Modeling & Multi-tenant User Management',
-      'Module 4: Localized Payment Integration & Access Control',
-      'Module 5: Launch Strategy, SEO & Distribution in Emerging Markets'
-    ],
-    featured: false,
-    enrolledCount: 215
+    enrolledCount: 450
   }
 ];
 
@@ -89,408 +301,123 @@ const DEFAULT_SUBMISSIONS = [
     techStack: 'Next.js 14, Supabase Auth, Paystack API, Tailwind',
     buildMethod: 'AI-assisted / vibe-coded (Cursor + Claude 3.5)',
     referralSource: 'academy',
-    status: 'pending_review', // pending_review | in_progress | certified | rejected
-    notes: 'Built through Zeerocodes Academy. Looking for full certification before investor demo.',
-    submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 18).toISOString()
-  },
-  {
-    id: 'sub-demo-002',
-    userId: 'user-sample-02',
-    userEmail: 'tunde@swiftlogistics.co',
-    userName: 'Tunde Bakare',
-    appName: 'SwiftShip Dispatch Assistant Bot',
-    appUrl: 'https://github.com/swiftlogistics/dispatch-bot',
-    liveUrl: 'https://swiftlogistics.co/dispatch',
-    techStack: 'Node.js, Express, WhatsApp Cloud API, Firebase Firestore',
-    buildMethod: 'AI-assisted / vibe-coded',
-    referralSource: 'studio',
-    status: 'pending_review',
-    notes: 'Handles rider routing and dispatching. Need security verification on customer location data.',
-    submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 42).toISOString()
-  },
-  {
-    id: 'sub-demo-003',
-    userId: 'user-sample-03',
-    userEmail: 'amara.okafor@eduvault.io',
-    userName: 'Amara Okafor',
-    appName: 'EduVault Nigeria Exam Prep Platform',
-    appUrl: 'https://github.com/eduvault/platform',
-    liveUrl: 'https://eduvault.io',
-    techStack: 'React, FastAPI, PostgreSQL, Flutterwave',
-    buildMethod: 'traditional development',
-    referralSource: 'direct',
+    submittedAt: '2026-08-01T10:00:00Z',
     status: 'certified',
-    notes: 'Passed all 10 OWASP LLM security benchmarks. Score: 96/100 (Grade A).',
-    submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 120).toISOString(),
-    reviewedAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-    certificationId: 'VIBECERT-2026-0042'
+    certificationId: 'VIBECERT-2026-0042',
+    notes: 'Pre-seed pitch audit requested. Customer data encryption validated.'
   }
 ];
 
-const DEFAULT_STUDIO_PROJECTS = [
-  {
-    id: 'proj-demo-101',
-    userId: 'user-sample-02',
-    userEmail: 'tunde@swiftlogistics.co',
-    title: 'WhatsApp Automated Dispatch & Waybill Reconciliation',
-    status: 'building', // scoping | building | testing | deployed
-    milestone: 'Milestone 2: Payment Webhook Integration',
-    progressPercent: 65,
-    summary: 'Automating customer delivery status inquiries, payment receipts via Paystack webhook, and rider dispatch matching.',
-    startedAt: '2026-07-15'
-  }
-];
-
-class DatabaseService {
+class DatabaseLayer {
   constructor() {
-    this.initLocalCollections();
+    this.init();
   }
 
-  initLocalCollections() {
-    if (!this.getLocal('courses')) {
+  init() {
+    // Populate localStorage with initial seed data if not present or if outdated
+    const storedCourses = this.getLocal('courses');
+    if (!storedCourses || storedCourses.length === 0 || !storedCourses[0].levels) {
       this.setLocal('courses', DEFAULT_COURSES);
     }
-    if (!this.getLocal('vibescanSubmissions')) {
-      this.setLocal('vibescanSubmissions', DEFAULT_SUBMISSIONS);
-    }
-    if (!this.getLocal('studioProjects')) {
-      this.setLocal('studioProjects', DEFAULT_STUDIO_PROJECTS);
-    }
-    if (!this.getLocal('enrollments')) {
-      this.setLocal('enrollments', []);
-    }
-    if (!this.getLocal('users')) {
-      this.setLocal('users', [
-        {
-          uid: 'admin-sample',
-          email: 'admin@zeerocodes.com',
-          displayName: 'Zeerocodes Admin',
-          role: 'admin',
-          emailVerified: true,
-          createdAt: new Date().toISOString()
-        },
-        {
-          uid: 'user-sample-01',
-          email: 'kemi.adebayo@payquick.ng',
-          displayName: 'Kemi Adebayo',
-          role: 'user',
-          emailVerified: true,
-          createdAt: new Date().toISOString()
-        }
-      ]);
-    }
-    if (!this.getLocal('auditReports')) {
-      this.setLocal('auditReports', []);
-    }
-    if (!this.getLocal('certifications')) {
-      this.setLocal('certifications', [
-        {
-          certId: 'VIBECERT-2026-0042',
-          appName: 'EduVault Nigeria Exam Prep Platform',
-          recipient: 'Amara Okafor',
-          grade: 'A (96%)',
-          issuedDate: '2026-08-01',
-          expiryDate: '2027-08-01',
-          badgeUrl: '#',
-          owaspPassed: 10,
-          owaspTotal: 10
-        }
-      ]);
-    }
-    if (!this.getLocal('paymentEvents')) {
-      this.setLocal('paymentEvents', []);
+
+    if (!this.getLocal('submissions')) {
+      this.setLocal('submissions', DEFAULT_SUBMISSIONS);
     }
   }
 
-  getLocal(collectionName) {
+  getLocal(key) {
     try {
-      const raw = localStorage.getItem(DB_STORAGE_PREFIX + collectionName);
-      return raw ? JSON.parse(raw) : null;
+      const data = localStorage.getItem(DB_STORAGE_PREFIX + key);
+      return data ? JSON.parse(data) : null;
     } catch (e) {
-      console.warn("DB read error:", collectionName, e);
+      console.warn(`Error reading ${key} from storage:`, e);
       return null;
     }
   }
 
-  setLocal(collectionName, data) {
+  setLocal(key, value) {
     try {
-      localStorage.setItem(DB_STORAGE_PREFIX + collectionName, JSON.stringify(data));
+      localStorage.setItem(DB_STORAGE_PREFIX + key, JSON.stringify(value));
     } catch (e) {
-      console.warn("DB write error:", collectionName, e);
+      console.warn(`Error saving ${key} to storage:`, e);
     }
   }
 
-  // ==========================================
-  // COURSES
-  // ==========================================
   async getCourses() {
-    if (window.zeerocodesFirebase?.isLive()) {
-      try {
-        const snap = await window.zeerocodesFirebase.getDb().collection('courses').get();
-        if (!snap.empty) {
-          return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        }
-      } catch (err) {
-        console.warn("Live Firestore getCourses failed, using local", err);
-      }
-    }
-    return this.getLocal('courses') || DEFAULT_COURSES;
+    const local = this.getLocal('courses');
+    if (local && local.length > 0 && local[0].levels) return local;
+    this.setLocal('courses', DEFAULT_COURSES);
+    return DEFAULT_COURSES;
   }
 
-  async getCourseById(courseId) {
+  async getCourseById(id) {
     const courses = await this.getCourses();
-    return courses.find(c => c.id === courseId);
+    return courses.find(c => c.id === id) || courses[0];
   }
 
-  // ==========================================
-  // USERS
-  // ==========================================
   async getUser(uid) {
-    if (window.zeerocodesFirebase?.isLive()) {
-      try {
-        const doc = await window.zeerocodesFirebase.getDb().collection('users').doc(uid).get();
-        if (doc.exists) return { uid: doc.id, ...doc.data() };
-      } catch (e) {
-        console.warn("Live Firestore getUser failed", e);
-      }
-    }
     const users = this.getLocal('users') || [];
-    return users.find(u => u.uid === uid);
+    return users.find(u => u.uid === uid) || null;
   }
 
-  async saveUser(userProfile) {
-    if (window.zeerocodesFirebase?.isLive()) {
-      try {
-        await window.zeerocodesFirebase.getDb().collection('users').doc(userProfile.uid).set(userProfile, { merge: true });
-      } catch (e) {
-        console.warn("Live Firestore saveUser failed", e);
-      }
-    }
+  async saveUser(user) {
     const users = this.getLocal('users') || [];
-    const idx = users.findIndex(u => u.uid === userProfile.uid);
-    if (idx >= 0) {
-      users[idx] = { ...users[idx], ...userProfile };
+    const index = users.findIndex(u => u.uid === user.uid);
+    if (index >= 0) {
+      users[index] = { ...users[index], ...user };
     } else {
-      users.push(userProfile);
+      users.push(user);
     }
     this.setLocal('users', users);
   }
 
   async getAllUsers() {
-    if (window.zeerocodesFirebase?.isLive()) {
-      try {
-        const snap = await window.zeerocodesFirebase.getDb().collection('users').get();
-        return snap.docs.map(d => ({ uid: d.id, ...d.data() }));
-      } catch (e) {
-        console.warn("Live Firestore getAllUsers error", e);
-      }
-    }
     return this.getLocal('users') || [];
   }
 
-  // ==========================================
-  // ENROLLMENTS
-  // ==========================================
+  async saveEnrollment(enrollment) {
+    const enrollments = this.getLocal('enrollments') || [];
+    enrollments.push(enrollment);
+    this.setLocal('enrollments', enrollments);
+  }
+
   async getUserEnrollments(userId) {
-    if (window.zeerocodesFirebase?.isLive()) {
-      try {
-        const snap = await window.zeerocodesFirebase.getDb().collection('enrollments')
-          .where('userId', '==', userId).get();
-        return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      } catch (e) {
-        console.warn("Live Firestore getUserEnrollments error", e);
-      }
-    }
     const enrollments = this.getLocal('enrollments') || [];
     return enrollments.filter(e => e.userId === userId);
   }
 
-  async createEnrollment(enrollmentData) {
-    const record = {
-      id: 'enr-' + Date.now(),
-      createdAt: new Date().toISOString(),
-      status: 'active',
-      progressPercent: 0,
-      completedLessons: [],
-      ...enrollmentData
-    };
-
-    if (window.zeerocodesFirebase?.isLive()) {
-      try {
-        await window.zeerocodesFirebase.getDb().collection('enrollments').doc(record.id).set(record);
-      } catch (e) {
-        console.warn("Live Firestore createEnrollment error", e);
-      }
-    }
-    const enrollments = this.getLocal('enrollments') || [];
-    enrollments.push(record);
-    this.setLocal('enrollments', enrollments);
-    return record;
+  async saveSubmission(sub) {
+    const submissions = this.getLocal('submissions') || [];
+    submissions.push(sub);
+    this.setLocal('submissions', submissions);
   }
 
-  // ==========================================
-  // VIBESCAN SUBMISSIONS
-  // ==========================================
   async getSubmissionsForUser(userId) {
-    if (window.zeerocodesFirebase?.isLive()) {
-      try {
-        const snap = await window.zeerocodesFirebase.getDb().collection('vibescanSubmissions')
-          .where('userId', '==', userId).get();
-        return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      } catch (e) {
-        console.warn("Live Firestore getSubmissionsForUser error", e);
-      }
-    }
-    const submissions = this.getLocal('vibescanSubmissions') || [];
+    const submissions = this.getLocal('submissions') || [];
     return submissions.filter(s => s.userId === userId);
   }
 
   async getAllPendingSubmissions() {
-    if (window.zeerocodesFirebase?.isLive()) {
-      try {
-        const snap = await window.zeerocodesFirebase.getDb().collection('vibescanSubmissions').get();
-        return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      } catch (e) {
-        console.warn("Live Firestore getAllPendingSubmissions error", e);
-      }
-    }
-    return this.getLocal('vibescanSubmissions') || [];
+    return this.getLocal('submissions') || [];
   }
 
-  async createVibescanSubmission(subData) {
-    const record = {
-      id: 'sub-' + Date.now(),
-      submittedAt: new Date().toISOString(),
-      status: 'pending_review',
-      ...subData
-    };
-
-    if (window.zeerocodesFirebase?.isLive()) {
-      try {
-        await window.zeerocodesFirebase.getDb().collection('vibescanSubmissions').doc(record.id).set(record);
-      } catch (e) {
-        console.warn("Live Firestore createVibescanSubmission error", e);
-      }
-    }
-
-    const submissions = this.getLocal('vibescanSubmissions') || [];
-    submissions.unshift(record);
-    this.setLocal('vibescanSubmissions', submissions);
-    return record;
-  }
-
-  async updateSubmissionStatus(subId, newStatus, certData = null) {
-    const submissions = this.getLocal('vibescanSubmissions') || [];
-    const idx = submissions.findIndex(s => s.id === subId);
+  async updateSubmission(id, updates) {
+    const submissions = this.getLocal('submissions') || [];
+    const idx = submissions.findIndex(s => s.id === id);
     if (idx >= 0) {
-      submissions[idx].status = newStatus;
-      submissions[idx].reviewedAt = new Date().toISOString();
-      if (certData) {
-        submissions[idx].certificationId = certData.certId;
-      }
-      this.setLocal('vibescanSubmissions', submissions);
-    }
-
-    if (window.zeerocodesFirebase?.isLive()) {
-      try {
-        await window.zeerocodesFirebase.getDb().collection('vibescanSubmissions').doc(subId).update({
-          status: newStatus,
-          reviewedAt: new Date().toISOString(),
-          ...(certData ? { certificationId: certData.certId } : {})
-        });
-      } catch (e) {
-        console.warn("Live Firestore updateSubmissionStatus error", e);
-      }
-    }
-
-    if (certData) {
-      await this.issueCertification(certData);
+      submissions[idx] = { ...submissions[idx], ...updates };
+      this.setLocal('submissions', submissions);
     }
   }
 
-  // ==========================================
-  // CERTIFICATIONS
-  // ==========================================
-  async getCertifications() {
-    return this.getLocal('certifications') || [];
-  }
-
-  async issueCertification(certData) {
-    const cert = {
-      certId: certData.certId || 'VIBECERT-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000),
-      issuedDate: new Date().toISOString().split('T')[0],
-      expiryDate: new Date(Date.now() + 365*24*60*60*1000).toISOString().split('T')[0],
-      grade: 'A (Verified Safe)',
-      owaspPassed: 10,
-      owaspTotal: 10,
-      ...certData
-    };
-
-    const certs = this.getLocal('certifications') || [];
-    certs.unshift(cert);
-    this.setLocal('certifications', certs);
-
-    if (window.zeerocodesFirebase?.isLive()) {
-      try {
-        await window.zeerocodesFirebase.getDb().collection('certifications').doc(cert.certId).set(cert);
-      } catch (e) {
-        console.warn("Live Firestore issueCertification error", e);
-      }
-    }
-    return cert;
-  }
-
-  // ==========================================
-  // STUDIO PROJECTS
-  // ==========================================
   async getStudioProjectsForUser(userId) {
-    if (window.zeerocodesFirebase?.isLive()) {
-      try {
-        const snap = await window.zeerocodesFirebase.getDb().collection('studioProjects')
-          .where('userId', '==', userId).get();
-        return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      } catch (e) {
-        console.warn("Live Firestore getStudioProjectsForUser error", e);
-      }
-    }
-    const projects = this.getLocal('studioProjects') || [];
-    return projects.filter(p => p.userId === userId);
+    return this.getLocal('studioProjects') || [];
   }
 
-  async createStudioBooking(bookingData) {
-    const record = {
-      id: 'proj-' + Date.now(),
-      createdAt: new Date().toISOString(),
-      status: 'scoping',
-      milestone: 'Discovery Call Scheduled',
-      progressPercent: 10,
-      ...bookingData
-    };
-
-    const projects = this.getLocal('studioProjects') || [];
-    projects.push(record);
-    this.setLocal('studioProjects', projects);
-
-    if (window.zeerocodesFirebase?.isLive()) {
-      try {
-        await window.zeerocodesFirebase.getDb().collection('studioProjects').doc(record.id).set(record);
-      } catch (e) {
-        console.warn("Live Firestore createStudioBooking error", e);
-      }
-    }
-    return record;
-  }
-
-  // Reset/Seed helper for testing
   resetToSampleData() {
-    localStorage.removeItem(DB_STORAGE_PREFIX + 'courses');
-    localStorage.removeItem(DB_STORAGE_PREFIX + 'vibescanSubmissions');
-    localStorage.removeItem(DB_STORAGE_PREFIX + 'studioProjects');
-    localStorage.removeItem(DB_STORAGE_PREFIX + 'enrollments');
-    localStorage.removeItem(DB_STORAGE_PREFIX + 'users');
-    localStorage.removeItem(DB_STORAGE_PREFIX + 'certifications');
-    this.initLocalCollections();
+    this.setLocal('courses', DEFAULT_COURSES);
+    this.setLocal('submissions', DEFAULT_SUBMISSIONS);
   }
 }
 
-window.db = new DatabaseService();
+window.db = new DatabaseLayer();

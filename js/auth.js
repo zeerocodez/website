@@ -301,27 +301,48 @@ class AuthService {
     const userDisplayNames = document.querySelectorAll('.user-display-name');
 
     if (this.currentUser) {
-      unauthGroup.forEach(el => el.classList.add('d-none'));
-      authGroup.forEach(el => el.classList.remove('d-none'));
+      unauthGroup.forEach(el => {
+        el.classList.add('d-none');
+        el.style.display = 'none';
+      });
+      authGroup.forEach(el => {
+        el.classList.remove('d-none');
+        el.style.display = 'flex';
+      });
 
       userDisplayNames.forEach(el => {
         el.textContent = this.currentUser.displayName || this.currentUser.email;
       });
 
       userRoleBadges.forEach(el => {
-        el.textContent = this.currentUser.role.toUpperCase();
-        el.className = `user-role-badge role-badge-${this.currentUser.role}`;
+        el.textContent = (this.currentUser.role || 'USER').toUpperCase();
+        el.className = `user-role-badge badge badge-teal`;
       });
 
       if (this.currentUser.role === 'admin') {
-        adminLinks.forEach(el => el.classList.remove('d-none'));
+        adminLinks.forEach(el => {
+          el.classList.remove('d-none');
+          el.style.display = 'block';
+        });
       } else {
-        adminLinks.forEach(el => el.classList.add('d-none'));
+        adminLinks.forEach(el => {
+          el.classList.add('d-none');
+          el.style.display = 'none';
+        });
       }
     } else {
-      unauthGroup.forEach(el => el.classList.remove('d-none'));
-      authGroup.forEach(el => el.classList.add('d-none'));
-      adminLinks.forEach(el => el.classList.add('d-none'));
+      unauthGroup.forEach(el => {
+        el.classList.remove('d-none');
+        el.style.display = 'flex';
+      });
+      authGroup.forEach(el => {
+        el.classList.add('d-none');
+        el.style.display = 'none';
+      });
+      adminLinks.forEach(el => {
+        el.classList.add('d-none');
+        el.style.display = 'none';
+      });
     }
   }
 }

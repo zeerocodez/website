@@ -11,7 +11,7 @@ const { z } = require('zod');
 
 const updateProfileSchema = z.object({
   name: z.string().min(1).max(100).optional(),
-  email: z.string().email().optional()
+  email: z.string().email().max(150).optional()
 }).strict();
 
 module.exports = async (req, res) => {
@@ -27,9 +27,18 @@ module.exports = async (req, res) => {
     });
   }
 
+  // Sanitize valid inputs
+  const sanitized = {};
+  if (parsed.data.name) {
+    sanitized.name = parsed.data.name.replace(/[<>]/g, '').trim();
+  }
+  if (parsed.data.email) {
+    sanitized.email = parsed.data.email.toLowerCase().trim();
+  }
+
   return res.status(200).json({
     success: true,
     message: 'Profile updated securely with strict allowlist.',
-    data: parsed.data
+    data: sanitized
   });
 };

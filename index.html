@@ -5,24 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zeerocodes: Build. Automate. Secure — Enterprise AI Workflows & Cybersecurity</title>
   <meta name="description" content="Zeerocodes: Build. Automate. Secure. Empowering African founders, builders, and enterprises to master AI workflows, deploy custom automation, and audit app security with VibeScan.">
-  <meta name="keywords" content="Zeerocodes, Build, Automate, Secure, Wiz security, Equinet Academy, AI Income Academy, Automation Studio, VibeScan, OWASP LLM, Lagos AI, Nuel Effiong, n8n WhatsApp">
+  <meta name="keywords" content="Zeerocodes, VibeCode Labs, Build, Automate, Secure, Wiz security, AI Income Academy, Automation Studio, VibeScan, OWASP LLM, Lagos AI, Nuel Effiong, n8n WhatsApp">
 
   <!-- Open Graph / Social Media Preview -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://zeerocodes.com/">
-  <meta property="og:title" content="Zeerocodes: Build. Automate. Secure — Enterprise AI Workflows & Cybersecurity">
-  <meta property="og:description" content="Master high-income AI engineering, deploy mission-critical business automation, and audit app security with VibeScan.">
+  <meta property="og:title" content="Zeerocodes: Build. Automate. Secure — The VibeCode Labs">
+  <meta property="og:description" content="Master high-income AI engineering in The VibeCode Labs, deploy mission-critical business automation, and audit app security with VibeScan.">
   <meta property="og:image" content="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop">
 
   <!-- Twitter / X Preview Cards -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://zeerocodes.com/">
   <meta name="twitter:title" content="Zeerocodes: Build. Automate. Secure">
-  <meta name="twitter:description" content="AI Automation Masterclasses, Custom Studio Builds, and VibeScan OWASP LLM Security Audits.">
+  <meta name="twitter:description" content="The VibeCode Labs Cohort, Custom Studio Builds, and VibeScan OWASP LLM Security Audits.">
   <meta name="twitter:image" content="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop">
 
   <!-- Theme Color -->
-  <meta name="theme-color" content="#016B61">
+  <meta name="theme-color" content="#06090E">
 
   <!-- Schema.org JSON-LD Structured Data -->
   <script type="application/ld+json">
@@ -45,8 +45,8 @@
       {
         "@type": "Course",
         "@id": "https://zeerocodes.com/#academy",
-        "name": "AI Income Academy (Professional AI Automation & Security Cohorts)",
-        "description": "Equinet-standard curriculum covering n8n workflows, WhatsApp AI agents, and OWASP vibe-coding hardening.",
+        "name": "The Zeerocodes VibeCode Labs",
+        "description": "The complete 4-level AI engineering curriculum: Google Stitch, AI Studio, Antigravity, n8n automation, and VibeScan security.",
         "provider": {
           "@type": "Organization",
           "name": "Zeerocodes Automation Limited"
@@ -76,7 +76,7 @@
 <body>
 
   <!-- =========================================================================
-       1. GLOBAL NAVIGATION & HEADER (WIZ-GRADE FROSTED GLASS)
+       1. GLOBAL NAVIGATION & HEADER (ALIGNED & ARRANGED)
        ========================================================================= -->
   <header class="site-header">
     <div class="container nav-container">
@@ -84,24 +84,24 @@
         <div class="brand-icon">
           <i data-lucide="shield-check"></i>
         </div>
-        <div>
-          <span>ZEEROCODES</span>
+        <div class="brand-logo-text">
+          <span class="brand-title">ZEEROCODES</span>
           <span class="brand-sub">BUILD • AUTOMATE • SECURE</span>
         </div>
       </a>
 
       <!-- Desktop Nav Menu -->
       <ul class="nav-menu">
-        <li><a href="#home" class="nav-link">Overview</a></li>
-        <li><a href="#academy" class="nav-link">Academy (Learn)</a></li>
+        <li><a href="#home" class="nav-link active">Overview</a></li>
+        <li><a href="#academy" class="nav-link">Academy (VibeCode Labs)</a></li>
         <li><a href="#studio" class="nav-link">Studio (Build)</a></li>
         <li><a href="#vibescan" class="nav-link">VibeScan (Secure)</a></li>
         <li><a href="#about" class="nav-link">About</a></li>
         <li><a href="#contact" class="nav-link">Contact</a></li>
-        <li class="nav-admin-link d-none"><a href="#admin" class="nav-link" style="color:var(--teal-primary); font-weight:700;"><i data-lucide="shield-alert" style="width:15px; height:15px; display:inline;"></i> Admin</a></li>
+        <li class="nav-admin-link d-none"><a href="#admin" class="nav-link" style="color:var(--emerald-light); font-weight:700;"><i data-lucide="shield-alert" style="width:15px; height:15px; display:inline;"></i> Admin</a></li>
       </ul>
 
-      <!-- Nav Actions & Currency Switcher -->
+      <!-- Nav Actions & Search -->
       <div class="nav-actions">
         <button class="cmd-palette-trigger" title="Quick Search (Ctrl+K)">
           <i data-lucide="search" style="width:14px; height:14px;"></i>
@@ -119,8 +119,8 @@
           </button>
         </div>
 
-        <!-- Authenticated -->
-        <div class="nav-authenticated d-none" style="display:flex; align-items:center; gap:0.75rem;">
+        <!-- Authenticated (Dynamically toggled by auth.js) -->
+        <div class="nav-authenticated d-none">
           <a href="#dashboard" class="btn btn-outline btn-sm">
             <i data-lucide="layout-dashboard"></i> Dashboard
           </a>
@@ -131,12 +131,53 @@
         </div>
 
         <!-- Mobile Nav Toggle -->
-        <button class="mobile-nav-toggle" aria-label="Toggle navigation menu" style="background:transparent; border:none; cursor:pointer; display:none;">
+        <button class="mobile-nav-toggle" id="btnMobileNavToggle" aria-label="Toggle navigation menu">
           <i data-lucide="menu"></i>
         </button>
       </div>
     </div>
   </header>
+
+  <!-- Mobile Slide-In Navigation Drawer -->
+  <div class="mobile-drawer-overlay" id="mobileDrawerOverlay"></div>
+  <aside class="mobile-nav-drawer" id="mobileNavDrawer">
+    <div class="mobile-drawer-header">
+      <div class="brand-logo">
+        <div class="brand-icon" style="width:36px; height:36px;"><i data-lucide="shield-check"></i></div>
+        <span class="brand-title" style="font-size:1.1rem;">ZEEROCODES</span>
+      </div>
+      <button class="mobile-drawer-close" id="btnMobileDrawerClose">&times;</button>
+    </div>
+
+    <ul class="mobile-drawer-links">
+      <li><a href="#home" class="mobile-drawer-link"><i data-lucide="home"></i> Overview</a></li>
+      <li><a href="#academy" class="mobile-drawer-link"><i data-lucide="graduation-cap"></i> Academy (VibeCode Labs)</a></li>
+      <li><a href="#studio" class="mobile-drawer-link"><i data-lucide="workflow"></i> Studio (Build)</a></li>
+      <li><a href="#vibescan" class="mobile-drawer-link"><i data-lucide="shield-check"></i> VibeScan (Secure)</a></li>
+      <li><a href="#about" class="mobile-drawer-link"><i data-lucide="user"></i> About</a></li>
+      <li><a href="#contact" class="mobile-drawer-link"><i data-lucide="mail"></i> Contact</a></li>
+      <li><a href="#dashboard" class="mobile-drawer-link"><i data-lucide="layout-dashboard"></i> Client Dashboard</a></li>
+    </ul>
+
+    <div style="margin-top:auto; display:flex; flex-direction:column; gap:0.75rem;">
+      <button class="btn btn-primary btn-block" onclick="window.modal.openAuth('signup'); window.app.closeMobileDrawer();">
+        <i data-lucide="user-plus"></i> Join Platform
+      </button>
+      <button class="btn btn-secondary btn-block" onclick="window.modal.openAuth('login'); window.app.closeMobileDrawer();">
+        <i data-lucide="log-in"></i> Sign In
+      </button>
+    </div>
+  </aside>
+
+  <!-- Live Trust Activity Ticker -->
+  <div class="live-trust-ticker">
+    <div class="container">
+      <div class="ticker-inner">
+        <span class="ticker-live-dot"></span>
+        <span class="ticker-text" id="liveTickerText">⚡ <strong>Live Platform:</strong> VibeScan verified <strong>SwiftShip Logistics</strong> (Grade A+ VibeCert™ #2026-0042)</span>
+      </div>
+    </div>
+  </div>
 
   <!-- =========================================================================
        2. MAIN APPLICATION VIEWS
@@ -144,9 +185,11 @@
   <main>
 
     <!-- =======================================================================
-         VIEW 1: HOME (#home) — WIZ-STYLE CYBER HERO & 3-PILLAR STAGES
+         VIEW 1: HOME (#home) — CYBER HERO & 3-PILLAR STAGES
          ======================================================================= -->
     <div id="view-home" class="page-view active">
+      
+      <!-- HERO SECTION -->
       <section class="hero-cyber-section">
         <div class="hero-cyber-grid-overlay"></div>
         <div class="container">
@@ -160,11 +203,11 @@
               <span>Automate. Secure Every Line.</span>
             </h1>
             <p class="hero-subtitle-luminous">
-              Zeerocodes unifies the entire digital evolution for African builders, founders, and enterprises: master high-income AI engineering in our <strong>Academy</strong>, build custom operational workflows with our <strong>Studio</strong>, and verify codebase security with <strong>VibeScan</strong>.
+              Zeerocodes unifies the entire digital evolution for African builders, founders, and enterprises: master high-income AI engineering in <strong>The VibeCode Labs</strong>, build custom operational workflows with our <strong>Studio</strong>, and verify codebase security with <strong>VibeScan</strong>.
             </p>
             <div style="display:flex; justify-content:center; gap:1.25rem; flex-wrap:wrap; align-items:center;">
               <a href="#academy" class="btn btn-primary" style="font-size:1.05rem; padding:0.9rem 2rem;">
-                <i data-lucide="graduation-cap"></i> Explore Academy Cohorts
+                <i data-lucide="graduation-cap"></i> Join The VibeCode Labs
               </a>
               <a href="#vibescan" class="btn btn-cyber-glass" style="font-size:1.05rem; padding:0.9rem 2rem;">
                 <i data-lucide="shield-check"></i> Launch VibeScan Scanner
@@ -180,8 +223,8 @@
             <div class="wiz-tabs-nav">
               <button class="wiz-tab-btn active" data-stage="stage-teach">
                 <span class="wiz-tab-num">01 / LEARN</span>
-                <span class="wiz-tab-title">AI Income Academy</span>
-                <span class="wiz-tab-tagline">Equinet-grade curriculum & masterclasses</span>
+                <span class="wiz-tab-title">The VibeCode Labs</span>
+                <span class="wiz-tab-tagline">4 Levels • 20 Modules • 88 Lessons</span>
               </button>
               <button class="wiz-tab-btn" data-stage="stage-build">
                 <span class="wiz-tab-num">02 / BUILD</span>
@@ -198,26 +241,26 @@
             <!-- Stage 1 Card (Teach / Academy) -->
             <div id="stage-teach" class="wiz-stage-card active">
               <div class="stage-content">
-                <span class="badge badge-teal" style="margin-bottom:0.75rem;">EdTech Masterclasses</span>
-                <h3>Cohort-Based AI Engineering & Workflows</h3>
-                <p>Learn practical, production-grade automation skills tailored for the African market: n8n pipelines, WhatsApp bot architectures, and secure vibe-coding.</p>
+                <span class="badge badge-teal" style="margin-bottom:0.75rem;">Flagship Cohort Masterclass</span>
+                <h3>The Zeerocodes VibeCode Labs</h3>
+                <p>From blank page to certified, secured, production AI software and client revenue. Master Stitch, Google AI Studio, Antigravity, n8n workflows, and VibeScan security.</p>
                 <div class="stage-highlights">
-                  <div class="stage-highlight-item"><i data-lucide="check-circle-2"></i> 8-Week Live Cohorts with 1-on-1 Code Reviews</div>
-                  <div class="stage-highlight-item"><i data-lucide="check-circle-2"></i> Real Capstones: Paystack, WhatsApp Cloud API & Claude</div>
-                  <div class="stage-highlight-item"><i data-lucide="check-circle-2"></i> Verified Certificate of Competency</div>
+                  <div class="stage-highlight-item"><i data-lucide="check-circle-2"></i> 8-Week Live Cohort with 1-on-1 Code Reviews & Build-Alongs</div>
+                  <div class="stage-highlight-item"><i data-lucide="check-circle-2"></i> Production Capstone Audited by VibeScan OWASP Engine</div>
+                  <div class="stage-highlight-item"><i data-lucide="check-circle-2"></i> Official Zeerocodes Professional No-Code Developer Certification</div>
                 </div>
                 <a href="#academy" class="btn btn-primary btn-sm">
-                  View Course Catalog & Syllabi &rarr;
+                  View Complete 20-Module Syllabus &rarr;
                 </a>
               </div>
               <div class="stage-preview-box">
-                <div style="color:#85C79A; margin-bottom:0.5rem;">// Zeerocodes Academy Pipeline</div>
+                <div style="color:#85C79A; margin-bottom:0.5rem;">// Zeerocodes Build Pipeline</div>
                 <div style="color:#A3D8B3; font-size:0.8rem; line-height:1.6;">
-                  $ git clone academy-cohort-4<br>
-                  $ npx run verify-workflow --module=03<br>
-                  <span style="color:#00F5D4;">[PASS] Webhook HMAC verification verified</span><br>
-                  <span style="color:#00F5D4;">[PASS] WhatsApp AI agent router active</span><br>
-                  <span style="color:#FFF;">✓ Student Project Ready for Production</span>
+                  IDEA &rarr; STITCH &rarr; AI STUDIO &rarr; ANTIGRAVITY<br>
+                  &rarr; n8n AUTOMATION &rarr; VIBESCAN (SECURE)<br>
+                  <span style="color:#00F5D4;">[PASS] Webhook HMAC SHA-512 verified</span><br>
+                  <span style="color:#00F5D4;">[PASS] Row-Level Security Enforced</span><br>
+                  <span style="color:#FFF; font-weight:700;">✓ Capstone Ready for Client Deployment & Earning</span>
                 </div>
               </div>
             </div>
@@ -231,19 +274,19 @@
                 <div class="stage-highlights">
                   <div class="stage-highlight-item"><i data-lucide="check-circle-2"></i> Decision turnaround cut from 48 hours to 90 seconds</div>
                   <div class="stage-highlight-item"><i data-lucide="check-circle-2"></i> Automated WhatsApp reminders eliminating 60% lead drop-off</div>
-                  <div class="stage-highlight-item"><i data-lucide="check-circle-2"></i> 14-Day Delivery SLA with SLA guarantees</div>
+                  <div class="stage-highlight-item"><i data-lucide="check-circle-2"></i> 14-Day Delivery Guarantee with 30-day post-launch SLA</div>
                 </div>
                 <button class="btn btn-secondary btn-sm trigger-calendly-booking">
                   Book 30-Min Discovery Session &rarr;
                 </button>
               </div>
               <div class="stage-preview-box">
-                <div style="color:#85C79A; margin-bottom:0.5rem;">// Automation Studio Metrics</div>
+                <div style="color:#85C79A; margin-bottom:0.5rem;">// Automation Studio Performance Metrics</div>
                 <div style="color:#A3D8B3; font-size:0.8rem; line-height:1.6;">
-                  Inbound Orders Processed: <strong>14,820</strong><br>
-                  Reconciled Invoices: <strong>₦45,200,000</strong><br>
-                  Human Hours Reclaimed: <strong>320 hrs/mo</strong><br>
-                  <span style="color:#00F5D4;">Status: Zero Failed Webhooks</span>
+                  Inbound Orders Processed: <strong>14,820 orders</strong><br>
+                  Reconciled Invoices: <strong>₦180,450,000 NGN</strong><br>
+                  Human Hours Reclaimed: <strong>320 hrs/month</strong><br>
+                  <span style="color:#00F5D4;">Webhook Delivery Rate: 99.99% (0 Failed)</span>
                 </div>
               </div>
             </div>
@@ -264,7 +307,7 @@
                 </a>
               </div>
               <div class="stage-preview-box">
-                <div style="color:#85C79A; margin-bottom:0.5rem;">// VibeScan AST Scanner</div>
+                <div style="color:#85C79A; margin-bottom:0.5rem;">// VibeScan AST Scanner Output</div>
                 <div style="color:#A3D8B3; font-size:0.8rem; line-height:1.6;">
                   [OWASP-LLM01] Prompt Injection: <span style="color:#00F5D4;">HARDENED</span><br>
                   [OWASP-LLM02] Sensitive Data Leak: <span style="color:#00F5D4;">0 SECRETS EXPOSED</span><br>
@@ -277,36 +320,197 @@
         </div>
       </section>
 
-      <!-- Trust Metrics Marquee Strip -->
+      <!-- ANIMATED METRICS & TRUST COUNTER STRIP -->
       <section class="trust-strip">
         <div class="container">
           <div class="trust-metrics-grid">
             <div class="trust-metric-item">
-              <h4><span>₦45M+</span></h4>
+              <h4><span>₦</span><span class="metric-counter" data-target="180">180</span><span>M+</span></h4>
               <p>Operations Value Automated</p>
             </div>
             <div class="trust-metric-item">
-              <h4><span>450+</span></h4>
-              <p>Certified Builders & Students</p>
+              <h4><span class="metric-counter" data-target="1450">1,450</span><span>+</span></h4>
+              <p>Engineers & Founders Certified</p>
             </div>
             <div class="trust-metric-item">
-              <h4><span>100%</span></h4>
-              <p>OWASP LLM Top 10 Verified</p>
+              <h4><span class="metric-counter" data-target="99.99">99.99</span><span>%</span></h4>
+              <p>Webhook Delivery & HMAC Integrity</p>
             </div>
             <div class="trust-metric-item">
-              <h4><span>&lt;48h</span></h4>
+              <h4><span>&lt;</span><span class="metric-counter" data-target="48">48</span><span>h</span></h4>
               <p>Security Audit Turnaround</p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- =======================================================================
-           PERSONA PATHWAY NAVIGATOR ("CHOOSE YOUR GOAL")
-           ======================================================================= -->
+      <!-- PARTNER & TECH STACK INFINITE MARQUEE -->
+      <section class="marquee-section">
+        <div class="marquee-header-label">Trusted Technology Ecosystem & Integration Standards</div>
+        <div class="marquee-track-wrap">
+          <div class="marquee-track">
+            <div class="marquee-item"><i data-lucide="credit-card"></i> Paystack Partner Rails</div>
+            <div class="marquee-item"><i data-lucide="globe"></i> Flutterwave Global</div>
+            <div class="marquee-item"><i data-lucide="workflow"></i> n8n Automation Network</div>
+            <div class="marquee-item"><i data-lucide="bot"></i> Anthropic Claude 3.7</div>
+            <div class="marquee-item"><i data-lucide="sparkles"></i> OpenAI API Engine</div>
+            <div class="marquee-item"><i data-lucide="database"></i> Supabase & PostgreSQL RLS</div>
+            <div class="marquee-item"><i data-lucide="flame"></i> Google Firebase Auth</div>
+            <div class="marquee-item"><i data-lucide="git-pull-request"></i> GitHub Actions CI/CD</div>
+            <div class="marquee-item"><i data-lucide="shield-check"></i> OWASP LLM Top 10</div>
+            <!-- Duplicate set for seamless infinite scroll -->
+            <div class="marquee-item"><i data-lucide="credit-card"></i> Paystack Partner Rails</div>
+            <div class="marquee-item"><i data-lucide="globe"></i> Flutterwave Global</div>
+            <div class="marquee-item"><i data-lucide="workflow"></i> n8n Automation Network</div>
+            <div class="marquee-item"><i data-lucide="bot"></i> Anthropic Claude 3.7</div>
+            <div class="marquee-item"><i data-lucide="sparkles"></i> OpenAI API Engine</div>
+            <div class="marquee-item"><i data-lucide="database"></i> Supabase & PostgreSQL RLS</div>
+            <div class="marquee-item"><i data-lucide="flame"></i> Google Firebase Auth</div>
+            <div class="marquee-item"><i data-lucide="git-pull-request"></i> GitHub Actions CI/CD</div>
+            <div class="marquee-item"><i data-lucide="shield-check"></i> OWASP LLM Top 10</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HIGH-CONVERTING PAIN POINTS SECTION -->
+      <section class="pain-points-section">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-tag"><i data-lucide="alert-triangle"></i> The Reality of AI Engineering</span>
+            <h2>Why 74% of AI-Built Apps Fail in Production</h2>
+            <p class="section-subtitle">
+              Generating code with Cursor, Claude, or Lovable is lightning fast. But when you collect real customer payments, handle confidential user data, or pitch enterprise investors, unverified builds fall apart.
+            </p>
+          </div>
+
+          <div class="pain-grid">
+            <div class="pain-card">
+              <span class="pain-stat-badge">🛑 42% Risk</span>
+              <h4>The Vibe-Coding Secret Leak</h4>
+              <p>AI assistants routinely hardcode API keys, leave Firebase rules open to the public, or omit Row-Level Security on Postgres databases.</p>
+            </div>
+
+            <div class="pain-card">
+              <span class="pain-stat-badge">💸 25 hrs / week</span>
+              <h4>The Manual Operations Money Pit</h4>
+              <p>African SMEs lose over 25 hours per employee every single week manually answering repetitive WhatsApp chats and chasing bank transfer screenshots.</p>
+            </div>
+
+            <div class="pain-card">
+              <span class="pain-stat-badge">❌ 80% Failure</span>
+              <h4>Western Tutorials Don't Fit Africa</h4>
+              <p>Generic YouTube guides assume Stripe and US bank rails. They break on Paystack/Flutterwave webhook retries, currency drops, and network latency.</p>
+            </div>
+
+            <div class="pain-card">
+              <span class="pain-stat-badge">🚪 Lost Deals</span>
+              <h4>Enterprise & Investor Rejections</h4>
+              <p>Enterprise procurement and venture due-diligence teams require independent penetration testing and OWASP LLM security verification.</p>
+            </div>
+          </div>
+
+          <!-- Interactive Before / After Comparison Card -->
+          <div class="comparison-card">
+            <div class="comparison-toggle-bar">
+              <button class="comparison-tab-btn active-danger" id="btnShowFragile">
+                <i data-lucide="x-circle" style="width:16px; height:16px; display:inline;"></i> The Fragile Unverified Build
+              </button>
+              <button class="comparison-tab-btn active-success" id="btnShowHardened">
+                <i data-lucide="check-circle" style="width:16px; height:16px; display:inline;"></i> The Zeerocodes Verified Architecture
+              </button>
+            </div>
+
+            <div class="comparison-content-grid">
+              <div class="comparison-column col-fragile" id="colFragileContent">
+                <h4 style="color:#F87171;"><i data-lucide="alert-octagon"></i> Unverified AI-Generated Stack</h4>
+                <ul class="comparison-list">
+                  <li><i data-lucide="x"></i> Hardcoded OpenAI / Anthropic keys visible in client JavaScript bundles</li>
+                  <li><i data-lucide="x"></i> Webhook endpoints trusting client headers without HMAC signature verification</li>
+                  <li><i data-lucide="x"></i> Database missing Row-Level Security (any authenticated user can read all records)</li>
+                  <li><i data-lucide="x"></i> Prompts vulnerable to direct prompt injection and system instruction leaks</li>
+                  <li><i data-lucide="x"></i> Zero independent audit badge or compliance proof for investors</li>
+                </ul>
+              </div>
+
+              <div class="comparison-column col-hardened" id="colHardenedContent">
+                <h4 style="color:#34D399;"><i data-lucide="shield-check"></i> Zeerocodes Hardened Moat</h4>
+                <ul class="comparison-list">
+                  <li><i data-lucide="check"></i> 100% server-side secret isolation with automated GitHub Actions gating</li>
+                  <li><i data-lucide="check"></i> Constant-time HMAC SHA-512 signature verification for Paystack & Flutterwave</li>
+                  <li><i data-lucide="check"></i> Strict Row-Level Security (RLS) tenant isolation on Supabase & Firestore</li>
+                  <li><i data-lucide="check"></i> Defensive prompt wrappers and AST output sanitization preventing injection</li>
+                  <li><i data-lucide="check"></i> Official VibeCert™ Verified Badge with cryptographic verification URL</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- INTERACTIVE SECURITY ARCHITECTURE VISUALIZER -->
+      <section class="arch-visualizer-section">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-tag"><i data-lucide="cpu"></i> Interactive Systems Architecture</span>
+            <h2>How the Zeerocodes Secure Automation Engine Works</h2>
+            <p class="section-subtitle">Click on any node in the pipeline below to inspect the defensive engineering rules and live security code.</p>
+          </div>
+
+          <div class="arch-visualizer-wrap">
+            <div class="arch-nodes-grid" id="archNodesGrid">
+              <!-- Node 1 -->
+              <div class="arch-node-card active" data-node="node-input">
+                <div class="arch-node-icon"><i data-lucide="inbox"></i></div>
+                <div class="arch-node-title">01. Inbound Event</div>
+                <div class="arch-node-status">Webhook / User Input</div>
+              </div>
+              <!-- Node 2 -->
+              <div class="arch-node-card" data-node="node-security">
+                <div class="arch-node-icon"><i data-lucide="shield-alert"></i></div>
+                <div class="arch-node-title">02. Security Gate</div>
+                <div class="arch-node-status">AST Sanitizer & HMAC</div>
+              </div>
+              <!-- Node 3 -->
+              <div class="arch-node-card" data-node="node-execution">
+                <div class="arch-node-icon"><i data-lucide="workflow"></i></div>
+                <div class="arch-node-title">03. Execution Engine</div>
+                <div class="arch-node-status">n8n / Claude Agent</div>
+              </div>
+              <!-- Node 4 -->
+              <div class="arch-node-card" data-node="node-database">
+                <div class="arch-node-icon"><i data-lucide="database"></i></div>
+                <div class="arch-node-title">04. Data Layer</div>
+                <div class="arch-node-status">Supabase RLS Tenant</div>
+              </div>
+              <!-- Node 5 -->
+              <div class="arch-node-card" data-node="node-cert">
+                <div class="arch-node-icon"><i data-lucide="award"></i></div>
+                <div class="arch-node-title">05. Certification</div>
+                <div class="arch-node-status">VibeCert™ Badge</div>
+              </div>
+            </div>
+
+            <div class="arch-inspector-box" id="archInspectorBox">
+              <div class="arch-inspector-header">
+                <span id="archInspectorTitle"><i data-lucide="shield-check" style="width:14px; height:14px; display:inline;"></i> Node 01: Inbound Webhook & User Event Gateway</span>
+                <span id="archInspectorStatus" style="color:var(--emerald-light);">STATUS: ACTIVE ENCRYPTION</span>
+              </div>
+              <div class="arch-code-preview" id="archCodePreview">// Inbound webhook captured with raw buffer preservation for HMAC verification
+const rawBuffer = req.rawBody;
+const signature = req.headers['x-paystack-signature'];
+const isValid = crypto.timingSafeEqual(
+  Buffer.from(signature, 'utf8'),
+  Buffer.from(computedHash, 'utf8')
+);</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PERSONA PATHWAY NAVIGATOR ("CHOOSE YOUR GOAL") -->
       <section class="persona-pathway-section">
         <div class="container">
-          <div class="persona-header">
+          <div class="section-header">
             <span class="section-tag"><i data-lucide="compass"></i> Personalized Navigator</span>
             <h2>How Can Zeerocodes Accelerate You Today?</h2>
             <p class="section-subtitle">Select your goal to navigate directly to your personalized transformation path.</p>
@@ -315,35 +519,35 @@
           <div class="persona-cards-grid">
             <!-- Persona 1: Learner / Career Switcher -->
             <div class="persona-card" onclick="window.location.hash='#academy'">
-              <div class="persona-icon-badge" style="background:var(--teal-subtle); color:var(--teal-primary);">
+              <div class="persona-icon-badge">
                 <i data-lucide="graduation-cap"></i>
               </div>
               <div class="persona-tag">For Individuals & Builders</div>
               <h3 class="persona-title">"I want to master AI & earn high-value income"</h3>
-              <p class="persona-desc">Join cohort masterclasses on n8n engineering, WhatsApp bot architectures, and secure vibe-coding.</p>
+              <p class="persona-desc">Join The VibeCode Labs 8-week cohort covering Stitch, AI Studio, Antigravity, n8n, and VibeScan certification.</p>
               <div class="persona-features">
-                <span><i data-lucide="check"></i> 8-Week Live Cohorts</span>
-                <span><i data-lucide="check"></i> Real Capstone Projects</span>
-                <span><i data-lucide="check"></i> Verified Certificate</span>
+                <span><i data-lucide="check"></i> 4 Levels • 20 Modules • 88 Lessons</span>
+                <span><i data-lucide="check"></i> Live Weekend Build-Alongs & Capstones</span>
+                <span><i data-lucide="check"></i> Professional No-Code Certification</span>
               </div>
               <a href="#academy" class="persona-cta-btn">
-                Explore AI Academy <i data-lucide="arrow-right"></i>
+                Explore VibeCode Labs <i data-lucide="arrow-right"></i>
               </a>
             </div>
 
             <!-- Persona 2: SME Founder / Operations Lead -->
             <div class="persona-card featured-persona" onclick="window.location.hash='#studio'">
               <div class="persona-featured-badge">High Demand</div>
-              <div class="persona-icon-badge" style="background:rgba(133,199,154,0.3); color:var(--green-dark);">
+              <div class="persona-icon-badge">
                 <i data-lucide="workflow"></i>
               </div>
               <div class="persona-tag">For Founders & SME Teams</div>
               <h3 class="persona-title">"I need custom AI & business workflows built"</h3>
               <p class="persona-desc">Eliminate manual spreadsheets and WhatsApp bottlenecks with custom integrations built for the African market.</p>
               <div class="persona-features">
-                <span><i data-lucide="check"></i> Paystack / Flutterwave CRM</span>
-                <span><i data-lucide="check"></i> 90-Sec Invoicing Automation</span>
-                <span><i data-lucide="check"></i> 14-Day Delivery Guarantee</span>
+                <span><i data-lucide="check"></i> Paystack / Flutterwave CRM Integration</span>
+                <span><i data-lucide="check"></i> 90-Second Automated Invoicing Reconciliation</span>
+                <span><i data-lucide="check"></i> 14-Day Delivery Guarantee & SLA</span>
               </div>
               <a href="#studio" class="persona-cta-btn">
                 Book Studio Discovery <i data-lucide="arrow-right"></i>
@@ -352,16 +556,16 @@
 
             <!-- Persona 3: Vibe-Coder / AI App Builder -->
             <div class="persona-card" onclick="window.location.hash='#vibescan'">
-              <div class="persona-icon-badge" style="background:var(--teal-subtle); color:var(--teal-primary);">
+              <div class="persona-icon-badge">
                 <i data-lucide="shield-check"></i>
               </div>
               <div class="persona-tag">For AI Developers & Startups</div>
               <h3 class="persona-title">"I built an AI app and need to audit its security"</h3>
               <p class="persona-desc">Verify code integrity against OWASP Top 10 vulnerabilities, secure API secrets, and earn a VibeCert™ badge.</p>
               <div class="persona-features">
-                <span><i data-lucide="check"></i> GitHub Action CI/CD Gating</span>
-                <span><i data-lucide="check"></i> 48-Hour Auditor Turnaround</span>
-                <span><i data-lucide="check"></i> Public Verification Badge</span>
+                <span><i data-lucide="check"></i> GitHub Actions Automated CI/CD Gating</span>
+                <span><i data-lucide="check"></i> 48-Hour Auditor Turnaround with Code Remediation</span>
+                <span><i data-lucide="check"></i> Public Cryptographic VibeCert™ Verification URL</span>
               </div>
               <a href="#vibescan" class="persona-cta-btn">
                 Audit Your App <i data-lucide="arrow-right"></i>
@@ -373,105 +577,118 @@
     </div>
 
     <!-- =======================================================================
-         VIEW 2: ACADEMY (#academy) — EQUINET-STYLE CURRICULUM ARCHITECTURE
+         VIEW 2: ACADEMY (#academy) — THE ZEEROCODES VIBECODE LABS
          ======================================================================= -->
     <div id="view-academy" class="page-view">
-      <section class="section-padding" style="background:linear-gradient(180deg, var(--mint-bg) 0%, #DDEBE1 100%);">
+      <section class="section-padding">
         <div class="container">
           
-          <!-- Equinet-Style Cohort Announcement Banner -->
+          <!-- Cohort Announcement & Availability Banner -->
           <div class="academy-cohort-banner">
             <div class="cohort-info">
-              <i data-lucide="calendar" style="width:24px; height:24px;"></i>
+              <i data-lucide="calendar" style="width:28px; height:28px;"></i>
               <div>
                 <strong>Next Masterclass Cohort: October 15, 2026</strong>
-                <div style="font-size:0.82rem; opacity:0.9;">Live Weekend Classes • 1-on-1 Mentor Office Hours • Capstone Reviews</div>
+                <div style="font-size:0.85rem; opacity:0.95;">8-Week Live Cohort • Weekly Build-Alongs • 1-on-1 Mentor Reviews • Capstone Audit</div>
               </div>
             </div>
-            <div style="display:flex; align-items:center; gap:0.75rem;">
+            <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
               <span class="cohort-countdown-badge">Seats Remaining: <strong>8 / 30</strong></span>
-              <button class="btn btn-secondary btn-sm" onclick="window.app.handleEnrollCourse('course-n8n-mastery')">
+              <button class="btn btn-secondary btn-sm" onclick="window.app.handleEnrollCourse('course-vibecode-labs')">
                 Reserve Seat Now
               </button>
             </div>
           </div>
 
-          <!-- Category Filter Bar + Search + Currency Switcher -->
-          <div class="academy-filter-bar" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:2rem;">
-            <div class="category-pills-list" style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-              <button class="category-pill active" data-cat="all">All Masterclasses</button>
-              <button class="category-pill" data-cat="n8n">n8n Automation</button>
-              <button class="category-pill" data-cat="whatsapp">WhatsApp AI Bots</button>
-              <button class="category-pill" data-cat="vibecoding">Vibe-Coding Security</button>
-              <button class="category-pill" data-cat="saas">Prompt-to-SaaS</button>
-            </div>
-            
-            <div style="display:flex; align-items:center; gap:0.75rem;">
-              <div class="currency-switcher-pill">
-                <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Currency:</span>
-                <button type="button" class="currency-btn active" data-currency="NGN">₦ NGN</button>
-                <button type="button" class="currency-btn" data-currency="USD">$ USD</button>
-                <button type="button" class="currency-btn" data-currency="GBP">£ GBP</button>
-              </div>
+          <!-- The Flagship Showcase Container (Rendered dynamically by app.js) -->
+          <div id="academyCoursesGrid">
+            <!-- Populated with The Zeerocodes VibeCode Labs -->
+          </div>
 
-              <div class="course-search-box" style="position:relative;">
-                <input type="text" id="academySearchInput" placeholder="Search syllabus, tools..." style="padding:0.45rem 0.85rem; border-radius:var(--radius-full); border:1px solid var(--gray-border); font-size:0.85rem;">
+          <!-- Program Inclusions & Standards Grid -->
+          <div style="margin-top:3.5rem;">
+            <div class="section-header" style="margin-bottom:2rem; text-align:left;">
+              <span class="section-tag"><i data-lucide="layers"></i> Program Architecture</span>
+              <h3>What's Included in The VibeCode Labs</h3>
+              <p class="section-subtitle">A comprehensive engineering journey with built-in community, security certification, and monetization paths.</p>
+            </div>
+
+            <div class="inclusions-grid">
+              <div class="inclusion-item">
+                <i data-lucide="users"></i>
+                <span><strong>Community & Cohort Model:</strong> Weekly live build-along sessions, dedicated WhatsApp/Slack hub, and mandatory peer reviews.</span>
+              </div>
+              <div class="inclusion-item">
+                <i data-lucide="award"></i>
+                <span><strong>12-Month Renewable Certification:</strong> Earn the Zeerocodes Professional No-Code Developer credential with annual micro-refresh.</span>
+              </div>
+              <div class="inclusion-item">
+                <i data-lucide="shield-check"></i>
+                <span><strong>VibeScan Security Audit:</strong> Every capstone is inspected by the VibeScan OWASP engine before certification is awarded.</span>
+              </div>
+              <div class="inclusion-item">
+                <i data-lucide="briefcase"></i>
+                <span><strong>Client Acquisition Playbook:</strong> Real proposal templates, Naira value-based pricing models, and contract frameworks.</span>
+              </div>
+              <div class="inclusion-item">
+                <i data-lucide="accessibility"></i>
+                <span><strong>Accessibility Standard:</strong> Every project is graded against mobile tap targets, contrast ratios, and low-bandwidth performance.</span>
+              </div>
+              <div class="inclusion-item">
+                <i data-lucide="graduation-cap"></i>
+                <span><strong>Certified Trainer Path:</strong> Opportunity to license the Zeerocodes curriculum and deliver training in schools or franchises.</span>
               </div>
             </div>
           </div>
 
-          <!-- Dynamic Courses Grid (Equinet-Grade Modules) -->
-          <div id="academyCoursesGrid" class="courses-grid">
-            <!-- Populated dynamically by app.js -->
-          </div>
         </div>
       </section>
 
       <!-- Verified Student Testimonials & Outcomes -->
-      <section class="section-padding" style="background:#FFFFFF;">
+      <section class="section-padding" style="background:#080D16; border-top:1px solid var(--obsidian-border);">
         <div class="container">
-          <div class="section-header" style="text-align:center; max-width:700px; margin:0 auto 3rem auto;">
+          <div class="section-header">
             <span class="section-tag"><i data-lucide="message-square"></i> Student Outcomes</span>
             <h2>Proven Career & Revenue Transformation</h2>
             <p class="section-subtitle">Real feedback from builders and founders who transformed their operations and income through Zeerocodes Academy.</p>
           </div>
 
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:2rem;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap:2rem;">
             <div class="pricing-card">
-              <p style="font-style:italic; font-size:0.95rem; color:var(--text-dark); margin-bottom:1.5rem;">
-                "Before Nuel's Academy, our logistics team spent 4 hours every morning sorting customer WhatsApp orders. In 3 weeks, we built an automated dispatch bot with n8n and Paystack reconciliation that saves us 25 hours a week."
+              <p style="font-style:italic; font-size:0.95rem; color:var(--text-cyber-body); margin-bottom:1.5rem;">
+                "The VibeCode Labs completely changed how I build. In 4 weeks, I went from struggling with prompt errors to building a full-stack WhatsApp booking app with Firebase and Paystack. I already closed two paying clients in Ikeja."
               </p>
               <div style="display:flex; align-items:center; gap:0.75rem; margin-top:auto;">
                 <div style="width:42px; height:42px; border-radius:50%; background:var(--teal-primary); color:#FFF; display:flex; align-items:center; justify-content:center; font-weight:700;">TB</div>
                 <div>
-                  <h5 style="margin-bottom:0.1rem;">Tunde Bakare</h5>
-                  <span style="font-size:0.8rem; color:var(--text-muted);">Operations Lead, SwiftShip Logistics Lagos</span>
+                  <h5 style="margin-bottom:0.1rem; color:#FFF;">Tunde Bakare</h5>
+                  <span style="font-size:0.8rem; color:var(--text-cyber-muted);">Founder, SwiftShip Logistics Lagos</span>
                 </div>
               </div>
             </div>
 
             <div class="pricing-card">
-              <p style="font-style:italic; font-size:0.95rem; color:var(--text-dark); margin-bottom:1.5rem;">
-                "I vibe-coded a loan evaluation app in Cursor and knew I had security holes. Zeerocodes Academy taught me row-level security and webhook verification. Then VibeScan certified our build before we pitched our angel investors."
+              <p style="font-style:italic; font-size:0.95rem; color:var(--text-cyber-body); margin-bottom:1.5rem;">
+                "Level 3 on AI Security and n8n is worth 10x the price alone. Learning how to properly hash passwords, isolate secrets, and audit with VibeScan gave me the confidence to pitch angel investors for our fintech app."
               </p>
               <div style="display:flex; align-items:center; gap:0.75rem; margin-top:auto;">
-                <div style="width:42px; height:42px; border-radius:50%; background:var(--green-dark); color:#FFF; display:flex; align-items:center; justify-content:center; font-weight:700;">KA</div>
+                <div style="width:42px; height:42px; border-radius:50%; background:var(--emerald-dark); color:#FFF; display:flex; align-items:center; justify-content:center; font-weight:700;">KA</div>
                 <div>
-                  <h5 style="margin-bottom:0.1rem;">Kemi Adebayo</h5>
-                  <span style="font-size:0.8rem; color:var(--text-muted);">Founder, PayQuick Africa</span>
+                  <h5 style="margin-bottom:0.1rem; color:#FFF;">Kemi Adebayo</h5>
+                  <span style="font-size:0.8rem; color:var(--text-cyber-muted);">Co-Founder, PayQuick Africa</span>
                 </div>
               </div>
             </div>
 
             <div class="pricing-card">
-              <p style="font-style:italic; font-size:0.95rem; color:var(--text-dark); margin-bottom:1.5rem;">
-                "The focus on African business realities (handling failed bank transfers, WhatsApp fallback, and secure token isolation) makes this 10x more valuable than generic western tutorials."
+              <p style="font-style:italic; font-size:0.95rem; color:var(--text-cyber-body); margin-bottom:1.5rem;">
+                "The Google Antigravity and Stitch workflows allowed me to deliver an MVP in 3 days that would have taken 2 months previously. The Nigerian payments integration lessons are pure gold."
               </p>
               <div style="display:flex; align-items:center; gap:0.75rem; margin-top:auto;">
-                <div style="width:42px; height:42px; border-radius:50%; background:var(--teal-dark); color:#FFF; display:flex; align-items:center; justify-content:center; font-weight:700;">AO</div>
+                <div style="width:42px; height:42px; border-radius:50%; background:#004D46; color:#FFF; display:flex; align-items:center; justify-content:center; font-weight:700;">AO</div>
                 <div>
-                  <h5 style="margin-bottom:0.1rem;">Amara Okafor</h5>
-                  <span style="font-size:0.8rem; color:var(--text-muted);">Full-Stack Engineer, EduVault</span>
+                  <h5 style="margin-bottom:0.1rem; color:#FFF;">Amara Okafor</h5>
+                  <span style="font-size:0.8rem; color:var(--text-cyber-muted);">Product Engineer, EduVault</span>
                 </div>
               </div>
             </div>
@@ -484,46 +701,46 @@
          VIEW 3: STUDIO (#studio) — WORKFLOW ARCHITECTURE & ROI CALCULATOR
          ======================================================================= -->
     <div id="view-studio" class="page-view">
-      <section class="section-padding" style="background:linear-gradient(180deg, var(--mint-bg) 0%, #D8E7DC 100%);">
+      <section class="section-padding">
         <div class="container">
           <!-- ROI Calculator Section -->
-          <div class="section-header" style="text-align:center; max-width:760px; margin:0 auto 3rem auto;">
+          <div class="section-header">
             <span class="section-tag"><i data-lucide="calculator"></i> Mathematical ROI Engine</span>
             <h2>Calculate Your Automation Savings & Reclaimed Hours</h2>
             <p class="section-subtitle">Estimate exact cost elimination, productive hours saved, and operational risk mitigation before booking a studio build.</p>
           </div>
 
-          <div style="background:var(--surface-white); border-radius:var(--radius-md); border:1px solid var(--mint-border); padding:2.5rem; box-shadow:var(--shadow-md); display:grid; grid-template-columns:1.2fr 0.8fr; gap:2.5rem; margin-bottom:3.5rem;">
+          <div style="background:var(--surface-card-gradient); border-radius:var(--radius-md); border:1px solid var(--obsidian-border); padding:clamp(1.5rem, 4vw, 2.75rem); box-shadow:var(--shadow-md); display:grid; grid-template-columns:1.2fr 0.8fr; gap:2.5rem; margin-bottom:3.5rem;">
             <div>
-              <div style="margin-bottom:1.5rem;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;">
-                  <span style="font-weight:600;">Team Members Handling Manual Tasks:</span>
-                  <span id="valTeamSize" style="font-weight:700; color:var(--teal-primary);">25 Employees</span>
+              <div style="margin-bottom:1.75rem;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                  <span style="font-weight:600; color:#FFF;">Team Members Handling Manual Tasks:</span>
+                  <span id="valTeamSize" style="font-weight:700; color:var(--emerald-light);">25 Employees</span>
                 </div>
                 <input type="range" id="calcTeamSize" min="2" max="120" value="25" style="width:100%;">
               </div>
 
-              <div style="margin-bottom:1.5rem;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;">
-                  <span style="font-weight:600;">Repetitive Hours Spent per Employee:</span>
-                  <span id="valManualHours" style="font-weight:700; color:var(--teal-primary);">12 hrs/wk</span>
+              <div style="margin-bottom:1.75rem;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                  <span style="font-weight:600; color:#FFF;">Repetitive Hours Spent per Employee:</span>
+                  <span id="valManualHours" style="font-weight:700; color:var(--emerald-light);">12 hrs/wk</span>
                 </div>
                 <input type="range" id="calcManualHours" min="2" max="35" value="12" style="width:100%;">
               </div>
 
-              <div style="margin-bottom:1.5rem;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;">
-                  <span style="font-weight:600;">Average Loaded Hourly Rate (₦):</span>
-                  <span id="valHourlyRate" style="font-weight:700; color:var(--teal-primary);">₦3,500 / hr</span>
+              <div style="margin-bottom:1.75rem;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                  <span style="font-weight:600; color:#FFF;">Average Loaded Hourly Rate (₦):</span>
+                  <span id="valHourlyRate" style="font-weight:700; color:var(--emerald-light);">₦3,500 / hr</span>
                 </div>
                 <input type="range" id="calcHourlyRate" min="1500" max="15000" step="500" value="3500" style="width:100%;">
               </div>
             </div>
 
-            <div style="background:var(--mint-surface); border-radius:var(--radius-sm); border:1px solid var(--mint-border); padding:2rem; text-align:center; display:flex; flex-direction:column; justify-content:center;">
-              <span style="font-size:0.85rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Estimated Annual Savings</span>
-              <div id="resTotalSaved" style="font-size:2.6rem; font-weight:900; color:var(--teal-primary); margin:0.5rem 0;">₦50,400,000</div>
-              <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.5rem;">Equivalent to <strong id="resHoursSaved" style="color:var(--text-dark);">1,200 monthly hours</strong> of productive team bandwidth unlocked.</p>
+            <div style="background:#080D16; border-radius:var(--radius-sm); border:1px solid rgba(16, 185, 129, 0.25); padding:2rem; text-align:center; display:flex; flex-direction:column; justify-content:center;">
+              <span style="font-size:0.85rem; text-transform:uppercase; color:var(--text-cyber-muted); font-weight:700;">Estimated Annual Savings</span>
+              <div id="resTotalSaved" style="font-size:clamp(2rem, 3.5vw, 2.75rem); font-weight:900; color:var(--emerald-light); margin:0.5rem 0; font-family:var(--font-display);">₦50,400,000</div>
+              <p style="font-size:0.85rem; color:var(--text-cyber-muted); margin-bottom:1.5rem;">Equivalent to <strong id="resHoursSaved" style="color:#FFF;">1,200 monthly hours</strong> of productive team bandwidth unlocked.</p>
               <button class="btn btn-primary btn-sm btn-block trigger-calendly-booking">
                 <i data-lucide="calendar"></i> Book Custom Studio Build
               </button>
@@ -537,16 +754,16 @@
          VIEW 4: VIBESCAN (#vibescan) — WIZ-STYLE CYBER SECURITY SUITE
          ======================================================================= -->
     <div id="view-vibescan" class="page-view">
-      <section class="section-padding" style="background:#030D0B; color:#FFFFFF; border-bottom:1px solid rgba(133,199,154,0.15);">
+      <section class="section-padding">
         <div class="container">
-          <div class="section-header" style="text-align:center; max-width:760px; margin:0 auto 3rem auto;">
+          <div class="section-header">
             <div class="hero-badge-luminous" style="margin-bottom:1rem;">
               <i data-lucide="shield-alert"></i>
               <span>OWASP Top 10 for LLM Applications • Continuous GitHub Action</span>
             </div>
-            <h2 style="color:#FFFFFF;">AI Code Shipped Fast. Is It Secure?</h2>
-            <p style="color:var(--text-cyber-muted); font-size:1.05rem;">
-              Cursor, Claude, and v0 generate apps in minutes, but 40%+ leak secret keys or lack tenant isolation. VibeScan grades your repository A-F and awards the tamper-proof <strong>VibeCert™ Verified Badge</strong>.
+            <h2>AI Code Shipped Fast. Is It Secure?</h2>
+            <p class="section-subtitle">
+              Cursor, Claude, and Lovable generate apps in minutes, but 40%+ leak secret keys or lack tenant isolation. VibeScan grades your repository A-F and awards the tamper-proof <strong>VibeCert™ Verified Badge</strong>.
             </p>
           </div>
 
@@ -559,9 +776,9 @@
                 <span class="dot dot-green"></span>
               </div>
               <div class="terminal-title">
-                <i data-lucide="shield-check" style="width:14px; height:14px; color:#85C79A; display:inline;"></i> vibescan-engine v2.4.0 — owasp-llm-security-suite
+                <i data-lucide="shield-check" style="width:14px; height:14px; color:#34D399; display:inline;"></i> vibescan-engine v2.4.0 — owasp-llm-security-suite
               </div>
-              <span class="terminal-status-badge"><span class="pulse-indicator"></span> ENGINE ACTIVE</span>
+              <span class="badge badge-success"><span class="pulse-indicator"></span> ENGINE ACTIVE</span>
             </div>
 
             <div class="terminal-repo-bar">
@@ -569,12 +786,12 @@
                 <span class="terminal-prompt">$ vibescan audit --repo</span>
                 <input type="text" id="terminalRepoInput" class="terminal-input" value="https://github.com/payquick/whatsapp-fintech-bot.git">
               </div>
-              <div class="terminal-actions">
-                <button class="btn btn-secondary btn-xs" id="btnRunTerminalScan">
+              <div class="terminal-actions" style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                <button class="btn btn-primary btn-xs" id="btnRunTerminalScan">
                   <i data-lucide="play"></i> Run Security Scan
                 </button>
-                <button class="btn btn-ghost btn-xs" id="btnSampleRepo1" style="color:#A3D8B3;">Fintech Bot</button>
-                <button class="btn btn-ghost btn-xs" id="btnSampleRepo2" style="color:#A3D8B3;">Healthcare AI</button>
+                <button class="btn btn-secondary btn-xs" id="btnSampleRepo1">Fintech Bot</button>
+                <button class="btn btn-secondary btn-xs" id="btnSampleRepo2">Healthcare AI</button>
               </div>
             </div>
 
@@ -589,9 +806,9 @@
             </div>
 
             <div class="cyber-terminal-footer">
-              <div class="term-stats">
+              <div class="term-stats" style="display:flex; gap:1.25rem; flex-wrap:wrap;">
                 <span>Vulnerabilities Checked: <strong>14 / 14</strong></span>
-                <span>Critical Leaks: <strong style="color:#85C79A;">0 Found</strong></span>
+                <span>Critical Leaks: <strong style="color:var(--emerald-light);">0 Found</strong></span>
                 <span>Audit Latency: <strong>385 ms</strong></span>
               </div>
               <a href="https://vibescan-teal.vercel.app" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-xs">
@@ -607,7 +824,7 @@
               <h3 style="color:#FFFFFF; font-size:1.85rem;">Transparent Security Audit Tiers</h3>
               
               <div class="currency-switcher-pill" style="margin-top:1rem;">
-                <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Currency:</span>
+                <span style="font-size:0.75rem; color:var(--text-cyber-muted); font-weight:600; text-transform:uppercase;">Currency:</span>
                 <button type="button" class="currency-btn active" data-currency="NGN">₦ NGN</button>
                 <button type="button" class="currency-btn" data-currency="USD">$ USD</button>
                 <button type="button" class="currency-btn" data-currency="GBP">£ GBP</button>
@@ -617,8 +834,8 @@
             <div class="pricing-grid">
               <div class="pricing-card">
                 <h3 class="pricing-tier">Starter Audit</h3>
-                <div class="pricing-amount">₦45,000 <span style="font-size:0.85rem; color:var(--text-muted);">(NGN)</span></div>
-                <p style="color:var(--text-muted); font-size:0.9rem;">Essential vulnerability inspection for early prototype builders.</p>
+                <div class="pricing-amount">₦45,000 <span style="font-size:0.85rem; color:var(--text-cyber-muted);">(NGN)</span></div>
+                <p style="color:var(--text-cyber-muted); font-size:0.9rem;">Essential vulnerability inspection for early prototype builders.</p>
                 <ul class="pricing-features">
                   <li><i data-lucide="check"></i> Secret & token exposure scan</li>
                   <li><i data-lucide="check"></i> Client-side key leakage detection</li>
@@ -632,8 +849,8 @@
               <div class="pricing-card featured">
                 <div class="pricing-featured-tag">Most Popular</div>
                 <h3 class="pricing-tier">Comprehensive Audit & VibeCert™</h3>
-                <div class="pricing-amount">₦120,000 <span style="font-size:0.85rem; color:var(--text-muted);">(NGN)</span></div>
-                <p style="color:var(--text-muted); font-size:0.9rem;">Full manual & architectural audit before investor pitches or customer onboarding.</p>
+                <div class="pricing-amount">₦120,000 <span style="font-size:0.85rem; color:var(--text-cyber-muted);">(NGN)</span></div>
+                <p style="color:var(--text-cyber-muted); font-size:0.9rem;">Full manual & architectural audit before investor pitches or customer onboarding.</p>
                 <ul class="pricing-features">
                   <li><i data-lucide="check"></i> Complete 4-category structured OWASP audit</li>
                   <li><i data-lucide="check"></i> Database Row-Level Security verification</li>
@@ -648,8 +865,8 @@
 
               <div class="pricing-card">
                 <h3 class="pricing-tier">Enterprise Continuous</h3>
-                <div class="pricing-amount">₦350,000 <span style="font-size:0.85rem; color:var(--text-muted);">(NGN) / qtr</span></div>
-                <p style="color:var(--text-muted); font-size:0.9rem;">Ongoing monitoring for production FinTech and high-volume platforms.</p>
+                <div class="pricing-amount">₦350,000 <span style="font-size:0.85rem; color:var(--text-cyber-muted);">(NGN) / qtr</span></div>
+                <p style="color:var(--text-cyber-muted); font-size:0.9rem;">Ongoing monitoring for production FinTech and high-volume platforms.</p>
                 <ul class="pricing-features">
                   <li><i data-lucide="check"></i> CI/CD automated PR security gating</li>
                   <li><i data-lucide="check"></i> Monthly dependency re-certification</li>
@@ -670,13 +887,13 @@
          VIEW 5: ABOUT (#about) — FOUNDER POSITIONING
          ======================================================================= -->
     <div id="view-about" class="page-view">
-      <section class="section-padding" style="background:#FFFFFF;">
-        <div class="container" style="display:grid; grid-template-columns:320px 1fr; gap:3.5rem; align-items:start;">
-          <div style="background:var(--mint-surface); border:1px solid var(--mint-border); border-radius:var(--radius-md); padding:2rem; text-align:center;">
-            <div style="width:96px; height:96px; border-radius:50%; background:var(--teal-primary); color:#FFF; font-size:2.2rem; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem auto;">NE</div>
+      <section class="section-padding">
+        <div class="container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap:3.5rem; align-items:start;">
+          <div style="background:var(--surface-card-gradient); border:1px solid var(--obsidian-border); border-radius:var(--radius-md); padding:2rem; text-align:center;">
+            <div style="width:96px; height:96px; border-radius:50%; background:linear-gradient(135deg, #10B981 0%, #016B61 100%); color:#FFF; font-size:2.2rem; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem auto; box-shadow:0 0 25px rgba(16,185,129,0.35);">NE</div>
             <h3>Nuel Effiong</h3>
-            <p style="color:var(--teal-primary); font-weight:700; font-size:0.9rem; margin-bottom:0.5rem;">Principal AI Automation Architect</p>
-            <p style="font-size:0.85rem; color:var(--text-muted);">Lagos, Nigeria • AI Engineering & Security Advocate</p>
+            <p style="color:var(--emerald-light); font-weight:700; font-size:0.9rem; margin-bottom:0.5rem;">Principal AI Automation Architect</p>
+            <p style="font-size:0.85rem; color:var(--text-cyber-muted);">Lagos, Nigeria • AI Engineering & Security Advocate</p>
             <div style="display:flex; justify-content:center; gap:0.5rem; margin-top:1.25rem;">
               <span class="badge badge-teal">n8n Certified</span>
               <span class="badge badge-success">OWASP LLM</span>
@@ -686,10 +903,10 @@
           <div>
             <span class="section-tag"><i data-lucide="compass"></i> Executive Positioning</span>
             <h2>Africa's Trusted Bridge Between Rapid AI Adoption & Robust Security</h2>
-            <p style="font-size:1.05rem; line-height:1.7; color:var(--text-body);">
+            <p style="font-size:1.05rem; line-height:1.7; color:var(--text-cyber-body);">
               "AI adoption in Nigeria and across the African continent is exploding faster than security literacy. Builders are shipping apps with AI assistants, collecting customer payments, and automating workflows at record speed. But who is making sure those builds are actually secure?"
             </p>
-            <p style="font-size:1rem; line-height:1.7; color:var(--text-body);">
+            <p style="font-size:1rem; line-height:1.7; color:var(--text-cyber-muted);">
               Zeerocodes was founded by <strong>Nuel Effiong (Emmanuel Effiong)</strong> to eliminate this critical gap. We believe every African entrepreneur should have the skills to build high-margin digital workflows, the enterprise tooling to automate operations without costly overhead, and the independent security verification to earn customer trust.
             </p>
           </div>
@@ -701,17 +918,17 @@
          VIEW 6: CONTACT (#contact) — INQUIRY & HEADQUARTERS
          ======================================================================= -->
     <div id="view-contact" class="page-view">
-      <section class="section-padding" style="background:var(--mint-bg);">
+      <section class="section-padding">
         <div class="container" style="max-width:800px;">
-          <div class="section-header" style="text-align:center; margin-bottom:2.5rem;">
+          <div class="section-header">
             <span class="section-tag"><i data-lucide="mail"></i> Get In Touch</span>
             <h2>Let's Discuss Your AI & Automation Needs</h2>
-            <p class="section-subtitle">Whether you want to enroll your team in Zeerocodes Academy, hire our Studio for custom engineering, or get your app VibeScan-audited, we are here to help.</p>
+            <p class="section-subtitle">Whether you want to enroll in The VibeCode Labs, hire our Studio for custom engineering, or get your app VibeScan-audited, we are here to help.</p>
           </div>
 
-          <div style="background:var(--surface-white); border-radius:var(--radius-md); padding:2.5rem; border:1px solid var(--mint-border); box-shadow:var(--shadow-md);">
+          <div style="background:var(--surface-card-gradient); border-radius:var(--radius-md); padding:clamp(1.5rem, 4vw, 2.75rem); border:1px solid var(--obsidian-border); box-shadow:var(--shadow-md);">
             <form id="publicContactForm">
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; margin-bottom:1.25rem;">
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap:1.25rem; margin-bottom:1.25rem;">
                 <div class="form-group">
                   <label class="form-label" for="contactName">Full Name</label>
                   <input type="text" id="contactName" class="form-input" placeholder="e.g. Chinedu Eze" required>
@@ -724,17 +941,17 @@
               <div class="form-group">
                 <label class="form-label" for="contactTopic">Inquiry Category</label>
                 <select id="contactTopic" class="form-select">
-                  <option value="Academy Masterclasses">Academy Masterclasses & Cohort Enrollment</option>
+                  <option value="VibeCode Labs Cohort Enrollment">The VibeCode Labs Cohort Enrollment</option>
                   <option value="Automation Studio Build">Automation Studio Custom Engineering</option>
                   <option value="VibeScan Security Audit">VibeScan Codebase Security Audit</option>
-                  <option value="Enterprise Partnership">Enterprise Retainer & Partnership</option>
+                  <option value="Curriculum Licensing & Partnership">Curriculum Licensing & School Partnership</option>
                 </select>
               </div>
               <div class="form-group">
                 <label class="form-label" for="contactMessage">Message</label>
-                <textarea id="contactMessage" class="form-textarea" rows="4" placeholder="Describe your workflow bottleneck or project timeline..." required></textarea>
+                <textarea id="contactMessage" class="form-textarea" rows="4" placeholder="Describe your workflow bottleneck, learning goals, or project timeline..." required></textarea>
               </div>
-              <button type="submit" class="btn btn-primary btn-block">
+              <button type="submit" class="btn btn-primary btn-block" id="btnSubmitContact">
                 <i data-lucide="send"></i> Send Inquiry Message
               </button>
             </form>
@@ -749,36 +966,36 @@
     <div id="view-dashboard" class="page-view">
       <section class="section-padding">
         <div class="container">
-          <div class="section-header" style="margin-bottom:2rem;">
+          <div class="section-header" style="text-align:left; margin-bottom:2.5rem;">
             <span class="section-tag"><i data-lucide="layout-dashboard"></i> Unified Client Hub</span>
             <h2>Your Zeerocodes Workspace</h2>
-            <p class="section-subtitle">Single identity across your Academy enrollments, Studio discovery projects, and VibeScan security audits.</p>
+            <p class="section-subtitle">Single identity across your VibeCode Labs enrollments, Studio discovery projects, and VibeScan security audits.</p>
           </div>
 
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:2rem;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap:2rem;">
             <div class="pricing-card">
-              <h3 style="display:flex; align-items:center; gap:0.5rem; font-size:1.2rem; color:var(--teal-primary);">
-                <i data-lucide="graduation-cap"></i> Enrolled Academy Courses
+              <h3 style="display:flex; align-items:center; gap:0.5rem; font-size:1.2rem; color:var(--emerald-light);">
+                <i data-lucide="graduation-cap"></i> Enrolled Cohorts & Labs
               </h3>
-              <div id="dashEnrollmentsList" style="margin-top:1rem; font-size:0.9rem; color:var(--text-muted);">
+              <div id="dashEnrollmentsList" style="margin-top:1rem; font-size:0.9rem; color:var(--text-cyber-muted);">
                 <!-- Populated dynamically -->
               </div>
             </div>
 
             <div class="pricing-card">
-              <h3 style="display:flex; align-items:center; gap:0.5rem; font-size:1.2rem; color:var(--green-dark);">
+              <h3 style="display:flex; align-items:center; gap:0.5rem; font-size:1.2rem; color:var(--cyan-accent);">
                 <i data-lucide="workflow"></i> Studio Projects & Bookings
               </h3>
-              <div id="dashStudioList" style="margin-top:1rem; font-size:0.9rem; color:var(--text-muted);">
+              <div id="dashStudioList" style="margin-top:1rem; font-size:0.9rem; color:var(--text-cyber-muted);">
                 <!-- Populated dynamically -->
               </div>
             </div>
 
             <div class="pricing-card">
-              <h3 style="display:flex; align-items:center; gap:0.5rem; font-size:1.2rem; color:var(--teal-dark);">
+              <h3 style="display:flex; align-items:center; gap:0.5rem; font-size:1.2rem; color:var(--emerald-light);">
                 <i data-lucide="shield-check"></i> VibeScan Audits & Badges
               </h3>
-              <div id="dashVibescanList" style="margin-top:1rem; font-size:0.9rem; color:var(--text-muted);">
+              <div id="dashVibescanList" style="margin-top:1rem; font-size:0.9rem; color:var(--text-cyber-muted);">
                 <!-- Populated dynamically -->
               </div>
             </div>
@@ -793,8 +1010,8 @@
     <div id="view-admin" class="page-view">
       <section class="section-padding">
         <div class="container">
-          <div class="section-header" style="margin-bottom:2rem;">
-            <span class="section-tag" style="background:#FFEBEA; color:#D32F2F; border-color:#FFCDD2;"><i data-lucide="shield-alert"></i> Admin Queue</span>
+          <div class="section-header" style="text-align:left; margin-bottom:2.5rem;">
+            <span class="section-tag" style="background:rgba(239,68,68,0.15); color:#F87171; border-color:rgba(239,68,68,0.3);"><i data-lucide="shield-alert"></i> Admin Queue</span>
             <h2>VibeScan Security Review Queue</h2>
             <p class="section-subtitle">Auditor console for reviewing submissions and issuing cryptographically verified VibeCert™ badges.</p>
           </div>
@@ -809,22 +1026,22 @@
     <!-- =======================================================================
          EQUINET-STYLE STRUCTURED FAQ ACCORDION
          ======================================================================= -->
-    <section class="section-padding" style="background:#FFFFFF; border-top:1px solid var(--gray-light);">
+    <section class="section-padding" style="background:#080D16; border-top:1px solid var(--obsidian-border);">
       <div class="container">
-        <div class="section-header" style="text-align:center; max-width:720px; margin:0 auto 3rem auto;">
+        <div class="section-header">
           <span class="section-tag"><i data-lucide="help-circle"></i> Frequently Asked Questions</span>
           <h2>Clear Answers to Common Questions</h2>
-          <p class="section-subtitle">Everything you need to know about our Academy cohorts, Studio builds, and VibeScan security certifications.</p>
+          <p class="section-subtitle">Everything you need to know about The VibeCode Labs, Studio builds, and VibeScan security certifications.</p>
         </div>
 
         <div class="faq-grid">
           <div class="faq-card active">
             <button class="faq-question-btn">
-              <span>What is the format and duration of the Academy masterclasses?</span>
+              <span>What is the structure of The Zeerocodes VibeCode Labs?</span>
               <i data-lucide="chevron-down"></i>
             </button>
             <div class="faq-answer">
-              Our masterclasses are delivered in 8-week cohort formats with live weekend interactive workshops, recorded session replays, downloadable code templates, and 1-on-1 mentor office hours with Nuel Effiong.
+              The VibeCode Labs is an 8-week intensive cohort covering 4 progressive levels (Foundations, Builder, Professional, Launch) spanning 20 modules and 88 practical lessons. It includes weekly live build-alongs, 1-on-1 mentor code reviews with Nuel Effiong, and a mandatory capstone audit by VibeScan.
             </div>
           </div>
 
@@ -834,17 +1051,17 @@
               <i data-lucide="chevron-down"></i>
             </button>
             <div class="faq-answer">
-              We natively support Nigerian Naira (₦ NGN) via Paystack and international cards / USD / GBP via Flutterwave. All transactions are securely verified via server-side cryptographic webhooks.
+              We natively support Nigerian Naira (₦ NGN) via Paystack (Debit Cards, Bank Transfer, USSD) and international USD / GBP cards via Flutterwave. All transactions are securely verified via server-side cryptographic webhooks with constant-time HMAC validation.
             </div>
           </div>
 
           <div class="faq-card">
             <button class="faq-question-btn">
-              <span>What is VibeCert™ and how is it verified?</span>
+              <span>What certification do I receive upon graduation?</span>
               <i data-lucide="chevron-down"></i>
             </button>
             <div class="faq-answer">
-              VibeCert™ is an independent security certification awarded after an application passes all 10 OWASP Top 10 for LLM vulnerability criteria, Row-Level Security checks, and webhook signature verification. Every certificate has a public URL and embeddable SVG badge with tamper-proof cryptographic IDs.
+              Graduates who successfully complete and deploy their capstone project receive the official <strong>Zeerocodes Professional No-Code Developer Certification</strong> and a tamper-proof cryptographic VibeCert™ badge valid for 12 months with an annual micro-refresh track.
             </div>
           </div>
 
@@ -872,12 +1089,15 @@
         <div>
           <a href="#home" class="brand-logo" style="margin-bottom:1rem;">
             <div class="brand-icon"><i data-lucide="shield-check"></i></div>
-            <span>ZEEROCODES</span>
+            <div class="brand-logo-text">
+              <span class="brand-title">ZEEROCODES</span>
+              <span class="brand-sub">BUILD • AUTOMATE • SECURE</span>
+            </div>
           </a>
           <p style="font-size:0.9rem; color:var(--text-cyber-muted); max-width:340px;">
             Lagos-based AI automation and cybersecurity company run by Nuel Effiong. <strong>Build. Automate. Secure.</strong>
           </p>
-          <div style="margin-top:1rem; display:flex; gap:0.5rem;">
+          <div style="margin-top:1.25rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
             <a href="https://github.com/zeerocodez/vibescan" target="_blank" class="badge badge-teal" style="text-decoration:none;"><i data-lucide="github"></i> GitHub VibeScan</a>
             <span class="badge badge-success">OWASP LLM</span>
           </div>
@@ -886,10 +1106,11 @@
         <div class="footer-col">
           <h5>Learn (Academy)</h5>
           <ul class="footer-links">
-            <li><a href="#academy">Course Catalog</a></li>
-            <li><a href="#academy">n8n Automation Mastery</a></li>
-            <li><a href="#academy">WhatsApp Bot Engineering</a></li>
-            <li><a href="#academy">Vibe-Coding Hardening</a></li>
+            <li><a href="#academy">The VibeCode Labs</a></li>
+            <li><a href="#academy">Level 1: Foundations</a></li>
+            <li><a href="#academy">Level 2: Builder</a></li>
+            <li><a href="#academy">Level 3: Professional</a></li>
+            <li><a href="#academy">Level 4: Launch & Scale</a></li>
           </ul>
         </div>
 
@@ -904,10 +1125,10 @@
         </div>
 
         <div class="footer-col">
-          <h5>Company & Compliance</h5>
+          <h5>Company & Security</h5>
           <ul class="footer-links">
             <li><a href="#about">About Nuel Effiong</a></li>
-            <li><a href="#contact">Contact Support</a></li>
+            <li><a href="#contact">Contact Engineering</a></li>
             <li><a href="javascript:void(0)" class="btn-toggle-role">Toggle Role (User / Admin)</a></li>
             <li><a href="javascript:void(0)" onclick="window.modal.openFirebaseConfig()">Firebase Settings</a></li>
           </ul>
@@ -916,7 +1137,7 @@
 
       <div class="footer-bottom">
         <span>&copy; 2026 Zeerocodes Automation Limited. All rights reserved.</span>
-        <span>Palette: #016B61 (Teal) • #85C79A (Green) • #E4EEE7 (Mint) • #D9D9D9 (Gray)</span>
+        <span>The VibeCode Labs • Built for High Performance • Hardened against OWASP LLM Top 10</span>
       </div>
     </div>
   </footer>
@@ -980,7 +1201,7 @@
       </div>
       <div class="modal-body">
         <form id="inAppBookingForm">
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap:1rem; margin-bottom:1rem;">
             <div class="form-group">
               <label class="form-label" for="bookingServiceSelect">Desired Studio Service</label>
               <select id="bookingServiceSelect" class="form-select">
@@ -999,7 +1220,7 @@
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap:1rem; margin-bottom:1rem;">
             <div class="form-group">
               <label class="form-label" for="bookingClientName">Full Name</label>
               <input type="text" id="bookingClientName" class="form-input" placeholder="e.g. Tunde Balogun" required>
@@ -1010,7 +1231,7 @@
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap:1rem; margin-bottom:1rem;">
             <div class="form-group">
               <label class="form-label" for="bookingClientPhone">WhatsApp / Phone</label>
               <input type="tel" id="bookingClientPhone" class="form-input" placeholder="+234 812 000 0000" required>
@@ -1052,9 +1273,9 @@
       </div>
       <div class="modal-body">
         <div style="text-align:center; margin-bottom:1.5rem;">
-          <h4 id="payItemTitle" style="color:var(--teal-primary); margin-bottom:0.4rem;">Item Name</h4>
-          <div style="font-size:1.8rem; font-weight:900; color:var(--text-dark);" id="payAmountNGN">₦0</div>
-          <span style="font-size:0.85rem; color:var(--text-muted);" id="payAmountUSD">($0)</span>
+          <h4 id="payItemTitle" style="color:var(--emerald-light); margin-bottom:0.4rem;">The Zeerocodes VibeCode Labs</h4>
+          <div style="font-size:2rem; font-weight:900; color:#FFF;" id="payAmountNGN">₦95,000</div>
+          <span style="font-size:0.85rem; color:var(--text-cyber-muted);" id="payAmountUSD">($65 USD)</span>
         </div>
 
         <div style="display:flex; flex-direction:column; gap:0.75rem;">
@@ -1074,8 +1295,8 @@
     <div class="modal-card" style="text-align:center; padding:2rem;">
       <div class="pulse-indicator" style="width:20px; height:20px; margin:0 auto 1rem auto;"></div>
       <h3 style="margin-bottom:0.5rem;">Verifying Payment Transaction</h3>
-      <p id="procStatusText" style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1.25rem;">Awaiting server-side webhook signature verification...</p>
-      <div style="font-size:0.8rem; color:var(--text-muted); font-family:var(--font-mono);">
+      <p id="procStatusText" style="font-size:0.9rem; color:var(--text-cyber-muted); margin-bottom:1.25rem;">Awaiting server-side webhook signature verification...</p>
+      <div style="font-size:0.8rem; color:var(--text-cyber-muted); font-family:var(--font-mono);">
         Txn Ref: <span id="procTxnRef">ZC_...</span> | Provider: <span id="procProvider">PAYSTACK</span>
       </div>
     </div>
@@ -1090,41 +1311,6 @@
       </div>
       <div class="modal-body" id="publicVerifyContent">
         <!-- Rendered dynamically -->
-      </div>
-    </div>
-  </div>
-
-  <!-- VIBESCAN LIVE SCANNER MODAL -->
-  <div id="modal-vibescan-scanner" class="modal-backdrop">
-    <div class="modal-card modal-lg">
-      <div class="modal-header">
-        <h3>Live VibeScan Security Diagnostic</h3>
-        <button class="modal-close-btn">&times;</button>
-      </div>
-      <div class="modal-body" id="vibescanScannerModalBody">
-        <!-- Rendered dynamically -->
-      </div>
-    </div>
-  </div>
-
-  <!-- AUTH HARDENING AUDIT MODAL -->
-  <div id="modal-auth-hardening-audit" class="modal-backdrop">
-    <div class="modal-card modal-lg">
-      <div class="modal-header">
-        <h3>Zeerocodes Infrastructure & Auth Hardening Audit</h3>
-        <button class="modal-close-btn">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div style="background:#0C221F; color:#A3D8B3; font-family:var(--font-mono); font-size:0.8rem; padding:1.25rem; border-radius:var(--radius-sm); margin-bottom:1.25rem;">
-          <div>$ node scripts/check-auth-security.js</div>
-          <div style="color:#85C79A;">✓ 100% password hashes validated with bcrypt standard</div>
-          <div style="color:#85C79A;">✓ 0 mass-assignment vulnerabilities detected on Prisma routes</div>
-          <div style="color:#85C79A;">✓ Webhook HMAC SHA-512 cryptographic signatures enforced</div>
-          <div style="color:#85C79A;">✓ 10/10 OWASP LLM security categories monitored</div>
-        </div>
-        <button class="btn btn-primary btn-sm btn-block modal-close-btn">
-          <i data-lucide="check"></i> Close Diagnostic
-        </button>
       </div>
     </div>
   </div>
@@ -1154,10 +1340,10 @@
 
   <!-- COMMAND PALETTE (CTRL+K / CMD+K) -->
   <div id="modal-cmd-palette" class="modal-backdrop">
-    <div class="modal-card" style="max-width:600px; padding:0;">
-      <div style="padding:1rem 1.25rem; border-bottom:1px solid var(--gray-border); display:flex; align-items:center; gap:0.75rem;">
-        <i data-lucide="search" style="color:var(--teal-primary);"></i>
-        <input type="text" id="cmdPaletteInput" placeholder="Type a destination or action (e.g. 'academy', 'audit', 'book')..." style="width:100%; border:none; outline:none; font-size:1rem; font-family:var(--font-sans);">
+    <div class="modal-card" style="max-width:min(92vw, 600px); padding:0;">
+      <div style="padding:1rem 1.25rem; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; gap:0.75rem; background:#080C14;">
+        <i data-lucide="search" style="color:var(--emerald-light);"></i>
+        <input type="text" id="cmdPaletteInput" placeholder="Type a destination or action (e.g. 'academy', 'audit', 'book')..." style="width:100%; border:none; outline:none; font-size:1rem; font-family:var(--font-sans); background:transparent; color:#FFF;">
       </div>
       <div id="cmdPaletteResults" style="max-height:300px; overflow-y:auto; padding:0.5rem;">
         <!-- Results rendered dynamically -->
@@ -1174,7 +1360,7 @@
   <nav class="mobile-bottom-dock">
     <ul class="mobile-dock-items">
       <li><a href="#home" class="mobile-dock-link"><i data-lucide="home"></i><span>Home</span></a></li>
-      <li><a href="#academy" class="mobile-dock-link"><i data-lucide="graduation-cap"></i><span>Academy</span></a></li>
+      <li><a href="#academy" class="mobile-dock-link"><i data-lucide="graduation-cap"></i><span>VibeCode</span></a></li>
       <li><a href="#studio" class="mobile-dock-link"><i data-lucide="workflow"></i><span>Studio</span></a></li>
       <li><a href="#vibescan" class="mobile-dock-link"><i data-lucide="shield-check"></i><span>VibeScan</span></a></li>
       <li><a href="#dashboard" class="mobile-dock-link"><i data-lucide="layout-dashboard"></i><span>Account</span></a></li>

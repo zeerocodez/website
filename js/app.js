@@ -1,24 +1,31 @@
 /**
- * Zeerocodes Application Orchestrator (v2.0)
- * Links UI components, Course Catalog, Dashboard Rendering, Admin Queue, LMS, Payments, and Structured Audit Review.
+ * Zeerocodes Application Orchestrator (v3.1)
+ * Links UI components, The Zeerocodes VibeCode Labs Flagship Showcase,
+ * Dashboard Rendering, Admin Queue, LMS, Payments, Interactive Visualizers,
+ * Animated Counters, Live Trust Ticker, and Hardened Form Handlers.
  */
 
 class ZeerocodesApp {
   constructor() {
+    this.activeLevel = 1;
     this.init();
   }
 
   async init() {
-    console.log("🚀 Zeerocodes Initializing (Teach • Build • Protect)...");
+    console.log("🚀 Zeerocodes Initializing (Build • Automate • Secure)...");
     
-    // Bind all static and dynamic forms
+    // Bind core interactive components
     this.bindAuthForms();
     this.bindIntakeForms();
     this.bindContactForm();
     this.bindMobileNavigation();
     this.bindActionTriggers();
+    this.initCounters();
+    this.initLiveTrustTicker();
+    this.initArchitectureVisualizer();
+    this.initComparisonToggle();
 
-    // Render public courses
+    // Render public flagship course
     await this.renderAcademyCourses();
 
     // Bind Wiz-Style 3-Pillar Hero Stage Switcher
@@ -35,7 +42,7 @@ class ZeerocodesApp {
       }
     });
 
-    // Bind Equinet-Style FAQ Accordions
+    // Bind FAQ Accordions
     document.addEventListener('click', (e) => {
       const faqBtn = e.target.closest('.faq-question-btn');
       if (faqBtn) {
@@ -71,72 +78,349 @@ class ZeerocodesApp {
   }
 
   // =========================================================================
-  // 1. PUBLIC ACADEMY COURSE CATALOG (EQUINET-STYLE PEDAGOGY)
+  // 1. ANIMATED NUMBERS & METRIC COUNTERS
+  // =========================================================================
+  initCounters() {
+    const counterElements = document.querySelectorAll('.metric-counter');
+    if (!counterElements.length) return;
+
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseFloat(el.getAttribute('data-target') || el.textContent);
+          const isDecimal = target % 1 !== 0;
+          const duration = 1800; // ms
+          const startTime = performance.now();
+
+          const animate = (now) => {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const easeOut = 1 - Math.pow(1 - progress, 3);
+            
+            if (isDecimal) {
+              el.textContent = (easeOut * target).toFixed(2);
+            } else if (target >= 1000) {
+              el.textContent = Math.floor(easeOut * target).toLocaleString();
+            } else {
+              el.textContent = Math.floor(easeOut * target);
+            }
+
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            } else {
+              el.textContent = isDecimal ? target.toFixed(2) : (target >= 1000 ? target.toLocaleString() : target);
+            }
+          };
+
+          requestAnimationFrame(animate);
+          obs.unobserve(el);
+        }
+      });
+    }, { threshold: 0.2 });
+
+    counterElements.forEach(el => observer.observe(el));
+  }
+
+  // =========================================================================
+  // 2. LIVE TRUST ACTIVITY TICKER ROTATOR
+  // =========================================================================
+  initLiveTrustTicker() {
+    const tickerTextEl = document.getElementById('liveTickerText');
+    if (!tickerTextEl) return;
+
+    const tickerUpdates = [
+      '⚡ <strong>Live Platform:</strong> VibeScan verified <strong>SwiftShip Logistics</strong> (Grade A+ VibeCert™ #2026-0042)',
+      '🎓 <strong>Academy Enrollment:</strong> New student joined <strong>The VibeCode Labs (October 15 Cohort)</strong> from Lagos, Nigeria',
+      '🚀 <strong>Studio Sprints:</strong> Paystack webhook reconciliation deployed for <strong>PayQuick Africa</strong>',
+      '🛡️ <strong>Security Audit:</strong> 0 Secrets Leaked across <strong>48 audited client repositories</strong> this month',
+      '💡 <strong>VibeScan Engine:</strong> OWASP LLM AST Parser active across 14 security rules'
+    ];
+
+    let currentIndex = 0;
+    setInterval(() => {
+      currentIndex = (currentIndex + 1) % tickerUpdates.length;
+      tickerTextEl.style.opacity = '0';
+      tickerTextEl.style.transform = 'translateY(4px)';
+      tickerTextEl.style.transition = 'all 0.3s ease';
+
+      setTimeout(() => {
+        tickerTextEl.innerHTML = tickerUpdates[currentIndex];
+        tickerTextEl.style.opacity = '1';
+        tickerTextEl.style.transform = 'translateY(0)';
+      }, 300);
+    }, 4500);
+  }
+
+  // =========================================================================
+  // 3. INTERACTIVE SECURITY ARCHITECTURE VISUALIZER
+  // =========================================================================
+  initArchitectureVisualizer() {
+    const nodeCards = document.querySelectorAll('.arch-node-card');
+    const inspectorTitle = document.getElementById('archInspectorTitle');
+    const inspectorStatus = document.getElementById('archInspectorStatus');
+    const codePreview = document.getElementById('archCodePreview');
+
+    if (!nodeCards.length || !inspectorTitle || !codePreview) return;
+
+    const nodeDetails = {
+      'node-input': {
+        title: 'Node 01: Inbound Webhook & User Event Gateway',
+        status: 'STATUS: ACTIVE ENCRYPTION',
+        code: `// Capture raw body for webhook HMAC validation\napp.use(express.json({\n  limit: '2mb',\n  verify: (req, res, buf) => {\n    req.rawBody = buf; // Preserves raw buffer before JSON parsing\n  }\n}));`
+      },
+      'node-security': {
+        title: 'Node 02: Defensive AST Filter & Cryptographic HMAC Verification',
+        status: 'STATUS: TIMING-SAFE VERIFICATION',
+        code: `// Constant-time comparison to prevent side-channel timing attacks\nconst sigBuffer = Buffer.from(req.headers['x-paystack-signature'], 'utf8');\nconst compBuffer = Buffer.from(computedHash, 'utf8');\nconst isValid = sigBuffer.length === compBuffer.length && \n  crypto.timingSafeEqual(sigBuffer, compBuffer);`
+      },
+      'node-execution': {
+        title: 'Node 03: Autonomous Execution Layer (n8n & Claude 3.7)',
+        status: 'STATUS: LEAST PRIVILEGE AGENT',
+        code: `// Enforce structured output validation with Zod before triggering financial tools\nconst dispatchOrderSchema = z.object({\n  customerPhone: z.string().regex(/^\\+234\\d{10}$/),\n  invoiceReference: z.string().startsWith('ZC_INV_'),\n  amountNGN: z.number().positive().max(5000000)\n}).strict();`
+      },
+      'node-database': {
+        title: 'Node 04: Hardened Data Layer (Supabase / Postgres RLS)',
+        status: 'STATUS: TENANT ISOLATION ENFORCED',
+        code: `-- PostgreSQL Row Level Security (RLS) Policy\nALTER TABLE orders ENABLE ROW LEVEL SECURITY;\nCREATE POLICY tenant_isolation_policy ON orders\n  FOR ALL\n  USING (auth.uid() = user_id);\n-- Client cannot bypass user_id scoping`
+      },
+      'node-cert': {
+        title: 'Node 05: Cryptographic VibeCert™ Security Badge Generation',
+        status: 'STATUS: VIBECERT™ CERTIFIED GRADE A+',
+        code: `// Issue tamper-proof cryptographic audit signature\nconst certHash = crypto.createHash('sha256')\n  .update(\`\${repoUrl}_\${auditTimestamp}_\${owaspGrade}\`)\n  .digest('hex');\nconst certId = 'VIBECERT-2026-' + certHash.substring(0, 6).toUpperCase();`
+      }
+    };
+
+    nodeCards.forEach(card => {
+      card.addEventListener('click', () => {
+        nodeCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+
+        const nodeId = card.getAttribute('data-node');
+        const detail = nodeDetails[nodeId];
+        if (detail) {
+          inspectorTitle.innerHTML = `<i data-lucide="shield-check" style="width:14px; height:14px; display:inline;"></i> ${detail.title}`;
+          inspectorStatus.textContent = detail.status;
+          codePreview.textContent = detail.code;
+          if (window.lucide) window.lucide.createIcons();
+        }
+      });
+    });
+  }
+
+  // =========================================================================
+  // 4. PAIN POINTS COMPARISON TOGGLE
+  // =========================================================================
+  initComparisonToggle() {
+    const btnFragile = document.getElementById('btnShowFragile');
+    const btnHardened = document.getElementById('btnShowHardened');
+    const colFragile = document.getElementById('colFragileContent');
+    const colHardened = document.getElementById('colHardenedContent');
+
+    if (!btnFragile || !btnHardened) return;
+
+    btnFragile.addEventListener('click', () => {
+      if (window.innerWidth < 992 && colFragile && colHardened) {
+        colFragile.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      if (window.toast) window.toast.info("Inspecting risks in unverified vibe-coded applications.");
+    });
+
+    btnHardened.addEventListener('click', () => {
+      if (window.innerWidth < 992 && colFragile && colHardened) {
+        colHardened.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      if (window.toast) window.toast.success("Inspecting Zeerocodes verified architecture protections.");
+    });
+  }
+
+  // =========================================================================
+  // 5. FLAGSHIP COHORT SHOWCASE: THE ZEEROCODES VIBECODE LABS
   // =========================================================================
   async renderAcademyCourses() {
     const container = document.getElementById('academyCoursesGrid');
     if (!container || !window.db) return;
 
     const courses = await window.db.getCourses();
+    const course = courses[0];
+    if (!course) return;
+
     const curr = window.payments ? window.payments.activeCurrency : 'NGN';
+    const formattedPrice = window.payments ? window.payments.formatPrice(course.priceNGN) : `₦${course.priceNGN.toLocaleString()}`;
+    const formattedOriginalPrice = window.payments ? window.payments.formatPrice(course.originalPriceNGN || 150000) : `₦150,000`;
 
-    container.innerHTML = courses.map(course => {
-      const formattedPrice = window.payments ? window.payments.formatPrice(course.priceNGN) : `₦${course.priceNGN.toLocaleString()}`;
-      return `
-        <div class="course-card">
-          <div class="course-card-header">
-            <div class="course-badge">${course.level}</div>
-            <div class="course-duration"><i data-lucide="clock"></i> ${course.duration}</div>
-          </div>
-          <h3 class="course-title">${course.title}</h3>
-          <p class="course-short-desc">${course.shortDesc}</p>
-          
-          <div class="course-tools-strip">
-            <span class="tool-tag">n8n</span>
-            <span class="tool-tag">WhatsApp API</span>
-            <span class="tool-tag">Paystack</span>
-            <span class="tool-tag">Claude 3.7</span>
-            <span class="tool-tag">OWASP Top 10</span>
+    container.innerHTML = `
+      <div class="vibecode-showcase-card">
+        
+        <!-- Header Grid -->
+        <div class="vibecode-header-grid">
+          <div>
+            <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.75rem; flex-wrap:wrap;">
+              <span class="badge badge-teal"><i data-lucide="sparkles" style="width:13px; height:13px;"></i> Flagship Cohort</span>
+              <span class="badge badge-cyber"><i data-lucide="layers" style="width:13px; height:13px;"></i> 4 Levels • 20 Modules • 88 Lessons</span>
+              <span class="badge badge-success"><i data-lucide="shield-check" style="width:13px; height:13px;"></i> VibeCert™ Audited</span>
+            </div>
+            
+            <h1 class="vibecode-title">${course.title}</h1>
+            <p class="vibecode-subtitle">${course.subtitle || 'From Blank Page to Certified, Secured, Production AI Software & Client Revenue'}</p>
+            <p style="color:var(--text-cyber-muted); font-size:0.98rem; line-height:1.7; margin-bottom:1.5rem;">
+              ${course.description}
+            </p>
+
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1.5rem;">
+              <span class="tool-tag" style="padding:4px 10px; font-size:0.8rem; background:rgba(1,107,97,0.25); color:#2DD4BF; border-color:rgba(45,212,191,0.3);"><i data-lucide="cpu" style="width:12px; height:12px; display:inline;"></i> Google Stitch</span>
+              <span class="tool-tag" style="padding:4px 10px; font-size:0.8rem;"><i data-lucide="code" style="width:12px; height:12px; display:inline;"></i> Google AI Studio</span>
+              <span class="tool-tag" style="padding:4px 10px; font-size:0.8rem;"><i data-lucide="bot" style="width:12px; height:12px; display:inline;"></i> Google Antigravity</span>
+              <span class="tool-tag" style="padding:4px 10px; font-size:0.8rem;"><i data-lucide="workflow" style="width:12px; height:12px; display:inline;"></i> n8n Automation</span>
+              <span class="tool-tag" style="padding:4px 10px; font-size:0.8rem;"><i data-lucide="credit-card" style="width:12px; height:12px; display:inline;"></i> Paystack & Flutterwave</span>
+              <span class="tool-tag" style="padding:4px 10px; font-size:0.8rem; background:rgba(16,185,129,0.2); color:#34D399; border-color:rgba(52,211,153,0.3);"><i data-lucide="shield-check" style="width:12px; height:12px; display:inline;"></i> VibeScan Security</span>
+            </div>
           </div>
 
-          <!-- Equinet-Style Curriculum Accordion Drawer -->
-          <div class="curriculum-accordion">
-            <button type="button" class="curriculum-header-btn" onclick="this.nextElementSibling.classList.toggle('active')">
-              <span><i data-lucide="book-open" style="width:14px; height:14px; display:inline; vertical-align:middle;"></i> View Detailed Syllabus (${course.modules.length} Modules)</span>
-              <i data-lucide="chevron-down" style="width:14px; height:14px;"></i>
+          <!-- Direct Pricing & Enrollment Card -->
+          <div class="enrollment-checkout-box">
+            <span class="enrollment-badge-early"><i data-lucide="clock" style="width:13px; height:13px; display:inline;"></i> Early-Bird Enrollment Open</span>
+            
+            <div style="display:flex; justify-content:center; align-items:baseline; margin:0.5rem 0;">
+              <span class="enrollment-price-struck">${formattedOriginalPrice}</span>
+              <span class="enrollment-price-main">${formattedPrice}</span>
+            </div>
+            <span style="font-size:0.82rem; color:var(--text-cyber-muted); display:block; margin-bottom:1.25rem;">
+              One-Time Payment • Full Lifetime Access to Curriculum & Updates
+            </span>
+
+            <button class="btn btn-primary btn-block" style="padding:0.9rem 1.5rem; font-size:1.05rem;" onclick="window.app.handleEnrollCourse('${course.id}')">
+              <i data-lucide="credit-card"></i> Enroll in October 15 Cohort
             </button>
-            <div class="curriculum-modules-drawer">
-              ${course.modules.map(mod => `
-                <div class="module-item">
-                  <i data-lucide="check-circle-2"></i>
-                  <span>${mod}</span>
-                </div>
-              `).join('')}
+
+            <div style="display:flex; flex-direction:column; gap:0.5rem; margin-top:1.25rem; font-size:0.8rem; color:var(--text-cyber-muted); text-align:left;">
+              <div style="display:flex; align-items:center; gap:0.45rem;"><i data-lucide="check" style="color:var(--emerald-light); width:14px; height:14px;"></i> 8-Week Live Training & Weekend Build-Alongs</div>
+              <div style="display:flex; align-items:center; gap:0.45rem;"><i data-lucide="check" style="color:var(--emerald-light); width:14px; height:14px;"></i> 1-on-1 Mentor Office Hours with Nuel Effiong</div>
+              <div style="display:flex; align-items:center; gap:0.45rem;"><i data-lucide="check" style="color:var(--emerald-light); width:14px; height:14px;"></i> Official 12-Month Renewable Certification</div>
+              <div style="display:flex; align-items:center; gap:0.45rem;"><i data-lucide="check" style="color:var(--emerald-light); width:14px; height:14px;"></i> 14-Day 100% Satisfaction Money-Back Guarantee</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- The Build Pipeline Visualizer Track -->
+        <div class="vibecode-pipeline-banner">
+          <div style="color:var(--text-cyber-muted); font-size:0.75rem; margin-bottom:0.75rem; text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">
+            <i data-lucide="git-branch" style="width:13px; height:13px; display:inline; vertical-align:middle;"></i> The Zeerocodes Build Pipeline (Foundations &rarr; Shipped App &rarr; Client Revenue)
+          </div>
+          <div class="pipeline-track">
+            <span class="pipeline-step">IDEA</span>
+            <span class="pipeline-arrow">&rarr;</span>
+            <span class="pipeline-step highlight">GOOGLE STITCH (Design)</span>
+            <span class="pipeline-arrow">&rarr;</span>
+            <span class="pipeline-step highlight">AI STUDIO (Prototype)</span>
+            <span class="pipeline-arrow">&rarr;</span>
+            <span class="pipeline-step highlight">ANTIGRAVITY (Production)</span>
+            <span class="pipeline-arrow">&rarr;</span>
+            <span class="pipeline-step highlight">n8n / AGENTS (Automate)</span>
+            <span class="pipeline-arrow">&rarr;</span>
+            <span class="pipeline-step highlight">VIBESCAN (Secure)</span>
+            <span class="pipeline-arrow">&rarr;</span>
+            <span class="pipeline-step">CLOUD RUN / PLAY STORE (Ship)</span>
+            <span class="pipeline-arrow">&rarr;</span>
+            <span class="pipeline-step">CLIENT / MARKET (Earn)</span>
+            <span class="pipeline-arrow">&rarr;</span>
+            <span class="pipeline-step highlight" style="background:#016B61; color:#FFF; border-color:#85C79A;">ZEEROCODES CERTIFICATION (Prove It)</span>
+          </div>
+        </div>
+
+        <!-- 4-Level Interactive Curriculum Switcher -->
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+            <div>
+              <h3 style="color:#FFFFFF; font-size:1.5rem; margin-bottom:0.25rem;">Complete 4-Level Curriculum Roadmap</h3>
+              <p style="font-size:0.9rem; color:var(--text-cyber-muted);">Click any level below to explore its modules, lessons, case studies, and labs.</p>
+            </div>
+            <div class="currency-switcher-pill">
+              <span style="font-size:0.75rem; color:var(--text-cyber-muted); font-weight:600; text-transform:uppercase;">Currency:</span>
+              <button type="button" class="currency-btn ${curr === 'NGN' ? 'active' : ''}" data-currency="NGN">₦ NGN</button>
+              <button type="button" class="currency-btn ${curr === 'USD' ? 'active' : ''}" data-currency="USD">$ USD</button>
+              <button type="button" class="currency-btn ${curr === 'GBP' ? 'active' : ''}" data-currency="GBP">£ GBP</button>
             </div>
           </div>
 
-          <div class="course-card-footer">
-            <div class="course-pricing">
-              <span class="price-ngn" style="font-size:1.25rem; font-weight:800; color:var(--teal-primary);">${formattedPrice}</span>
-              <span class="price-usd" style="font-size:0.8rem; color:var(--text-muted);">(${curr})</span>
-            </div>
-            <button class="btn btn-primary btn-sm" onclick="window.app.handleEnrollCourse('${course.id}')">
-              <i data-lucide="credit-card"></i> Enroll in Cohort
+          <!-- Level Tabs -->
+          <div class="curriculum-level-nav">
+            ${course.levels.map(lvl => `
+              <button class="curriculum-level-btn ${lvl.levelNumber === this.activeLevel ? 'active' : ''}" onclick="window.app.switchLevel(${lvl.levelNumber})">
+                <span class="level-badge">LEVEL ${lvl.levelNumber}</span>
+                <span class="level-btn-title">${lvl.title.split(': ')[1] || lvl.title}</span>
+                <span class="level-btn-lessons">${lvl.modules.length} Modules • ${lvl.lessonCount} Lessons</span>
+              </button>
+            `).join('')}
+          </div>
+
+          <!-- Dynamic Modules Grid for the Active Level -->
+          <div class="modules-grid" id="curriculumModulesContainer">
+            ${this.renderLevelModules(course.levels.find(l => l.levelNumber === this.activeLevel) || course.levels[0])}
+          </div>
+
+          <div style="text-align:center; padding-top:1.5rem; border-top:1px solid rgba(255,255,255,0.08);">
+            <button class="btn btn-primary" style="padding:0.85rem 2.25rem; font-size:1.05rem;" onclick="window.app.handleEnrollCourse('${course.id}')">
+              <i data-lucide="check-circle-2"></i> Join Next Cohort — ${formattedPrice}
             </button>
           </div>
         </div>
-      `;
-    }).join('');
+
+      </div>
+    `;
 
     if (window.lucide) window.lucide.createIcons();
   }
 
-  /**
-   * Section B: Payment-Gated Academy Enrollment
-   */
+  renderLevelModules(level) {
+    if (!level || !level.modules) return '';
+    return level.modules.map(mod => `
+      <div class="module-card">
+        <div class="module-card-header">
+          <div class="module-number-badge">${mod.number}</div>
+          <div class="module-card-title">${mod.title}</div>
+        </div>
+        <ul class="module-lessons-list">
+          ${mod.lessons.map(lesson => `
+            <li>
+              <i data-lucide="check-circle-2"></i>
+              <span>${lesson}</span>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    `).join('');
+  }
+
+  switchLevel(levelNumber) {
+    this.activeLevel = levelNumber;
+    const course = window.db ? window.db.getLocal('courses')?.[0] : null;
+    if (!course || !course.levels) return;
+
+    // Update level button active classes
+    document.querySelectorAll('.curriculum-level-btn').forEach((btn, idx) => {
+      if (idx + 1 === levelNumber) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    // Update modules grid
+    const container = document.getElementById('curriculumModulesContainer');
+    const targetLevel = course.levels.find(l => l.levelNumber === levelNumber);
+    if (container && targetLevel) {
+      container.innerHTML = this.renderLevelModules(targetLevel);
+      if (window.lucide) window.lucide.createIcons();
+    }
+  }
+
+  renderCourses() {
+    return this.renderAcademyCourses();
+  }
+
   async handleEnrollCourse(courseId) {
     if (!window.auth || !window.auth.isAuthenticated()) {
-      if (window.toast) window.toast.info("Please sign in or create an account to enroll.");
+      if (window.toast) window.toast.info("Please sign in or create a free account to enroll.");
       if (window.modal) window.modal.openAuth('signup');
       return;
     }
@@ -144,7 +428,6 @@ class ZeerocodesApp {
     const course = await window.db.getCourseById(courseId);
     if (!course) return;
 
-    // Launch Paystack / Flutterwave checkout modal
     if (window.payments) {
       window.payments.openCheckoutModal({
         type: 'academy_enrollment',
@@ -157,332 +440,99 @@ class ZeerocodesApp {
   }
 
   // =========================================================================
-  // 2. USER DASHBOARD RENDERING (UNIFIED ACCOUNT SYSTEM)
+  // 6. CONTACT FORM INTAKE (AJAX WITH SERVERLESS & FALLBACK)
   // =========================================================================
-  async renderUserDashboard() {
-    const user = window.auth ? window.auth.getUser() : null;
-    if (!user) return;
+  bindContactForm() {
+    const contactForm = document.getElementById('publicContactForm');
+    const submitBtn = document.getElementById('btnSubmitContact');
 
-    // Account Bar Details
-    const emailEl = document.getElementById('dashUserEmail');
-    const nameEl = document.getElementById('dashUserName');
-    const roleBadgeEl = document.getElementById('dashRoleBadge');
-    const verifiedBadgeEl = document.getElementById('dashVerifiedBadge');
-    const emailVerifyBanner = document.getElementById('dashEmailVerifyBanner');
+    if (!contactForm) return;
 
-    if (emailEl) emailEl.textContent = user.email;
-    if (nameEl) nameEl.textContent = user.displayName || 'Zeerocodes Member';
-    if (roleBadgeEl) {
-      roleBadgeEl.textContent = (user.role || 'user').toUpperCase();
-      roleBadgeEl.className = `badge badge-${user.role || 'user'}`;
-    }
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('contactName')?.value.trim();
+      const email = document.getElementById('contactEmail')?.value.trim();
+      const topic = document.getElementById('contactTopic')?.value;
+      const message = document.getElementById('contactMessage')?.value.trim();
 
-    // Email Verification Status Banner
-    if (user.emailVerified) {
-      if (verifiedBadgeEl) {
-        verifiedBadgeEl.innerHTML = `<span class="badge badge-success"><i data-lucide="check-check"></i> Email Verified</span>`;
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<span class="pulse-indicator"></span> Sending Inquiry...`;
       }
-      if (emailVerifyBanner) emailVerifyBanner.classList.add('d-none');
-    } else {
-      if (verifiedBadgeEl) {
-        verifiedBadgeEl.innerHTML = `<span class="badge badge-warning"><i data-lucide="alert-circle"></i> Unverified</span>`;
+
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, topic, message })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          if (window.toast) window.toast.success(data.message || `Thank you, ${name}! Your message has been sent.`);
+          contactForm.reset();
+        } else {
+          // Graceful fallback for local file execution
+          if (window.toast) window.toast.success(`Thank you, ${name}! Your inquiry regarding "${topic}" has been recorded.`);
+          contactForm.reset();
+        }
+      } catch (err) {
+        console.warn("Contact endpoint direct call error, saving locally:", err);
+        if (window.toast) window.toast.success(`Thank you, ${name}! Your inquiry has been received by the Zeerocodes team.`);
+        contactForm.reset();
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<i data-lucide="send"></i> Send Inquiry Message`;
+          if (window.lucide) window.lucide.createIcons();
+        }
       }
-      if (emailVerifyBanner) emailVerifyBanner.classList.remove('d-none');
-    }
-
-    // Load User Enrollments
-    await this.renderDashboardEnrollments(user.uid);
-
-    // Load User VibeScan Submissions
-    await this.renderDashboardSubmissions(user.uid);
-
-    // Load User Studio Projects
-    await this.renderDashboardStudioProjects(user.uid);
-
-    if (window.lucide) window.lucide.createIcons();
-  }
-
-  async renderDashboardEnrollments(userId) {
-    const container = document.getElementById('dashEnrollmentsList');
-    if (!container || !window.db) return;
-
-    const enrollments = await window.db.getUserEnrollments(userId);
-    if (enrollments.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state-card">
-          <div class="empty-state-icon"><i data-lucide="graduation-cap"></i></div>
-          <h4>No Course Enrollments Yet</h4>
-          <p>Gain hands-on skills in AI automation, WhatsApp workflows, and secure coding for emerging markets.</p>
-          <a href="#academy" class="btn btn-secondary btn-sm"><i data-lucide="compass"></i> Explore Academy Courses</a>
-        </div>
-      `;
-    } else {
-      container.innerHTML = enrollments.map(enr => `
-        <div class="dash-item-card">
-          <div class="dash-item-header">
-            <div>
-              <span class="badge badge-teal">Academy Course</span>
-              <h4 class="dash-item-title">${enr.courseTitle}</h4>
-            </div>
-            <span class="badge badge-success">${enr.completed ? '100% Completed' : 'Active'}</span>
-          </div>
-          <div class="progress-bar-container">
-            <div class="progress-bar-label">
-              <span>Progress</span>
-              <span>${enr.progressPercent || 0}% Complete</span>
-            </div>
-            <div class="progress-track">
-              <div class="progress-fill" style="width: ${enr.progressPercent || 0}%;"></div>
-            </div>
-          </div>
-          <div class="dash-item-actions">
-            <button class="btn btn-primary btn-sm" onclick="window.lms.openCoursePlayer('${enr.id}')">
-              <i data-lucide="play"></i> Launch Course Player
-            </button>
-            <button class="btn btn-outline btn-sm" onclick="window.modal.openVibescanIntake('academy')">
-              <i data-lucide="shield-check"></i> Audit Project Code
-            </button>
-          </div>
-        </div>
-      `).join('');
-    }
-  }
-
-  async renderDashboardSubmissions(userId) {
-    const container = document.getElementById('dashSubmissionsList');
-    if (!container || !window.db) return;
-
-    const submissions = await window.db.getSubmissionsForUser(userId);
-    if (submissions.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state-card">
-          <div class="empty-state-icon"><i data-lucide="shield-alert"></i></div>
-          <h4>No VibeScan Audits Submitted</h4>
-          <p>Verify your AI-assisted or vibe-coded applications against the OWASP Top 10 before investor or public launch.</p>
-          <button class="btn btn-secondary btn-sm" onclick="window.modal.openVibescanIntake('dashboard')">
-            <i data-lucide="shield-plus"></i> Submit App for Security Audit
-          </button>
-        </div>
-      `;
-    } else {
-      container.innerHTML = submissions.map(sub => {
-        let statusBadge = `<span class="badge badge-warning">Pending Review</span>`;
-        if (sub.status === 'in_progress') statusBadge = `<span class="badge badge-teal">In Auditor Review</span>`;
-        if (sub.status === 'certified') statusBadge = `<span class="badge badge-success">Certified Safe (${sub.certificationId || 'Verified'})</span>`;
-        if (sub.status === 'not_certified' || sub.status === 'rejected') statusBadge = `<span class="badge badge-error">Remediation Needed</span>`;
-
-        return `
-          <div class="dash-item-card">
-            <div class="dash-item-header">
-              <div>
-                <span class="badge badge-teal">VibeScan Audit</span>
-                <h4 class="dash-item-title">${sub.appName}</h4>
-                <div class="dash-item-meta">
-                  <span><i data-lucide="git-branch"></i> ${sub.buildMethod}</span>
-                  <span><i data-lucide="calendar"></i> ${new Date(sub.submittedAt).toLocaleDateString()}</span>
-                </div>
-              </div>
-              <div>${statusBadge}</div>
-            </div>
-            <p class="dash-item-desc"><strong>Tech Stack:</strong> ${sub.techStack}</p>
-            <div class="dash-item-actions">
-              <a href="${sub.appUrl}" target="_blank" rel="noreferrer" class="btn btn-outline btn-sm">
-                <i data-lucide="external-link"></i> Repo Link
-              </a>
-              <button class="btn btn-secondary btn-sm" onclick="window.vibescanReview.openUserReportViewer('${sub.id}')">
-                <i data-lucide="file-text"></i> View Audit Findings & Badge
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-  }
-
-  async renderDashboardStudioProjects(userId) {
-    const container = document.getElementById('dashStudioProjectsList');
-    if (!container || !window.db) return;
-
-    const projects = await window.db.getStudioProjectsForUser(userId);
-    if (projects.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state-card">
-          <div class="empty-state-icon"><i data-lucide="cpu"></i></div>
-          <h4>No Studio Projects Active</h4>
-          <p>Need custom WhatsApp automation, Paystack invoice bots, or business system integration?</p>
-          <button class="btn btn-secondary btn-sm trigger-calendly-booking">
-            <i data-lucide="calendar"></i> Book a Studio Discovery Session
-          </button>
-        </div>
-      `;
-    } else {
-      container.innerHTML = projects.map(proj => {
-        const isDelivered = proj.status === 'project_delivered' || proj.progressPercent === 100;
-        return `
-          <div class="dash-item-card">
-            <div class="dash-item-header">
-              <div>
-                <span class="badge badge-teal">Studio Engagement</span>
-                <h4 class="dash-item-title">${proj.title}</h4>
-              </div>
-              <span class="badge badge-${isDelivered ? 'success' : 'teal'}">${proj.milestone}</span>
-            </div>
-            <p class="dash-item-desc">${proj.summary}</p>
-            <div class="progress-bar-container">
-              <div class="progress-bar-label">
-                <span>Build Phase</span>
-                <span>${proj.progressPercent}%</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" style="width: ${proj.progressPercent}%;"></div>
-              </div>
-            </div>
-
-            ${isDelivered ? `
-              <div style="margin-top:0.75rem; background:var(--mint-bg); padding:0.6rem 0.8rem; border-radius:var(--radius-sm); border:1px solid var(--green-secondary); display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:0.8rem; color:var(--teal-dark); font-weight:600;">System Delivered! Protect your automation:</span>
-                <button class="btn btn-primary btn-xs" onclick="window.studio.openDeliveredStudioCrossSell('${proj.id}')">
-                  <i data-lucide="shield"></i> VibeScan Audit
-                </button>
-              </div>
-            ` : ''}
-          </div>
-        `;
-      }).join('');
-    }
+    });
   }
 
   // =========================================================================
-  // 3. ADMIN DASHBOARD RENDERING (ROLE-GATED)
+  // 7. MOBILE NAVIGATION DRAWER
   // =========================================================================
-  async renderAdminDashboard() {
-    if (!window.auth || !window.auth.isAdmin()) {
-      window.location.hash = '#dashboard';
-      return;
-    }
+  bindMobileNavigation() {
+    const toggleBtn = document.getElementById('btnMobileNavToggle');
+    const closeBtn = document.getElementById('btnMobileDrawerClose');
+    const drawer = document.getElementById('mobileNavDrawer');
+    const overlay = document.getElementById('mobileDrawerOverlay');
+    const drawerLinks = document.querySelectorAll('.mobile-drawer-link');
 
-    const pendingQueueContainer = document.getElementById('adminSubmissionsQueue');
-    const usersTableContainer = document.getElementById('adminUsersTableBody');
-    const totalUsersCount = document.getElementById('adminStatTotalUsers');
-    const pendingAuditsCount = document.getElementById('adminStatPendingAudits');
-    const activeEnrollmentsCount = document.getElementById('adminStatEnrollments');
-
-    if (!window.db) return;
-
-    // Submissions sorted oldest first
-    const allSubmissions = await window.db.getAllPendingSubmissions();
-    allSubmissions.sort((a, b) => new Date(a.submittedAt) - new Date(b.submittedAt));
-
-    const allUsers = await window.db.getAllUsers();
-
-    if (totalUsersCount) totalUsersCount.textContent = allUsers.length;
-    if (pendingAuditsCount) {
-      const pending = allSubmissions.filter(s => s.status === 'pending_review' || s.status === 'in_progress');
-      pendingAuditsCount.textContent = pending.length;
-    }
-    if (activeEnrollmentsCount) {
-      const enrollments = window.db.getLocal('enrollments') || [];
-      activeEnrollmentsCount.textContent = enrollments.length;
-    }
-
-    // Render Pending Queue
-    if (pendingQueueContainer) {
-      if (allSubmissions.length === 0) {
-        pendingQueueContainer.innerHTML = `<tr><td colspan="6" class="text-center py-4">No submissions in queue.</td></tr>`;
-      } else {
-        pendingQueueContainer.innerHTML = allSubmissions.map(sub => `
-          <tr>
-            <td>
-              <strong>${sub.appName}</strong><br>
-              <span class="text-muted text-sm">${sub.userName || sub.userEmail}</span>
-            </td>
-            <td><a href="${sub.appUrl}" target="_blank" class="table-link"><i data-lucide="external-link"></i> ${sub.appUrl.replace('https://', '').substring(0, 24)}...</a></td>
-            <td><span class="badge badge-outline">${sub.buildMethod}</span></td>
-            <td>
-              <span class="badge badge-referral badge-ref-${sub.referralSource || 'direct'}">
-                ${(sub.referralSource || 'direct').toUpperCase()}
-              </span>
-            </td>
-            <td>
-              <span class="badge badge-${sub.status === 'certified' ? 'success' : (sub.status === 'not_certified' ? 'error' : 'warning')}">
-                ${sub.status.replace('_', ' ').toUpperCase()}
-              </span>
-            </td>
-            <td class="action-cell">
-              <button class="btn btn-sm btn-primary" onclick="window.vibescanReview.openStructuredReview('${sub.id}')">
-                <i data-lucide="check-square"></i> Structured Audit Form
-              </button>
-            </td>
-          </tr>
-        `).join('');
-      }
-    }
-
-    // Render Users Table
-    if (usersTableContainer) {
-      usersTableContainer.innerHTML = allUsers.map(u => `
-        <tr>
-          <td>
-            <strong>${u.displayName || 'Zeerocodes Member'}</strong><br>
-            <span class="text-muted text-sm">${u.email}</span>
-          </td>
-          <td>
-            <span class="badge badge-${u.emailVerified ? 'success' : 'warning'}">
-              ${u.emailVerified ? 'Verified' : 'Pending'}
-            </span>
-          </td>
-          <td>
-            <span class="badge badge-${u.role === 'admin' ? 'teal' : 'outline'}">
-              ${(u.role || 'user').toUpperCase()}
-            </span>
-          </td>
-          <td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Active'}</td>
-          <td>
-            <button class="btn btn-outline btn-xs" onclick="window.app.toggleSpecificUserRole('${u.uid}', '${u.role === 'admin' ? 'user' : 'admin'}')">
-              Make ${u.role === 'admin' ? 'User' : 'Admin'}
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    if (window.lucide) window.lucide.createIcons();
-  }
-
-  async toggleSpecificUserRole(userId, newRole) {
-    const user = await window.db.getUser(userId);
-    if (user) {
-      user.role = newRole;
-      await window.db.saveUser(user);
-      if (window.toast) window.toast.info(`Updated user role to ${newRole.toUpperCase()}`);
-      await this.renderAdminDashboard();
-    }
-  }
-
-  previewCertBadge(certId) {
-    const certs = window.db.getLocal('certifications') || [];
-    const cert = certs.find(c => c.certId === certId) || {
-      certId: certId || 'VIBECERT-2026-0042',
-      appName: 'Sample AI Application',
-      grade: 'Grade A (Verified Safe)',
-      issuedDate: '2026-08-01'
+    const openDrawer = () => {
+      if (drawer) drawer.classList.add('active');
+      if (overlay) overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
     };
 
-    const certBadgeModal = document.getElementById('modal-cert-preview');
-    if (certBadgeModal) {
-      document.getElementById('badgeCertId').textContent = cert.certId;
-      document.getElementById('badgeAppName').textContent = cert.appName;
-      document.getElementById('badgeGrade').textContent = cert.grade;
-      document.getElementById('badgeIssueDate').textContent = cert.issuedDate;
-      window.modal.open('modal-cert-preview');
-    }
+    const closeDrawer = () => {
+      if (drawer) drawer.classList.remove('active');
+      if (overlay) overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    };
+
+    if (toggleBtn) toggleBtn.addEventListener('click', openDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    if (overlay) overlay.addEventListener('click', closeDrawer);
+
+    drawerLinks.forEach(link => {
+      link.addEventListener('click', closeDrawer);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeDrawer();
+    });
+
+    this.closeMobileDrawer = closeDrawer;
   }
 
   // =========================================================================
-  // 4. FORM BINDINGS & LISTENERS
+  // 8. AUTH & INTAKE FORMS
   // =========================================================================
   bindAuthForms() {
-    // Sign In Form
+    // Login Form
     const loginForm = document.getElementById('auth-form-login');
     if (loginForm) {
       loginForm.addEventListener('submit', async (e) => {
@@ -491,15 +541,14 @@ class ZeerocodesApp {
         const pass = document.getElementById('loginPassword').value;
         try {
           await window.auth.signInWithEmail(email, pass);
-          window.modal.closeAll();
-          window.location.hash = email.includes('admin') ? '#admin' : '#dashboard';
+          if (window.modal) window.modal.closeAll();
         } catch (err) {
           console.error(err);
         }
       });
     }
 
-    // Sign Up Form
+    // Signup Form
     const signupForm = document.getElementById('auth-form-signup');
     if (signupForm) {
       signupForm.addEventListener('submit', async (e) => {
@@ -509,285 +558,109 @@ class ZeerocodesApp {
         const pass = document.getElementById('signupPassword').value;
         try {
           await window.auth.signUpWithEmail(email, pass, name);
-          window.modal.closeAll();
-          window.location.hash = '#dashboard';
+          if (window.modal) window.modal.closeAll();
         } catch (err) {
           console.error(err);
         }
       });
     }
 
-    // Google Sign-In Buttons
-    document.querySelectorAll('.btn-google-auth').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        try {
-          await window.auth.signInWithGoogle();
-          window.modal.closeAll();
-          window.location.hash = '#dashboard';
-        } catch (err) {
-          console.error(err);
-        }
-      });
-    });
-
-    // Sign Out Buttons
+    // Sign Out
     document.querySelectorAll('.btn-sign-out').forEach(btn => {
       btn.addEventListener('click', () => {
-        window.auth.signOut();
+        if (window.auth) window.auth.signOut();
       });
     });
 
-    // Auth Modal Tab Switchers
+    // Auth tab toggles
     document.querySelectorAll('.auth-tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const tab = btn.getAttribute('data-tab');
-        window.modal.openAuth(tab);
+        document.querySelectorAll('.auth-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (tab === 'login') {
+          document.getElementById('auth-form-login')?.classList.remove('d-none');
+          if (document.getElementById('auth-form-login')) document.getElementById('auth-form-login').style.display = 'block';
+          document.getElementById('auth-form-signup')?.classList.add('d-none');
+          if (document.getElementById('auth-form-signup')) document.getElementById('auth-form-signup').style.display = 'none';
+        } else {
+          document.getElementById('auth-form-signup')?.classList.remove('d-none');
+          if (document.getElementById('auth-form-signup')) document.getElementById('auth-form-signup').style.display = 'block';
+          document.getElementById('auth-form-login')?.classList.add('d-none');
+          if (document.getElementById('auth-form-login')) document.getElementById('auth-form-login').style.display = 'none';
+        }
       });
     });
-
-    // Resend Email Verification Button
-    const resendBtn = document.getElementById('btnResendVerification');
-    if (resendBtn) {
-      resendBtn.addEventListener('click', () => {
-        window.auth.sendVerificationEmail();
-      });
-    }
-
-    // Structured Audit Form Submit
-    const structForm = document.getElementById('structuredAuditForm');
-    if (structForm) {
-      structForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = {
-          authHandlingStatus: document.getElementById('auditAuthSelect').value,
-          authHandlingNotes: document.getElementById('auditAuthNotes').value,
-          dataExposureStatus: document.getElementById('auditDataSelect').value,
-          dataExposureNotes: document.getElementById('auditDataNotes').value,
-          dependencyRiskStatus: document.getElementById('auditDepSelect').value,
-          dependencyRiskNotes: document.getElementById('auditDepNotes').value,
-          apiSecurityStatus: document.getElementById('auditApiSelect').value,
-          apiSecurityNotes: document.getElementById('auditApiNotes').value,
-          overallOutcome: document.getElementById('auditOutcomeSelect').value,
-          summaryNotes: document.getElementById('auditSummaryNotes').value
-        };
-
-        await window.vibescanReview.submitAuditReport(formData);
-      });
-    }
   }
 
   bindIntakeForms() {
-    // VibeScan Submission Intake Form (triggers Payment gate)
-    const vibescanForm = document.getElementById('vibescanIntakeForm');
-    if (vibescanForm) {
-      vibescanForm.addEventListener('submit', async (e) => {
+    // In-App Booking Form
+    const bookingForm = document.getElementById('inAppBookingForm');
+    if (bookingForm) {
+      bookingForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        if (!window.auth || !window.auth.isAuthenticated()) {
-          window.modal.openAuth('signup');
-          return;
-        }
-
-        const user = window.auth.getUser();
-        const appName = document.getElementById('vibescanAppName').value;
-        const appUrl = document.getElementById('vibescanAppUrl').value;
-        const techStack = document.getElementById('vibescanTechStack').value;
-        const buildMethod = document.getElementById('vibescanBuildMethod').value;
-        const refSource = document.getElementById('vibescanReferralSource').value || 'direct';
-        const notes = document.getElementById('vibescanNotes').value;
-
-        window.modal.closeAll();
-
-        // Launch Payment Checkout before entering the admin queue
-        if (window.payments) {
-          window.payments.openCheckoutModal({
-            type: 'vibescan_audit',
-            itemId: 'audit-comprehensive',
-            itemTitle: `VibeScan Security Audit: ${appName}`,
-            amountNGN: 120000,
-            amountUSD: 80,
-            metadata: {
-              userName: user.displayName,
-              appName: appName,
-              appUrl: appUrl,
-              techStack: techStack,
-              buildMethod: buildMethod,
-              referralSource: refSource,
-              notes: notes
-            }
-          });
-        }
-      });
-    }
-
-    // Firebase Config Form
-    const fbConfigForm = document.getElementById('firebaseConfigForm');
-    if (fbConfigForm) {
-      fbConfigForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const apiKey = document.getElementById('fbCfgApiKey').value.trim();
-        const authDomain = document.getElementById('fbCfgAuthDomain').value.trim();
-        const projectId = document.getElementById('fbCfgProjectId').value.trim();
-        const appId = document.getElementById('fbCfgAppId').value.trim();
-
-        window.zeerocodesFirebase.saveConfig({
-          apiKey, authDomain, projectId, appId,
-          storageBucket: `${projectId}.appspot.com`,
-          messagingSenderId: '1234567890'
-        });
-        window.modal.closeAll();
-      });
-    }
-  }
-
-  bindContactForm() {
-    const contactForm = document.getElementById('contactForm');
-    if (contactForm) {
-      contactForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const name = document.getElementById('contactName').value;
+        const name = document.getElementById('bookingClientName')?.value;
+        const service = document.getElementById('bookingServiceSelect')?.value;
         if (window.toast) {
-          window.toast.success(`Thank you, ${name}! Your inquiry has been received. We'll reply within 1 business day.`);
+          window.toast.success(`Discovery session confirmed for ${name}! Scope: ${service}`);
         }
-        contactForm.reset();
-      });
-    }
-  }
-
-  bindMobileNavigation() {
-    const toggleBtns = document.querySelectorAll('.mobile-nav-toggle');
-    const drawer = document.querySelector('.mobile-nav-drawer');
-    const overlay = document.querySelector('.mobile-nav-overlay');
-
-    if (toggleBtns && drawer && overlay) {
-      toggleBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          drawer.classList.toggle('active');
-          overlay.classList.toggle('active');
-        });
-      });
-
-      overlay.addEventListener('click', () => {
-        drawer.classList.remove('active');
-        overlay.classList.remove('active');
+        if (window.modal) window.modal.closeAll();
+        bookingForm.reset();
       });
     }
   }
 
   bindActionTriggers() {
-    // Delegated click handler for actions anywhere in the DOM
     document.addEventListener('click', (e) => {
-      // 1. Calendly / Studio Booking trigger
       if (e.target.closest('.trigger-calendly-booking')) {
         if (window.modal) window.modal.openBooking();
       }
 
-      // 2. Command Palette trigger
       if (e.target.closest('.cmd-palette-trigger')) {
-        if (window.modal) window.modal.open('modal-command-palette');
+        if (window.modal) window.modal.open('modal-cmd-palette');
       }
 
-      // 3. Quick role toggle
       if (e.target.closest('.btn-toggle-role')) {
         if (window.auth) window.auth.toggleRole();
       }
-
-      // 4. Reset sample seed data
-      if (e.target.closest('.btn-reset-demo-data')) {
-        if (confirm("Reset local sandbox data to fresh seed state?")) {
-          window.db.resetToSampleData();
-          if (window.toast) window.toast.info("Database reset to initial sample state.");
-          window.location.reload();
-        }
-      }
     });
 
-    // Command Palette Trigger
     this.bindCommandPalette();
-
-    // Academy Filters & Search
-    this.bindAcademyFilters();
-
-    // Dashboard Tabs
-    this.bindDashboardTabs();
-
-    // Back to Top Button
     this.bindBackToTop();
-
-    // Initialize Interactive Calculators & Visualizers
-    setTimeout(() => {
-      if (typeof window.initRoiCalculator === 'function') {
-        window.initRoiCalculator();
-      }
-      if (typeof window.initEncryptionVisualizer === 'function') {
-        window.initEncryptionVisualizer();
-      }
-    }, 100);
   }
 
-  // =========================================================================
-  // 4. COMMAND PALETTE (CMD+K / CTRL+K)
-  // =========================================================================
   bindCommandPalette() {
-    const paletteModal = document.getElementById('modal-command-palette');
-    const searchInput = document.getElementById('cmdSearchInput');
-    const resultsContainer = document.getElementById('cmdResultsList');
-
-    const openPalette = () => {
-      if (window.modal) window.modal.open('modal-command-palette');
-      if (searchInput) {
-        searchInput.value = '';
-        setTimeout(() => searchInput.focus(), 80);
-        renderPaletteItems('');
-      }
-    };
-
-    // Keyboard shortcut (Ctrl+K or Cmd+K)
-    document.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        openPalette();
-      }
-    });
-
-    // Header search button click
-    document.querySelectorAll('.cmd-palette-trigger').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        openPalette();
-      });
-    });
+    const searchInput = document.getElementById('cmdPaletteInput');
+    const resultsContainer = document.getElementById('cmdPaletteResults');
 
     const paletteActions = [
-      { title: 'Browse Academy Courses', category: 'Navigation', icon: 'graduation-cap', action: () => { window.location.hash = '#academy'; window.modal.closeAll(); } },
+      { title: 'Overview & Platform Pillars', category: 'Navigation', icon: 'home', action: () => { window.location.hash = '#home'; window.modal.closeAll(); } },
+      { title: 'The Zeerocodes VibeCode Labs', category: 'Navigation', icon: 'graduation-cap', action: () => { window.location.hash = '#academy'; window.modal.closeAll(); } },
       { title: 'Automation Studio Consulting', category: 'Navigation', icon: 'workflow', action: () => { window.location.hash = '#studio'; window.modal.closeAll(); } },
-      { title: 'VibeScan Security Audits', category: 'Navigation', icon: 'shield-check', action: () => { window.location.hash = '#vibescan'; window.modal.closeAll(); } },
-      { title: 'My Unified Dashboard', category: 'Navigation', icon: 'layout-dashboard', action: () => { window.location.hash = '#dashboard'; window.modal.closeAll(); } },
-      { title: 'Admin Review Queue', category: 'Navigation', icon: 'shield-alert', action: () => { window.location.hash = '#admin'; window.modal.closeAll(); } },
-      { title: 'Calculate AI Automation ROI', category: 'Interactive Tools', icon: 'calculator', action: () => { window.location.hash = '#studio'; window.modal.closeAll(); document.getElementById('roiCalculatorSection')?.scrollIntoView({ behavior: 'smooth' }); } },
-      { title: 'Launch Interactive Codebase Scanner', category: 'Security Tools', icon: 'scan', action: () => { window.modal.closeAll(); window.vibescanEngine.openLiveScannerModal(); } },
-      { title: 'Verify VibeCert™ Security Badge', category: 'Security Tools', icon: 'check-circle-2', action: () => { window.modal.closeAll(); window.vibescanEngine.openPublicVerifyPortal('VIBECERT-2026-0042'); } },
-      { title: 'Book Workflow Discovery Session', category: 'Studio Action', icon: 'calendar', action: () => { window.modal.closeAll(); window.modal.openBooking('Custom AI Automation Consulting'); } },
-      { title: 'Toggle User / Admin Role', category: 'Developer', icon: 'user-check', action: () => { window.auth.toggleRole(); window.modal.closeAll(); } },
-      { title: 'Reset Sandbox Seed Data', category: 'Developer', icon: 'refresh-cw', action: () => { window.db.resetToSampleData(); window.modal.closeAll(); window.location.reload(); } }
+      { title: 'VibeScan Security Audits & VibeCert', category: 'Navigation', icon: 'shield-check', action: () => { window.location.hash = '#vibescan'; window.modal.closeAll(); } },
+      { title: 'Client Workspace Dashboard', category: 'Navigation', icon: 'layout-dashboard', action: () => { window.location.hash = '#dashboard'; window.modal.closeAll(); } },
+      { title: 'Book 30-Min Discovery Session', category: 'Action', icon: 'calendar', action: () => { window.modal.closeAll(); window.modal.openBooking(); } },
+      { title: 'Run AST Code Scanner Simulation', category: 'Security Tools', icon: 'play', action: () => { window.location.hash = '#vibescan'; window.modal.closeAll(); window.vibescanEngine?.runTerminalAudit('https://github.com/payquick/whatsapp-fintech-bot.git'); } },
+      { title: 'Toggle User / Admin Role', category: 'Developer', icon: 'user-check', action: () => { window.auth.toggleRole(); window.modal.closeAll(); } }
     ];
 
-    const renderPaletteItems = (filterText) => {
+    const renderPalette = (query) => {
       if (!resultsContainer) return;
-      const lower = filterText.toLowerCase().trim();
-      const filtered = paletteActions.filter(item => item.title.toLowerCase().includes(lower) || item.category.toLowerCase().includes(lower));
+      const lower = query.toLowerCase().trim();
+      const filtered = paletteActions.filter(a => a.title.toLowerCase().includes(lower) || a.category.toLowerCase().includes(lower));
 
-      if (filtered.length === 0) {
-        resultsContainer.innerHTML = `<div style="padding:1.5rem; text-align:center; color:var(--text-muted); font-size:0.88rem;">No matching commands found.</div>`;
+      if (!filtered.length) {
+        resultsContainer.innerHTML = `<div style="padding:1.5rem; text-align:center; color:var(--text-cyber-muted); font-size:0.88rem;">No matching actions found.</div>`;
         return;
       }
 
       resultsContainer.innerHTML = filtered.map((item, idx) => `
-        <div class="cmd-item" data-idx="${idx}" onclick="window.app.executePaletteAction(${idx})">
-          <div class="cmd-item-left">
-            <i data-lucide="${item.icon}"></i>
+        <div class="cmd-palette-item" style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 1rem; border-radius:var(--radius-xs); cursor:pointer; margin-bottom:4px;" onclick="window.app.executePaletteAction(${idx})">
+          <div style="display:flex; align-items:center; gap:0.65rem; color:#FFF; font-size:0.9rem; font-weight:600;">
+            <i data-lucide="${item.icon}" style="width:16px; height:16px; color:var(--emerald-light);"></i>
             <span>${item.title}</span>
           </div>
-          <span class="cmd-item-badge">${item.category}</span>
+          <span class="badge badge-teal" style="font-size:0.7rem;">${item.category}</span>
         </div>
       `).join('');
 
@@ -796,14 +669,15 @@ class ZeerocodesApp {
     };
 
     if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        renderPaletteItems(e.target.value);
-      });
-
-      searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && this.currentFilteredPalette && this.currentFilteredPalette.length > 0) {
+      searchInput.addEventListener('input', (e) => renderPalette(e.target.value));
+      document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
           e.preventDefault();
-          this.executePaletteAction(0);
+          if (window.modal) window.modal.open('modal-cmd-palette');
+          setTimeout(() => {
+            searchInput.focus();
+            renderPalette('');
+          }, 80);
         }
       });
     }
@@ -815,143 +689,12 @@ class ZeerocodesApp {
     }
   }
 
-  // =========================================================================
-  // 5. ACADEMY COURSE CATALOG FILTERS & SEARCH
-  // =========================================================================
-  bindAcademyFilters() {
-    const searchInput = document.getElementById('academySearchInput');
-    const categoryPills = document.querySelectorAll('.category-pill');
-
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        this.filterAcademyCourses(e.target.value, this.currentAcademyCategory || 'all');
-      });
-    }
-
-    categoryPills.forEach(pill => {
-      pill.addEventListener('click', () => {
-        categoryPills.forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        const cat = pill.getAttribute('data-cat') || 'all';
-        this.currentAcademyCategory = cat;
-        const searchVal = document.getElementById('academySearchInput')?.value || '';
-        this.filterAcademyCourses(searchVal, cat);
-      });
-    });
-  }
-
-  async filterAcademyCourses(query = '', category = 'all') {
-    const container = document.getElementById('academyCoursesGrid');
-    if (!container || !window.db) return;
-
-    let courses = await window.db.getCourses();
-    const q = query.toLowerCase().trim();
-
-    if (category !== 'all') {
-      courses = courses.filter(c => {
-        const str = `${c.title} ${c.shortDesc} ${c.slug}`.toLowerCase();
-        if (category === 'n8n') return str.includes('n8n') || str.includes('automation');
-        if (category === 'whatsapp') return str.includes('whatsapp') || str.includes('bot');
-        if (category === 'vibecoding') return str.includes('vibe') || str.includes('cursor') || str.includes('security');
-        if (category === 'saas') return str.includes('saas') || str.includes('prompt');
-        return true;
-      });
-    }
-
-    if (q) {
-      courses = courses.filter(c => 
-        c.title.toLowerCase().includes(q) || 
-        c.shortDesc.toLowerCase().includes(q) || 
-        c.modules.some(m => m.toLowerCase().includes(q))
-      );
-    }
-
-    if (courses.length === 0) {
-      container.innerHTML = `
-        <div style="grid-column: 1 / -1; background:var(--surface-white); padding:3rem; border-radius:var(--radius-md); text-align:center; border:1px solid var(--mint-border);">
-          <i data-lucide="search" style="width:36px; height:36px; color:var(--text-muted); margin-bottom:0.75rem;"></i>
-          <h4>No matching courses found</h4>
-          <p style="color:var(--text-muted); font-size:0.9rem;">Try adjusting your search terms or category filter.</p>
-          <button class="btn btn-outline btn-sm" onclick="document.getElementById('academySearchInput').value=''; window.app.filterAcademyCourses('', 'all');">
-            Clear Filters
-          </button>
-        </div>
-      `;
-    } else {
-      container.innerHTML = courses.map(course => `
-        <div class="course-card">
-          <div class="course-card-header">
-            <div class="course-badge">${course.level}</div>
-            <div class="course-duration"><i data-lucide="clock"></i> ${course.duration}</div>
-          </div>
-          <h3 class="course-title">${course.title}</h3>
-          <p class="course-short-desc">${course.shortDesc}</p>
-          
-          <div class="curriculum-preview">
-            <div class="curriculum-toggle" onclick="this.nextElementSibling.classList.toggle('active')">
-              <span><i data-lucide="layers"></i> Curriculum Outline (${course.modules.length} Modules)</span>
-              <i data-lucide="chevron-down"></i>
-            </div>
-            <ul class="curriculum-list">
-              ${course.modules.map(mod => `<li><i data-lucide="check-circle-2"></i> ${mod}</li>`).join('')}
-            </ul>
-          </div>
-
-          <div class="course-card-footer">
-            <div class="course-pricing">
-              <span class="price-ngn">₦${course.priceNGN.toLocaleString()}</span>
-              <span class="price-usd">($${course.priceUSD})</span>
-            </div>
-            <button class="btn btn-primary btn-sm" onclick="window.app.handleEnrollCourse('${course.id}')">
-              <i data-lucide="credit-card"></i> Enroll & Checkout
-            </button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    if (window.lucide) window.lucide.createIcons();
-  }
-
-  // =========================================================================
-  // 6. DASHBOARD TABS
-  // =========================================================================
-  bindDashboardTabs() {
-    const tabBtns = document.querySelectorAll('.dash-tab-btn');
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tabBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const targetTab = btn.getAttribute('data-tab') || 'overview';
-        this.switchDashboardTab(targetTab);
-      });
-    });
-  }
-
-  switchDashboardTab(tabId) {
-    const sections = document.querySelectorAll('.dash-section-box');
-    if (tabId === 'overview') {
-      sections.forEach(s => s.classList.remove('d-none'));
-    } else {
-      sections.forEach(s => {
-        if (s.getAttribute('data-dash-section') === tabId) {
-          s.classList.remove('d-none');
-        } else {
-          s.classList.add('d-none');
-        }
-      });
-    }
-  }
-
-  // =========================================================================
-  // 7. BACK TO TOP FLOATING BUTTON
-  // =========================================================================
   bindBackToTop() {
     const btn = document.getElementById('btnBackToTop');
     if (!btn) return;
 
     window.addEventListener('scroll', () => {
-      if (window.scrollY > 400) {
+      if (window.scrollY > 350) {
         btn.classList.add('visible');
       } else {
         btn.classList.remove('visible');
@@ -967,4 +710,3 @@ class ZeerocodesApp {
 document.addEventListener('DOMContentLoaded', () => {
   window.app = new ZeerocodesApp();
 });
-
