@@ -2240,6 +2240,135 @@ img, svg, video {
   }
 }
 
+/* ==========================================================================
+   VIBESCAN AI SECURITY SALES & PEACE OF MIND STYLES
+   ========================================================================== */
+.security-traps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 1.75rem;
+  margin-bottom: 3.5rem;
+}
+
+.security-trap-card {
+  background: var(--surface-card-gradient);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: var(--transition-smooth);
+}
+
+.security-trap-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 25px rgba(239, 68, 68, 0.12);
+}
+
+.security-trap-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  background: rgba(239, 68, 68, 0.12);
+  color: #F87171;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  margin-bottom: 1rem;
+  width: fit-content;
+}
+
+.security-trap-title {
+  font-size: 1.2rem;
+  color: #FFFFFF;
+  margin-bottom: 0.65rem;
+}
+
+.security-trap-problem {
+  font-size: 0.88rem;
+  color: var(--text-cyber-muted);
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+}
+
+.security-trap-fix {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--radius-xs);
+  padding: 0.85rem 1rem;
+  font-size: 0.84rem;
+  color: #6EE7B7;
+  line-height: 1.55;
+  margin-top: auto;
+}
+
+.security-trap-fix strong {
+  color: #FFFFFF;
+}
+
+.sleep-peaceful-banner {
+  background: radial-gradient(900px 400px at 50% 0%, rgba(16, 185, 129, 0.2) 0%, rgba(1, 107, 97, 0.15) 50%, #080D16 100%);
+  border: 1.5px solid rgba(52, 211, 153, 0.4);
+  border-radius: var(--radius-lg);
+  padding: clamp(2rem, 5vw, 3.5rem);
+  margin-bottom: 4rem;
+  box-shadow: 0 0 50px rgba(16, 185, 129, 0.2);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.sleep-badge-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10B981 0%, #016B61 100%);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem auto;
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+}
+
+.security-guarantee-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 1.25rem;
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.security-guarantee-item {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.security-guarantee-item i {
+  color: var(--emerald-light);
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.security-guarantee-item span {
+  font-size: 0.88rem;
+  color: var(--text-cyber-body);
+  line-height: 1.5;
+}
+
 @media (max-width: 480px) {
   .hero-header-center { margin-bottom: 2.5rem; }
   .brand-sub { display: none; }
