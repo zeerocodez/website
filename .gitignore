@@ -27,9 +27,11 @@ Thumbs.db
 .idea/
 *.swp
 
-# Local deploy scripts
+# Local deploy scripts & binaries
 deploy_now.bat
 push_with_token.bat
 .github/
+git_bin/
+mingit.zip
 
 
