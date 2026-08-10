@@ -23,34 +23,99 @@
 
   <meta name="theme-color" content="#06090E">
 
-  <!-- Schema.org Structured Data -->
+  <!-- Comprehensive Schema.org Structured Data Graph (AI-SEO) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@graph": [
       {
+        "@type": "WebSite",
+        "@id": "https://zeerocodes.com/#website",
+        "url": "https://zeerocodes.com",
+        "name": "Zeerocodes",
+        "description": "Custom Web Applications, Business Workflow Automations, and AI Cybersecurity in Lagos, Nigeria.",
+        "publisher": { "@id": "https://zeerocodes.com/#organization" },
+        "inLanguage": "en-US"
+      },
+      {
         "@type": "Organization",
         "@id": "https://zeerocodes.com/#organization",
         "name": "Zeerocodes Automation Limited",
         "url": "https://zeerocodes.com",
-        "logo": "https://zeerocodes.com/images/logo.png",
+        "logo": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=300&auto=format&fit=crop",
         "description": "Lagos-based custom software, automation, and AI education firm founded by Nuel Effiong.",
         "founder": {
           "@type": "Person",
-          "name": "Nuel Effiong"
+          "name": "Nuel Effiong",
+          "jobTitle": "Principal AI Systems Architect"
+        },
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Lagos",
+          "addressCountry": "NG"
         }
       },
       {
         "@type": "Service",
         "@id": "https://zeerocodes.com/#studio",
         "name": "Zeerocodes Studio",
-        "serviceType": "Custom Web Applications, High-Converting Websites, and Autonomous Business Automations"
+        "provider": { "@id": "https://zeerocodes.com/#organization" },
+        "serviceType": "Custom Web App Development, High-Converting Websites, and WhatsApp & Paystack Business Automations",
+        "areaServed": ["Nigeria", "United Kingdom", "United States", "Global"]
+      },
+      {
+        "@type": "Service",
+        "@id": "https://zeerocodes.com/#vibescan",
+        "name": "VibeScan AI Cybersecurity Audits",
+        "provider": { "@id": "https://zeerocodes.com/#organization" },
+        "serviceType": "OWASP Top 10 LLM Security Scanning, Supabase PostgreSQL RLS Hardening, and VibeCert™ Badges",
+        "description": "48-Hour rapid security audit protecting vibe-coded applications against API key leaks, missing database RLS, and webhook spoofing."
       },
       {
         "@type": "Course",
         "@id": "https://zeerocodes.com/#academy",
         "name": "The Zeerocodes VibeCode Labs",
-        "description": "Complete 4-level hands-on training taking absolute beginners to certified software builders."
+        "description": "Complete 4-level hands-on training taking absolute beginners to certified software builders shipping production apps and earning client revenue.",
+        "provider": { "@id": "https://zeerocodes.com/#organization" },
+        "educationalCredentialAwarded": "Certified Zeerocodes Software Builder (VibeCert™)",
+        "hasCourseInstance": {
+          "@type": "CourseInstance",
+          "courseMode": "Online & Live Mentorship",
+          "instructor": {
+            "@type": "Person",
+            "name": "Nuel Effiong"
+          }
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://zeerocodes.com/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How fast will you build and deliver my custom software or automation project?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Standard custom web apps, customer portals, and high-converting websites are designed, coded, tested, and deployed within 14 to 28 business days. Event-driven automations deploy in under 14 days."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do you maintain and run the automations after they are built?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes! Through our Managed Operations SLA, Zeerocodes hosts, monitors, and maintains your entire automation setup 24/7 with a 99.99% uptime guarantee."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "I have zero coding experience. Can I really learn in The VibeCode Labs?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "100% yes. Level 1 starts at the absolute beginning. We teach you modern AI visual tools, prompt engineering, and visual automation step-by-step with weekly live mentorship from Nuel Effiong."
+            }
+          }
+        ]
       }
     ]
   }
@@ -88,6 +153,7 @@
         <li><a href="#studio" class="nav-link">Studio (We Build For You)</a></li>
         <li><a href="#academy" class="nav-link">Academy (Learn to Build)</a></li>
         <li><a href="#vibescan" class="nav-link">Security (VibeScan)</a></li>
+        <li><a href="#blog" class="nav-link">Blog</a></li>
         <li><a href="#about" class="nav-link">About</a></li>
         <li><a href="#contact" class="nav-link">Contact</a></li>
         <li class="nav-admin-link d-none"><a href="#admin" class="nav-link" style="color:var(--emerald-light); font-weight:700;"><i data-lucide="shield-alert" style="width:15px; height:15px; display:inline;"></i> Admin</a></li>
@@ -146,6 +212,7 @@
       <li><a href="#studio" class="mobile-drawer-link"><i data-lucide="workflow"></i> Studio (We Build For You)</a></li>
       <li><a href="#academy" class="mobile-drawer-link"><i data-lucide="graduation-cap"></i> Academy (Learn to Build)</a></li>
       <li><a href="#vibescan" class="mobile-drawer-link"><i data-lucide="shield-check"></i> Security (VibeScan)</a></li>
+      <li><a href="#blog" class="mobile-drawer-link"><i data-lucide="newspaper"></i> Blog & Insights</a></li>
       <li><a href="#about" class="mobile-drawer-link"><i data-lucide="user"></i> About</a></li>
       <li><a href="#contact" class="mobile-drawer-link"><i data-lucide="mail"></i> Contact</a></li>
       <li><a href="#dashboard" class="mobile-drawer-link"><i data-lucide="layout-dashboard"></i> Client Dashboard</a></li>
@@ -1220,7 +1287,44 @@ const isValid = crypto.timingSafeEqual(
     </div>
 
     <!-- =======================================================================
-         VIEW 5: ABOUT (#about) — FOUNDER STORY & MISSION
+         VIEW 5: BLOG (#blog) — INDUSTRY INSIGHTS & CASE STUDIES
+         ======================================================================= -->
+    <div id="view-blog" class="page-view">
+      <section class="section-padding">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-tag"><i data-lucide="newspaper"></i> Developer & Founder Hub</span>
+            <h2>Proven Playbooks on AI Automation, Custom Code & Cybersecurity</h2>
+            <p class="section-subtitle">Real-world case studies, architectural blueprints, and security breakdowns from the engineering trenches in Lagos.</p>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div style="max-width:650px; margin:0 auto 2rem auto;">
+            <div style="position:relative; display:flex; align-items:center;">
+              <i data-lucide="search" style="position:absolute; left:16px; color:var(--emerald-light); width:18px; height:18px;"></i>
+              <input type="text" id="blogSearchInput" class="form-input" placeholder="Search guides, Paystack automations, Supabase RLS, or career roadmaps..." style="padding-left:48px; border-radius:var(--radius-full);">
+            </div>
+          </div>
+
+          <!-- Category Filter Pills -->
+          <div class="blog-cat-bar">
+            <button class="blog-cat-btn active" data-category="All">All Stories</button>
+            <button class="blog-cat-btn" data-category="Automations">Automations</button>
+            <button class="blog-cat-btn" data-category="AI Security">AI Security</button>
+            <button class="blog-cat-btn" data-category="Career & Training">Career & Training</button>
+            <button class="blog-cat-btn" data-category="Custom Apps">Custom Apps</button>
+          </div>
+
+          <!-- Blog Grid -->
+          <div class="blog-grid" id="blogPostsGrid">
+            <!-- Populated dynamically by blog.js -->
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- =======================================================================
+         VIEW 6: ABOUT (#about) — FOUNDER STORY & MISSION
          ======================================================================= -->
     <div id="view-about" class="page-view">
       <section class="section-padding">
@@ -1257,7 +1361,7 @@ const isValid = crypto.timingSafeEqual(
     </div>
 
     <!-- =======================================================================
-         VIEW 6: CONTACT (#contact) — START A PROJECT
+         VIEW 7: CONTACT (#contact) — START A PROJECT
          ======================================================================= -->
     <div id="view-contact" class="page-view">
       <section class="section-padding">
@@ -1305,7 +1409,7 @@ const isValid = crypto.timingSafeEqual(
     </div>
 
     <!-- =======================================================================
-         VIEW 7: DASHBOARD (#dashboard) — CLIENT HUB
+         VIEW 8: DASHBOARD (#dashboard) — CLIENT HUB
          ======================================================================= -->
     <div id="view-dashboard" class="page-view">
       <section class="section-padding">
@@ -1349,19 +1453,85 @@ const isValid = crypto.timingSafeEqual(
     </div>
 
     <!-- =======================================================================
-         VIEW 8: ADMIN (#admin) — REVIEW QUEUE
+         VIEW 9: ADMIN (#admin) — ENTERPRISE CONSOLE
          ======================================================================= -->
     <div id="view-admin" class="page-view">
       <section class="section-padding">
         <div class="container">
-          <div class="section-header" style="text-align:left; margin-bottom:2.5rem;">
-            <span class="section-tag" style="background:rgba(239,68,68,0.15); color:#F87171; border-color:rgba(239,68,68,0.3);"><i data-lucide="shield-alert"></i> Admin Queue</span>
-            <h2>Review & Audit Queue</h2>
-            <p class="section-subtitle">Auditor console for reviewing project milestones, code repositories, and issuing VibeCert™ badges.</p>
+          <div class="section-header" style="text-align:left; margin-bottom:2rem;">
+            <span class="section-tag" style="background:rgba(239,68,68,0.15); color:#F87171; border-color:rgba(239,68,68,0.3);">
+              <i data-lucide="shield-alert"></i> Zeerocodes Command Hub
+            </span>
+            <h2>Enterprise Admin Console</h2>
+            <p class="section-subtitle">Manage client Studio builds, perform code audits, track student enrollments, and monitor webhook health.</p>
           </div>
 
-          <div id="adminReviewQueue" style="display:flex; flex-direction:column; gap:1.5rem;">
-            <!-- Rendered dynamically -->
+          <!-- Metrics Telemetry Bar -->
+          <div class="admin-metrics-grid">
+            <div class="admin-metric-card">
+              <div class="admin-metric-icon"><i data-lucide="wallet"></i></div>
+              <div>
+                <div style="font-size:0.8rem; color:var(--text-cyber-muted);">Total Pipeline Revenue</div>
+                <div style="font-size:1.5rem; font-weight:800; color:#FFF;" id="adminStatRevenue">₦180.5M</div>
+              </div>
+            </div>
+
+            <div class="admin-metric-card">
+              <div class="admin-metric-icon"><i data-lucide="workflow"></i></div>
+              <div>
+                <div style="font-size:0.8rem; color:var(--text-cyber-muted);">Active Studio Builds</div>
+                <div style="font-size:1.5rem; font-weight:800; color:var(--cyan-accent);" id="adminStatProjects">3 Active</div>
+              </div>
+            </div>
+
+            <div class="admin-metric-card">
+              <div class="admin-metric-icon"><i data-lucide="shield-check"></i></div>
+              <div>
+                <div style="font-size:0.8rem; color:var(--text-cyber-muted);">VibeScan Audit Queue</div>
+                <div style="font-size:1.5rem; font-weight:800; color:var(--emerald-light);" id="adminStatAudits">1 In Queue</div>
+              </div>
+            </div>
+
+            <div class="admin-metric-card">
+              <div class="admin-metric-icon"><i data-lucide="graduation-cap"></i></div>
+              <div>
+                <div style="font-size:0.8rem; color:var(--text-cyber-muted);">Total Builders Trained</div>
+                <div style="font-size:1.5rem; font-weight:800; color:#FFF;" id="adminStatStudents">1,450</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Admin Tabs Bar -->
+          <div class="admin-tabs-bar">
+            <button class="admin-tab-btn active" data-tab="adminTabStudio"><i data-lucide="workflow"></i> Studio Projects Queue</button>
+            <button class="admin-tab-btn" data-tab="adminTabVibescan"><i data-lucide="shield-check"></i> VibeScan Audits</button>
+            <button class="admin-tab-btn" data-tab="adminTabAcademy"><i data-lucide="graduation-cap"></i> Academy Enrollments</button>
+            <button class="admin-tab-btn" data-tab="adminTabWebhooks"><i data-lucide="activity"></i> Webhook & Security Telemetry</button>
+          </div>
+
+          <!-- Tab Panels -->
+          <div id="adminTabStudio" class="admin-tab-panel active">
+            <div id="adminStudioQueueContainer">
+              <!-- Rendered dynamically by admin.js -->
+            </div>
+          </div>
+
+          <div id="adminTabVibescan" class="admin-tab-panel">
+            <div id="adminVibescanQueueContainer">
+              <!-- Rendered dynamically by admin.js -->
+            </div>
+          </div>
+
+          <div id="adminTabAcademy" class="admin-tab-panel">
+            <div id="adminEnrollmentsContainer">
+              <!-- Rendered dynamically by admin.js -->
+            </div>
+          </div>
+
+          <div id="adminTabWebhooks" class="admin-tab-panel">
+            <div id="adminWebhookLogsContainer">
+              <!-- Rendered dynamically by admin.js -->
+            </div>
           </div>
         </div>
       </section>
@@ -1718,6 +1888,29 @@ const isValid = crypto.timingSafeEqual(
     </div>
   </div>
 
+  <!-- BLOG ARTICLE FULL READER MODAL -->
+  <div id="modal-article-reader" class="modal-backdrop">
+    <div class="modal-card modal-lg" style="max-height:90vh; display:flex; flex-direction:column; padding:0; overflow:hidden;">
+      <div class="modal-header" style="padding:1.25rem 1.5rem; background:#080D16; border-bottom:1px solid rgba(255,255,255,0.08);">
+        <div style="flex:1;">
+          <h3 id="articleReaderTitle" style="font-size:1.35rem; color:#FFF; margin-bottom:0.35rem; line-height:1.3;">Article Title</h3>
+          <div id="articleReaderMeta" style="font-size:0.82rem; color:var(--text-cyber-muted); display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+            <!-- Meta details injected by blog.js -->
+          </div>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body guide-article-content" style="padding:1.5rem 1.75rem; overflow-y:auto;">
+        <div style="width:100%; height:260px; border-radius:var(--radius-sm); overflow:hidden; margin-bottom:1.5rem; background:#080D16;">
+          <img id="articleReaderHeroImg" src="" alt="Article Banner" style="width:100%; height:100%; object-fit:cover;">
+        </div>
+        <div id="articleReaderBody">
+          <!-- Populated by blog.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- COMMAND PALETTE -->
   <div id="modal-cmd-palette" class="modal-backdrop">
     <div class="modal-card" style="max-width:min(92vw, 600px); padding:0;">
@@ -1743,7 +1936,7 @@ const isValid = crypto.timingSafeEqual(
       <li><a href="#studio" class="mobile-dock-link"><i data-lucide="workflow"></i><span>Studio</span></a></li>
       <li><a href="#academy" class="mobile-dock-link"><i data-lucide="graduation-cap"></i><span>Academy</span></a></li>
       <li><a href="#vibescan" class="mobile-dock-link"><i data-lucide="shield-check"></i><span>Security</span></a></li>
-      <li><a href="#dashboard" class="mobile-dock-link"><i data-lucide="layout-dashboard"></i><span>Portal</span></a></li>
+      <li><a href="#blog" class="mobile-dock-link"><i data-lucide="newspaper"></i><span>Blog</span></a></li>
     </ul>
   </nav>
 
@@ -1760,6 +1953,8 @@ const isValid = crypto.timingSafeEqual(
   <script src="js/roiCalculator.js"></script>
   <script src="js/encryptionVisualizer.js"></script>
   <script src="js/knowledgeBase.js"></script>
+  <script src="js/blog.js"></script>
+  <script src="js/admin.js"></script>
   <script src="js/studio.js"></script>
   <script src="js/bookingModal.js"></script>
   <script src="js/router.js"></script>

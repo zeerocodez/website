@@ -72,6 +72,16 @@ class ZeerocodesApp {
       window.knowledgeBase.renderGuidesGrid();
     }
 
+    // Initialize Blog Hub
+    if (window.blog && window.blog.init) {
+      window.blog.init();
+    }
+
+    // Initialize Admin Console
+    if (window.adminConsole && window.adminConsole.init) {
+      window.adminConsole.init();
+    }
+
     // Initial auth UI update
     if (window.auth) {
       window.auth.updateNavigationUI();

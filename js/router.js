@@ -7,16 +7,88 @@
 class Router {
   constructor() {
     this.routes = {
-      '#home': { viewId: 'view-home', title: 'Zeerocodes | Teach • Build • Protect', public: true },
-      '#academy': { viewId: 'view-academy', title: 'Zeerocodes Academy | Practical AI & Automation Courses for Africa', public: true },
-      '#studio': { viewId: 'view-studio', title: 'Zeerocodes Studio | Enterprise Workflow Automation Consulting', public: true },
-      '#vibescan': { viewId: 'view-vibescan', title: 'VibeScan by Zeerocodes | AI App Security Audits & Certification', public: true },
-      '#pricing-vibescan': { viewId: 'view-vibescan', scrollToId: 'pricing-vibescan', title: 'VibeScan Audit Pricing | Zeerocodes', public: true },
-      '#roiCalculatorSection': { viewId: 'view-studio', scrollToId: 'roiCalculatorSection', title: 'Automation ROI Calculator | Zeerocodes Studio', public: true },
-      '#about': { viewId: 'view-about', title: 'About Zeerocodes & Nuel Effiong | Africa AI Security Authority', public: true },
-      '#contact': { viewId: 'view-contact', title: 'Contact Zeerocodes | Lagos AI Consulting & Inquiries', public: true },
-      '#dashboard': { viewId: 'view-dashboard', title: 'My Unified Account | Zeerocodes Dashboard', authRequired: true },
-      '#admin': { viewId: 'view-admin', title: 'Admin Review Queue & Operations | Zeerocodes', adminRequired: true }
+      '#home': {
+        viewId: 'view-home',
+        title: 'Zeerocodes | Custom Software, Business Automations & AI Security in Lagos',
+        desc: 'Zeerocodes builds custom web apps, automates WhatsApp & Paystack business workflows, and trains beginners to become certified builders.',
+        keywords: 'custom software agency Lagos, AI automation Nigeria, WhatsApp Paystack automation, The VibeCode Labs, VibeScan AI security',
+        public: true
+      },
+      '#studio': {
+        viewId: 'view-studio',
+        title: 'Zeerocodes Studio | Custom Web Apps & Autonomous Workflow Automations',
+        desc: 'We build production Next.js apps, customer portals, and 90-second WhatsApp billing engines for African businesses. Delivered in 14-28 days.',
+        keywords: 'custom software agency, hire developer Lagos, WhatsApp automation bot, Paystack webhook integration, SaaS MVP builder',
+        public: true
+      },
+      '#academy': {
+        viewId: 'view-academy',
+        title: 'The Zeerocodes VibeCode Labs | 4-Level AI Software Builder Masterclass',
+        desc: 'Go from absolute beginner to certified builder shipping production software and earning client revenue. 8-week cohort led by Nuel Effiong.',
+        keywords: 'learn AI coding Nigeria, The VibeCode Labs, prompt engineering course Lagos, beginner to certified software builder',
+        public: true
+      },
+      '#vibescan': {
+        viewId: 'view-vibescan',
+        title: 'VibeScan AI Cybersecurity | Sleep Peacefully Knowing Your AI App Is Secure',
+        desc: 'We perform AI cybersecurity audits for vibe-coded applications. Close API key leaks, missing Supabase RLS, and webhook exploits in 48 hours.',
+        keywords: 'vibe coding security audit, OWASP LLM top 10 scanner, Supabase RLS fix, secure Paystack webhook, VibeCert badge',
+        public: true
+      },
+      '#blog': {
+        viewId: 'view-blog',
+        title: 'Zeerocodes Engineering Blog | Real Case Studies in Automation & AI Security',
+        desc: 'Read in-depth case studies, architectural blueprints, and security breakdowns from the software and automation trenches in Lagos, Nigeria.',
+        keywords: 'AI automation case studies, WhatsApp Paystack webhook n8n, Supabase RLS guide, AI software development blog',
+        public: true
+      },
+      '#pricing-vibescan': {
+        viewId: 'view-vibescan',
+        scrollToId: 'pricing-vibescan',
+        title: 'VibeScan Audit Pricing & Packages | Zeerocodes',
+        desc: 'Transparent pricing for VibeScan AI code audits: Starter Scan, Comprehensive Audit, and Enterprise Retainer with VibeCert™ badge.',
+        public: true
+      },
+      '#roiCalculatorSection': {
+        viewId: 'view-studio',
+        scrollToId: 'roiCalculatorSection',
+        title: 'Automation ROI & Hours Reclaimed Calculator | Zeerocodes Studio',
+        desc: 'Calculate how many hours and millions in manual payroll your business can reclaim with autonomous event-driven automations.',
+        public: true
+      },
+      '#knowledge-hub': {
+        viewId: 'view-home',
+        scrollToId: 'knowledge-hub',
+        title: 'Security & Automation Knowledge Base | Zeerocodes',
+        desc: 'Deep-dive developer guides on constant-time HMAC, Supabase PostgreSQL RLS, and prompt injection defense.',
+        public: true
+      },
+      '#about': {
+        viewId: 'view-about',
+        title: 'About Zeerocodes & Nuel Effiong | Principal AI Systems Architect',
+        desc: 'Learn the story behind Zeerocodes: bridging high-speed AI engineering with enterprise security for African founders and builders.',
+        keywords: 'Nuel Effiong, Zeerocodes founder, AI architect Lagos, Africa tech builder',
+        public: true
+      },
+      '#contact': {
+        viewId: 'view-contact',
+        title: 'Start a Project | Contact Zeerocodes Studio & Builder Cohort',
+        desc: 'Schedule a free 30-minute discovery call with Nuel Effiong or send us your software scope. We respond within 24 hours.',
+        keywords: 'contact software agency Lagos, hire automation engineer Nigeria, book discovery session',
+        public: true
+      },
+      '#dashboard': {
+        viewId: 'view-dashboard',
+        title: 'Client & Builder Portal | Zeerocodes',
+        desc: 'View active Studio deliverables, enrolled course lessons, and security audit reports.',
+        authRequired: true
+      },
+      '#admin': {
+        viewId: 'view-admin',
+        title: 'Enterprise Admin Command Hub | Zeerocodes',
+        desc: 'Manage Studio client projects, audit code repositories, track student cohorts, and monitor webhook health.',
+        adminRequired: true
+      }
     };
 
     this.init();
@@ -108,13 +180,26 @@ class Router {
       homeView.style.display = 'block';
     }
 
-    // 4. Update browser document title
+    // 4. Update dynamic SEO Title & Meta Tags
     if (route.title) {
       document.title = route.title;
     }
+    if (route.desc) {
+      let metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', route.desc);
+
+      let ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.setAttribute('content', route.title);
+
+      let ogDesc = document.querySelector('meta[property="og:description"]');
+      if (ogDesc) ogDesc.setAttribute('content', route.desc);
+
+      let ogUrl = document.querySelector('meta[property="og:url"]');
+      if (ogUrl) ogUrl.setAttribute('content', `https://zeerocodes.com/${cleanHash}`);
+    }
 
     // 5. Update Navigation link states
-    document.querySelectorAll('.nav-link, .mobile-dock-link').forEach(link => {
+    document.querySelectorAll('.nav-link, .mobile-dock-link, .mobile-drawer-link').forEach(link => {
       const href = link.getAttribute('href');
       if (href === cleanHash || (cleanHash === '#pricing-vibescan' && href === '#vibescan')) {
         link.classList.add('active');
@@ -135,11 +220,13 @@ class Router {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 7. Refresh dynamic contents if navigating to dashboard or admin
-    if (cleanHash === '#dashboard' && window.app) {
+    // 7. Refresh dynamic contents based on route
+    if (cleanHash === '#blog' && window.blog) {
+      window.blog.renderBlogView();
+    } else if (cleanHash === '#dashboard' && window.app) {
       window.app.renderUserDashboard();
-    } else if (cleanHash === '#admin' && window.app) {
-      window.app.renderAdminDashboard();
+    } else if (cleanHash === '#admin' && window.adminConsole) {
+      window.adminConsole.renderAdminConsole();
     }
 
     // 8. Re-render Lucide icons
@@ -149,7 +236,7 @@ class Router {
 
     // Close mobile nav drawer & overlay if open
     const mobileDrawer = document.querySelector('.mobile-nav-drawer');
-    const mobileOverlay = document.querySelector('.mobile-nav-overlay');
+    const mobileOverlay = document.querySelector('.mobile-drawer-overlay');
     if (mobileDrawer) mobileDrawer.classList.remove('active');
     if (mobileOverlay) mobileOverlay.classList.remove('active');
   }
