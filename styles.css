@@ -2369,6 +2369,74 @@ img, svg, video {
   line-height: 1.5;
 }
 
+/* ==========================================================================
+   KNOWLEDGE BASE & GUIDES HUB STYLES
+   ========================================================================== */
+.knowledge-guides-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 1.75rem;
+  margin-bottom: 3.5rem;
+}
+
+.knowledge-card {
+  background: var(--surface-card-gradient);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.knowledge-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--emerald-primary);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 25px rgba(16, 185, 129, 0.2);
+}
+
+.guide-article-content {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-cyber-body);
+}
+
+.guide-article-content h3 {
+  font-size: 1.3rem;
+  color: #FFFFFF;
+  margin: 1.5rem 0 0.65rem 0;
+}
+
+.guide-article-content pre {
+  background: #03060A;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-xs);
+  padding: 1.25rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  color: #A3D8B3;
+  margin: 1rem 0 1.5rem 0;
+}
+
+.guide-article-content code {
+  font-family: var(--font-mono);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--emerald-light);
+  font-size: 0.88em;
+}
+
+.guide-article-content ul, .guide-article-content ol {
+  margin: 0.75rem 0 1.25rem 1.5rem;
+}
+
+.guide-article-content li {
+  margin-bottom: 0.5rem;
+}
+
 @media (max-width: 480px) {
   .hero-header-center { margin-bottom: 2.5rem; }
   .brand-sub { display: none; }

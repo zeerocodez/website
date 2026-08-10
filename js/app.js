@@ -67,6 +67,11 @@ class ZeerocodesApp {
       window.vibescanEngine.initCyberTerminal();
     }
 
+    // Initialize Security Knowledge Base Hub
+    if (window.knowledgeBase && window.knowledgeBase.renderGuidesGrid) {
+      window.knowledgeBase.renderGuidesGrid();
+    }
+
     // Initial auth UI update
     if (window.auth) {
       window.auth.updateNavigationUI();

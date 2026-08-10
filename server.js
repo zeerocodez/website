@@ -144,9 +144,24 @@ app.patch('/api/users/me', (req, res) => {
 
 /**
  * =========================================================================
- * 4. SERVER-SIDE WEBHOOKS (Constant-Time HMAC Verification)
+ * 4. SERVER-SIDE WEBHOOKS (Constant-Time HMAC & Idempotency Buffer)
  * =========================================================================
  */
+// In-Memory Idempotency Cache (stores processed transaction references for 24 hours)
+const processedWebhooks = new Map();
+const IDEMPOTENCY_TTL_MS = 24 * 60 * 60 * 1000;
+
+function isDuplicateWebhook(eventId) {
+  if (!eventId) return false;
+  const now = Date.now();
+  if (processedWebhooks.has(eventId)) {
+    const timestamp = processedWebhooks.get(eventId);
+    if (now - timestamp < IDEMPOTENCY_TTL_MS) return true;
+  }
+  processedWebhooks.set(eventId, now);
+  return false;
+}
+
 app.post('/api/webhook/paystack', (req, res) => {
   try {
     const signature = req.headers['x-paystack-signature'];
@@ -171,8 +186,27 @@ app.post('/api/webhook/paystack', (req, res) => {
     }
 
     const event = req.body;
-    console.log(`✅ Verified Paystack webhook event: ${event?.event}`, event?.data?.reference);
-    return res.status(200).json({ received: true, status: 'verified' });
+    const eventRef = event?.data?.reference || event?.data?.id || `paystack_${Date.now()}`;
+
+    // Idempotency Deduplication Check
+    if (isDuplicateWebhook(eventRef)) {
+      console.log(`ℹ️ Duplicate Paystack webhook received for ref ${eventRef}. Acknowledging without re-fulfilling.`);
+      return res.status(200).json({ received: true, status: 'already_processed', reference: eventRef });
+    }
+
+    console.log(`✅ Verified Paystack webhook event: ${event?.event}`, eventRef);
+
+    // Asynchronous fulfillment queue dispatch
+    if (event?.event === 'charge.success') {
+      const metadata = event.data?.metadata || {};
+      if (metadata.type === 'academy_enrollment') {
+        console.log(`🎓 Enrolling user ${metadata.userId} in course ${metadata.itemId}`);
+      } else if (metadata.type === 'vibescan_audit') {
+        console.log(`🛡️ Queuing repository audit for ${metadata.appName}`);
+      }
+    }
+
+    return res.status(200).json({ received: true, status: 'verified', reference: eventRef });
   } catch (error) {
     console.error('Paystack webhook error:', error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -197,8 +231,15 @@ app.post('/api/webhook/flutterwave', (req, res) => {
     }
 
     const event = req.body;
-    console.log('✅ Verified Flutterwave webhook event:', event?.event, event?.data?.id);
-    return res.status(200).json({ received: true, status: 'verified' });
+    const eventRef = event?.data?.tx_ref || event?.data?.id || `flw_${Date.now()}`;
+
+    if (isDuplicateWebhook(eventRef)) {
+      console.log(`ℹ️ Duplicate Flutterwave webhook received for ref ${eventRef}.`);
+      return res.status(200).json({ received: true, status: 'already_processed', reference: eventRef });
+    }
+
+    console.log('✅ Verified Flutterwave webhook event:', event?.event, eventRef);
+    return res.status(200).json({ received: true, status: 'verified', reference: eventRef });
   } catch (error) {
     console.error('Flutterwave webhook error:', error);
     return res.status(500).json({ error: 'Internal server error' });

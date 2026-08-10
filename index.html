@@ -1368,9 +1368,26 @@ const isValid = crypto.timingSafeEqual(
     </div>
 
     <!-- =======================================================================
+         SECURITY & AUTOMATION KNOWLEDGE BASE
+         ======================================================================= -->
+    <section class="section-padding" id="knowledge-hub" style="background:#080D16; border-top:1px solid var(--obsidian-border);">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag"><i data-lucide="book-open"></i> Engineering & Security Hub</span>
+          <h2>Security & Automation Knowledge Base</h2>
+          <p class="section-subtitle">Deep-dive technical guides on securing Paystack webhooks, locking down Supabase databases, and building resilient business automations.</p>
+        </div>
+
+        <div class="knowledge-guides-grid" id="knowledgeGuidesGrid">
+          <!-- Populated dynamically by knowledgeBase.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
          FAQ ACCORDION
          ======================================================================= -->
-    <section class="section-padding" style="background:#080D16; border-top:1px solid var(--obsidian-border);">
+    <section class="section-padding" style="background:var(--obsidian-base); border-top:1px solid var(--obsidian-border);">
       <div class="container">
         <div class="section-header">
           <span class="section-tag"><i data-lucide="help-circle"></i> Frequently Asked Questions</span>
@@ -1685,6 +1702,22 @@ const isValid = crypto.timingSafeEqual(
     </div>
   </div>
 
+  <!-- KNOWLEDGE BASE GUIDE VIEWER MODAL -->
+  <div id="modal-guide-viewer" class="modal-backdrop">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 id="guideViewerTitle" style="font-size:1.25rem; color:#FFF; margin-bottom:0.25rem;">Security Guide</h3>
+          <div id="guideViewerMeta" style="font-size:0.8rem; color:var(--text-cyber-muted);">Payment Security • 4 min read</div>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body guide-article-content" id="guideViewerBody">
+        <!-- Rendered dynamically by knowledgeBase.js -->
+      </div>
+    </div>
+  </div>
+
   <!-- COMMAND PALETTE -->
   <div id="modal-cmd-palette" class="modal-backdrop">
     <div class="modal-card" style="max-width:min(92vw, 600px); padding:0;">
@@ -1726,6 +1759,7 @@ const isValid = crypto.timingSafeEqual(
   <script src="js/vibescanLiveEngine.js"></script>
   <script src="js/roiCalculator.js"></script>
   <script src="js/encryptionVisualizer.js"></script>
+  <script src="js/knowledgeBase.js"></script>
   <script src="js/studio.js"></script>
   <script src="js/bookingModal.js"></script>
   <script src="js/router.js"></script>

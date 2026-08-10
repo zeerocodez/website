@@ -10,6 +10,9 @@
 
 const crypto = require('crypto');
 
+// Serverless instance-level idempotency cache
+const processedServerlessRefs = new Set();
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -39,7 +42,16 @@ module.exports = async (req, res) => {
     }
 
     const event = req.body;
-    console.log(`✅ Verified Paystack webhook event: ${event?.event}`, event?.data?.reference);
+    const ref = event?.data?.reference || `paystack_${Date.now()}`;
+
+    // Idempotency check
+    if (processedServerlessRefs.has(ref)) {
+      console.log(`ℹ️ Serverless duplicate Paystack webhook detected for ref ${ref}.`);
+      return res.status(200).json({ received: true, status: 'already_processed', reference: ref });
+    }
+    processedServerlessRefs.add(ref);
+
+    console.log(`✅ Verified Paystack webhook event: ${event?.event}`, ref);
 
     if (event?.event === 'charge.success') {
       const metadata = event.data?.metadata || {};
@@ -50,7 +62,7 @@ module.exports = async (req, res) => {
       }
     }
 
-    return res.status(200).json({ received: true, status: 'verified' });
+    return res.status(200).json({ received: true, status: 'verified', reference: ref });
   } catch (error) {
     console.error('Paystack webhook processing error:', error);
     return res.status(500).json({ error: 'Internal server error' });
