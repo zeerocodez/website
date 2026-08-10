@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "cleanUrls": true,
   "headers": [
     {
       "source": "/(.*)",
@@ -10,16 +10,5 @@
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "/api/:path*"
-    },
-    {
-      "source": "/((?!api/|styles.css|index.html|js/|images/|icons/|favicon.ico).*)",
-      "destination": "/index.html"
-    }
   ]
 }
-
