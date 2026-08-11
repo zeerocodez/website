@@ -905,9 +905,9 @@ const isValid = crypto.timingSafeEqual(
       </section>
 
       <!-- PERSONA PATHWAY -->
-      <section class="persona-pathway-section">
+      <section class="persona-pathway-section section-padding">
         <div class="container">
-          <div class="section-header">
+          <div class="section-header text-center">
             <span class="section-tag"><i data-lucide="compass"></i> Choose Your Path</span>
             <h2>What Do You Need to Accomplish Today?</h2>
             <p class="section-subtitle">Click where you want to start, and we will take you directly there.</p>
@@ -923,12 +923,12 @@ const isValid = crypto.timingSafeEqual(
               <h3 class="persona-title">"I want you to build an app, website, or automation for me"</h3>
               <p class="persona-desc">We build custom web apps, customer portals, and multi-channel automation systems that run your operations without daily headaches.</p>
               <div class="persona-features">
-                <span><i data-lucide="check"></i> Custom Apps & Portals in 14–28 Days</span>
-                <span><i data-lucide="check"></i> Automated Invoicing & Multi-Channel Workflows</span>
-                <span><i data-lucide="check"></i> We Run & Maintain It for You (99.99% Uptime)</span>
+                <div class="persona-feature-item"><i data-lucide="check"></i> <span>Custom Apps & Portals in 14–28 Days</span></div>
+                <div class="persona-feature-item"><i data-lucide="check"></i> <span>Automated Invoicing & Multi-Channel Workflows</span></div>
+                <div class="persona-feature-item"><i data-lucide="check"></i> <span>We Run & Maintain It for You (99.99% Uptime)</span></div>
               </div>
               <a href="#studio" class="persona-cta-btn">
-                Hire Studio to Build <i data-lucide="arrow-right"></i>
+                <span>Hire Studio to Build</span> <i data-lucide="arrow-right"></i>
               </a>
             </div>
 
@@ -940,12 +940,12 @@ const isValid = crypto.timingSafeEqual(
               <h3 class="persona-title">"I want to learn to build apps and earn client income"</h3>
               <p class="persona-desc">Join The VibeCode Labs 8-week cohort. We take you from absolute beginner to a certified builder who ships real software for paying clients.</p>
               <div class="persona-features">
-                <span><i data-lucide="check"></i> 4 Levels • 20 Modules • 88 Practical Lessons</span>
-                <span><i data-lucide="check"></i> Weekly Live Build-Alongs with Nuel Effiong</span>
-                <span><i data-lucide="check"></i> Official Professional Developer Certificate</span>
+                <div class="persona-feature-item"><i data-lucide="check"></i> <span>4 Levels • 20 Modules • 88 Practical Lessons</span></div>
+                <div class="persona-feature-item"><i data-lucide="check"></i> <span>Weekly Live Build-Alongs with Nuel Effiong</span></div>
+                <div class="persona-feature-item"><i data-lucide="check"></i> <span>Official Professional Developer Certificate</span></div>
               </div>
               <a href="#academy" class="persona-cta-btn">
-                Join The VibeCode Labs <i data-lucide="arrow-right"></i>
+                <span>Join The VibeCode Labs</span> <i data-lucide="arrow-right"></i>
               </a>
             </div>
 
@@ -957,12 +957,12 @@ const isValid = crypto.timingSafeEqual(
               <h3 class="persona-title">"I built an app with AI and want to audit its security"</h3>
               <p class="persona-desc">Run our free quick scan or book a 48-hour comprehensive audit to seal secret leaks and earn a verified VibeCert™ badge.</p>
               <div class="persona-features">
-                <span><i data-lucide="check"></i> 100% Free Instant AST Code Security Scan</span>
-                <span><i data-lucide="check"></i> 48-Hour Full Auditor Report with Fixes</span>
-                <span><i data-lucide="check"></i> Official Public VibeCert™ Verified Badge</span>
+                <div class="persona-feature-item"><i data-lucide="check"></i> <span>100% Free Instant AST Code Security Scan</span></div>
+                <div class="persona-feature-item"><i data-lucide="check"></i> <span>48-Hour Full Auditor Report with Fixes</span></div>
+                <div class="persona-feature-item"><i data-lucide="check"></i> <span>Official Public VibeCert™ Verified Badge</span></div>
               </div>
               <a href="#vibescan" class="persona-cta-btn">
-                Audit Your App <i data-lucide="arrow-right"></i>
+                <span>Audit Your App</span> <i data-lucide="arrow-right"></i>
               </a>
             </div>
           </div>
@@ -972,7 +972,7 @@ const isValid = crypto.timingSafeEqual(
       <!-- SECURITY & AUTOMATION KNOWLEDGE BASE (Contained in Home View) -->
       <section class="section-padding" id="knowledge-hub" style="background:#080D16; border-top:1px solid var(--obsidian-border);">
         <div class="container">
-          <div class="section-header">
+          <div class="section-header text-center">
             <span class="section-tag"><i data-lucide="book-open"></i> Engineering & Security Hub</span>
             <h2>Security & Automation Knowledge Base</h2>
             <p class="section-subtitle">Deep-dive technical guides on securing Paystack webhooks, locking down Supabase databases, and building resilient business automations.</p>
@@ -986,63 +986,82 @@ const isValid = crypto.timingSafeEqual(
 
       <!-- FAQ ACCORDION (Contained in Home View) -->
       <section class="section-padding" id="faq-section" style="background:var(--obsidian-base); border-top:1px solid var(--obsidian-border);">
-        <div class="container">
-          <div class="section-header">
+        <div class="container" style="max-width: 920px;">
+          <div class="section-header text-center">
             <span class="section-tag"><i data-lucide="help-circle"></i> Frequently Asked Questions</span>
             <h2>Got Questions? We Have Honest Answers.</h2>
-            <p class="section-subtitle">Everything you need to know about working with us, our delivery process, and how our builder training works.</p>
+            <p class="section-subtitle">Everything you need to know about working with us, our delivery timeline, security, and the academy.</p>
           </div>
 
-          <div class="faq-grid">
+          <div class="faq-accordion-container">
             <div class="faq-card active">
-              <button class="faq-question-btn">
-                <span>How fast will you build and deliver my project?</span>
-                <i data-lucide="chevron-down"></i>
+              <button class="faq-question-btn" type="button">
+                <span class="faq-q-text">How fast will you build and deliver my project?</span>
+                <span class="faq-icon-wrap"><i data-lucide="chevron-down"></i></span>
               </button>
               <div class="faq-answer">
-                Standard custom web apps, customer portals, and high-converting websites are designed, coded, tested, and deployed within <strong>14 to 28 business days</strong>. Event-driven automations (like automated invoicing, lead qualifiers, and appointment bots) typically deploy in under 14 days.
+                <p>Standard custom web apps, customer portals, and high-converting websites are designed, coded, tested, and deployed within <strong>14 to 28 business days</strong>. Event-driven automations (like automated invoicing, lead qualifiers, and appointment bots) typically deploy in under 14 days.</p>
               </div>
             </div>
 
             <div class="faq-card">
-              <button class="faq-question-btn">
-                <span>Do you maintain and run the automations after they are built?</span>
-                <i data-lucide="chevron-down"></i>
+              <button class="faq-question-btn" type="button">
+                <span class="faq-q-text">Do you maintain and run the automations after they are built?</span>
+                <span class="faq-icon-wrap"><i data-lucide="chevron-down"></i></span>
               </button>
               <div class="faq-answer">
-                Yes! Through our <strong>Managed Operations</strong>, Zeerocodes hosts, monitors, and maintains your entire automation setup 24/7. If a phone network drops a webhook or an API changes, our team fixes it immediately with an uptime guarantee.
+                <p>Yes! Through our <strong>Managed Operations</strong>, Zeerocodes hosts, monitors, and maintains your entire automation setup 24/7. If a phone network drops a webhook or an API changes, our team fixes it immediately with an uptime guarantee.</p>
               </div>
             </div>
 
             <div class="faq-card">
-              <button class="faq-question-btn">
-                <span>What is the difference between the Free VibeScan and a Paid Audit?</span>
-                <i data-lucide="chevron-down"></i>
+              <button class="faq-question-btn" type="button">
+                <span class="faq-q-text">What is the difference between the Free VibeScan and a Paid Audit?</span>
+                <span class="faq-icon-wrap"><i data-lucide="chevron-down"></i></span>
               </button>
               <div class="faq-answer">
-                The <strong>Free Basic Scan</strong> is an automated OWASP LLM AST tool that quickly flags leaked API keys and missing security configurations in seconds. The <strong>Comprehensive Paid Audit</strong> adds a deep manual review by Principal Architect Nuel Effiong, custom code remediation patches, and the official cryptographically verified <strong>VibeCert™ badge</strong> for your website and investor deck.
+                <p>The <strong>Free Basic Scan</strong> is an automated OWASP LLM AST tool that quickly flags leaked API keys and missing security configurations in seconds. The <strong>Comprehensive Paid Audit</strong> adds a deep manual review by Principal Architect Nuel Effiong, custom code remediation patches, and the official cryptographically verified <strong>VibeCert™ badge</strong> for your website and investor deck.</p>
               </div>
             </div>
 
             <div class="faq-card">
-              <button class="faq-question-btn">
-                <span>I have zero coding experience. Can I really learn in The VibeCode Labs?</span>
-                <i data-lucide="chevron-down"></i>
+              <button class="faq-question-btn" type="button">
+                <span class="faq-q-text">I have zero coding experience. Can I really learn in The VibeCode Labs?</span>
+                <span class="faq-icon-wrap"><i data-lucide="chevron-down"></i></span>
               </button>
               <div class="faq-answer">
-                100% yes. Level 1 starts at the absolute beginning. You don't need to memorize complex syntax. We teach you modern AI visual tools, prompt engineering, and visual automation step-by-step with weekly live mentorship from Nuel Effiong.
+                <p>100% yes. Level 1 starts at the absolute beginning. You don't need to memorize complex syntax. We teach you modern AI visual tools, prompt engineering, and visual automation step-by-step with weekly live mentorship from Nuel Effiong.</p>
               </div>
             </div>
 
             <div class="faq-card">
-              <button class="faq-question-btn">
-                <span>What is your guarantee on custom builds and the academy?</span>
-                <i data-lucide="chevron-down"></i>
+              <button class="faq-question-btn" type="button">
+                <span class="faq-q-text">What is your guarantee on custom builds and the academy?</span>
+                <span class="faq-icon-wrap"><i data-lucide="chevron-down"></i></span>
               </button>
               <div class="faq-answer">
-                For Studio client builds, we provide a <strong>30-day post-launch warranty and SLA</strong> to fix any issues for free. For The VibeCode Labs cohort, we offer a <strong>14-day 100% money-back satisfaction guarantee</strong> if you feel the training isn't right for you.
+                <p>For Studio client builds, we provide a <strong>30-day post-launch warranty and SLA</strong> to fix any issues for free. For The VibeCode Labs cohort, we offer a <strong>14-day 100% money-back satisfaction guarantee</strong> if you feel the training isn't right for you.</p>
               </div>
             </div>
+
+            <div class="faq-card">
+              <button class="faq-question-btn" type="button">
+                <span class="faq-q-text">How do you protect my app and database from malicious players?</span>
+                <span class="faq-icon-wrap"><i data-lucide="chevron-down"></i></span>
+              </button>
+              <div class="faq-answer">
+                <p>We build with strict zero-trust security guardrails: constant-time cryptographic HMAC checks for payment webhooks, database Row-Level Security (RLS) policies, input sanitization to block prompt injections, and 100% server-side secret management so no API keys ever leak to the browser.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Need custom help callout -->
+          <div class="faq-cta-box" style="margin-top: 3rem; text-align: center; background: rgba(0, 245, 212, 0.04); border: 1px dashed rgba(0, 245, 212, 0.25); border-radius: var(--radius-md); padding: 2.25rem 2rem;">
+            <h4 style="font-size: 1.2rem; color: #FFFFFF; margin-bottom: 0.5rem; font-weight: 700;">Have a specific question about your project or stack?</h4>
+            <p style="color: var(--text-cyber-muted); font-size: 0.92rem; margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">Chat directly with Principal Architect Nuel Effiong. We will give you honest technical advice with zero sales pressure.</p>
+            <button class="btn btn-primary btn-sm trigger-calendly-booking" style="padding: 0.75rem 1.75rem;">
+              <i data-lucide="calendar"></i> Book a Free 20-Min Discovery Call
+            </button>
           </div>
         </div>
       </section>
