@@ -63,6 +63,20 @@ class Router {
         desc: 'Deep-dive developer guides on constant-time HMAC, Supabase PostgreSQL RLS, and prompt injection defense.',
         public: true
       },
+      '#faq': {
+        viewId: 'view-home',
+        scrollToId: 'faq-section',
+        title: 'Frequently Asked Questions | Zeerocodes',
+        desc: 'Answers about project timelines, managed operations SLA, The VibeCode Labs cohort, and VibeScan security audits.',
+        public: true
+      },
+      '#roi-calculator': {
+        viewId: 'view-studio',
+        scrollToId: 'roi-calculator',
+        title: 'Cost Savings Calculator | Zeerocodes Studio',
+        desc: 'Calculate how much time and money your business will save by automating repetitive manual workflows.',
+        public: true
+      },
       '#about': {
         viewId: 'view-about',
         title: 'About Zeerocodes & Nuel Effiong | Principal AI Systems Architect',

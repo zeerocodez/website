@@ -6,6 +6,19 @@
 
 const AUTH_USER_KEY = 'zeerocodes_current_user';
 
+const MASTER_ADMIN_EMAILS = [
+  'zeerocodes@gmail.com',
+  'admin@zeerocodes.com',
+  'nuel@zeerocodes.com',
+  'nueleffiong@gmail.com'
+];
+
+function isMasterAdminEmail(email) {
+  if (!email) return false;
+  const clean = String(email).toLowerCase().trim();
+  return MASTER_ADMIN_EMAILS.includes(clean) || clean.includes('admin@zeerocodes') || clean.includes('nuel@zeerocodes');
+}
+
 class AuthService {
   constructor() {
     this.currentUser = null;
@@ -19,6 +32,11 @@ class AuthService {
       const stored = localStorage.getItem(AUTH_USER_KEY);
       if (stored) {
         this.currentUser = JSON.parse(stored);
+        // Ensure master admin emails are always upgraded to admin
+        if (this.currentUser && isMasterAdminEmail(this.currentUser.email)) {
+          this.currentUser.role = 'admin';
+          localStorage.setItem(AUTH_USER_KEY, JSON.stringify(this.currentUser));
+        }
       }
     } catch (e) {
       console.warn("Error reading stored user session", e);
@@ -63,6 +81,9 @@ class AuthService {
   }
 
   setUser(user) {
+    if (user && isMasterAdminEmail(user.email)) {
+      user.role = 'admin';
+    }
     this.currentUser = user;
     if (user) {
       localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
@@ -82,7 +103,7 @@ class AuthService {
   }
 
   isAdmin() {
-    return !!this.currentUser && this.currentUser.role === 'admin';
+    return !!this.currentUser && (this.currentUser.role === 'admin' || isMasterAdminEmail(this.currentUser.email));
   }
 
   isEmailVerified() {
@@ -91,14 +112,12 @@ class AuthService {
 
   // Sync profile document with Firestore
   async syncUserProfile(fbUser, extra = {}) {
-    let role = 'user';
+    let role = isMasterAdminEmail(fbUser.email) ? 'admin' : 'user';
     // Check if user already exists in Firestore/db
-    if (window.db) {
+    if (window.db && role !== 'admin') {
       const existing = await window.db.getUser(fbUser.uid);
       if (existing && existing.role) {
         role = existing.role;
-      } else if (fbUser.email && (fbUser.email.includes('admin@zeerocodes') || fbUser.email.includes('nuel@zeerocodes'))) {
-        role = 'admin';
       }
     }
 
@@ -144,20 +163,20 @@ class AuthService {
     } else {
       // Local Sandbox Simulation
       const uid = 'usr_' + Date.now();
-      const role = email.toLowerCase().includes('admin') ? 'admin' : 'user';
+      const role = isMasterAdminEmail(email) ? 'admin' : 'user';
       const profile = {
         uid: uid,
         email: email,
         displayName: displayName || email.split('@')[0],
         role: role,
-        emailVerified: false,
+        emailVerified: true,
         isLocalMock: true,
         createdAt: new Date().toISOString()
       };
 
       if (window.db) await window.db.saveUser(profile);
       this.setUser(profile);
-      if (window.toast) window.toast.success(`Account registered! (Verification email simulated for ${email})`);
+      if (window.toast) window.toast.success(`Account registered with ${role.toUpperCase()} privileges!`);
       return profile;
     }
   }
@@ -169,7 +188,7 @@ class AuthService {
         const cred = await firebaseAuth.signInWithEmailAndPassword(email, password);
         const profile = await this.syncUserProfile(cred.user);
         this.setUser(profile);
-        if (window.toast) window.toast.success(`Welcome back, ${profile.displayName}!`);
+        if (window.toast) window.toast.success(`Welcome back, ${profile.displayName}! (${profile.role.toUpperCase()})`);
         return profile;
       } catch (err) {
         if (window.toast) window.toast.error(err.message || "Sign in failed");
@@ -177,28 +196,26 @@ class AuthService {
       }
     } else {
       // Local Sandbox Simulation
-      let role = 'user';
-      if (email.toLowerCase().includes('admin') || email.toLowerCase().includes('nuel')) {
-        role = 'admin';
-      }
+      let role = isMasterAdminEmail(email) ? 'admin' : 'user';
       
       // Check existing user in local db
       const allUsers = (window.db && window.db.getLocal('users')) || [];
       const match = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (match && match.role === 'admin') role = 'admin';
       
       const profile = {
         uid: match ? match.uid : 'usr_' + Date.now(),
         email: email,
         displayName: match ? match.displayName : email.split('@')[0],
-        role: match ? match.role : role,
-        emailVerified: match ? match.emailVerified : true,
+        role: role,
+        emailVerified: true,
         isLocalMock: true,
         lastLogin: new Date().toISOString()
       };
 
       if (window.db) await window.db.saveUser(profile);
       this.setUser(profile);
-      if (window.toast) window.toast.success(`Welcome back, ${profile.displayName}!`);
+      if (window.toast) window.toast.success(`Welcome back, ${profile.displayName}! Signed in as ${role.toUpperCase()}.`);
       return profile;
     }
   }
@@ -222,9 +239,9 @@ class AuthService {
       // Local Sandbox Simulation
       const profile = {
         uid: 'google_user_' + Date.now(),
-        email: 'founder@africanbuilds.com',
-        displayName: 'Nuel African Founder',
-        role: 'user',
+        email: 'zeerocodes@gmail.com',
+        displayName: 'Zeerocodes Admin',
+        role: 'admin',
         emailVerified: true,
         isLocalMock: true,
         provider: 'google.com',
@@ -232,7 +249,7 @@ class AuthService {
       };
       if (window.db) await window.db.saveUser(profile);
       this.setUser(profile);
-      if (window.toast) window.toast.success("Signed in with Google (Sandbox Verified)");
+      if (window.toast) window.toast.success("Signed in as zeerocodes@gmail.com (ADMIN Access Granted)");
       return profile;
     }
   }

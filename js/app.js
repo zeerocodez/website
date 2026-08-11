@@ -42,6 +42,20 @@ class ZeerocodesApp {
       }
     });
 
+    // Bind Multi-Industry Solution Pills Switcher
+    document.addEventListener('click', (e) => {
+      const industryBtn = e.target.closest('.industry-pill-btn');
+      if (industryBtn) {
+        const indId = industryBtn.getAttribute('data-industry');
+        document.querySelectorAll('.industry-pill-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.industry-detail-card').forEach(c => c.classList.remove('active'));
+        industryBtn.classList.add('active');
+        const targetDetail = document.getElementById(indId);
+        if (targetDetail) targetDetail.classList.add('active');
+        if (window.lucide) window.lucide.createIcons();
+      }
+    });
+
     // Bind FAQ Accordions
     document.addEventListener('click', (e) => {
       const faqBtn = e.target.closest('.faq-question-btn');
