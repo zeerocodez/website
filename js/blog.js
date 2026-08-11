@@ -346,7 +346,7 @@ class BlogManager {
         "name": "Zeerocodes",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://zeerocodes.com/images/logo.png"
+          "url": "https://zeerocodes.com/logo.png"
         }
       },
       "datePublished": "2026-08-10",
