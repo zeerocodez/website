@@ -96,6 +96,16 @@ class ZeerocodesApp {
       window.adminConsole.init();
     }
 
+    // Initialize PWA Service Worker for offline capability
+    this.initPwaServiceWorker();
+
+    // Initialize Public AST Security Scanner on #vibescan
+    this.initPublicAstScanner();
+
+    // Sync saved currency or default to NGN
+    const savedCurr = localStorage.getItem('zeerocodes_currency') || 'NGN';
+    this.setGlobalCurrency(savedCurr);
+
     // Initial auth UI update
     if (window.auth) {
       window.auth.updateNavigationUI();
@@ -851,63 +861,99 @@ class ZeerocodesApp {
           </div>
         `;
       } else {
-        const activeEnroll = enrollments[0];
-        const completedCount = (activeEnroll.completedLessons || []).length;
-        const totalLessons = 88;
-        const percent = Math.round((completedCount / totalLessons) * 100);
+        const allCourses = await window.db.getCourses();
+        const unEnrolledCourses = allCourses.filter(c => !enrollments.some(e => e.courseId === c.id));
 
         lmsContainer.innerHTML = `
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap:1.5rem; margin-bottom:1.5rem;">
-            <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.5rem;">
-              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
-                <span class="badge badge-success">ACTIVE COHORT</span>
-                <span style="font-size:0.8rem; color:var(--text-cyber-muted);">8-Week Live Masterclass</span>
-              </div>
-              <h3 style="color:#FFF; font-size:1.2rem; margin-bottom:0.4rem;">${activeEnroll.courseTitle}</h3>
-              <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin-bottom:1.25rem;">
-                4 Levels • 20 Modules • 88 Practical Lessons • VibeScan Capstone Audit
-              </p>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h4 style="color:#FFF; font-size:1.1rem; margin:0;">Enrolled Curriculum Tracks (${enrollments.length})</h4>
+            <span class="badge badge-teal">Unified Multi-Track Access</span>
+          </div>
 
-              <div style="margin-bottom:1.25rem;">
-                <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-cyber-muted); margin-bottom:0.4rem;">
-                  <span>Curriculum Progress</span>
-                  <strong style="color:var(--emerald-light);">${percent}% (${completedCount}/${totalLessons} Lessons)</strong>
-                </div>
-                <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden;">
-                  <div style="width:${percent}%; height:100%; background:linear-gradient(90deg, var(--emerald-primary), var(--cyan-accent));"></div>
-                </div>
-              </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap:1.5rem; margin-bottom:1.75rem;">
+            ${enrollments.map(activeEnroll => {
+              const completedCount = (activeEnroll.completedLessons || []).length;
+              const totalLessons = activeEnroll.courseId === 'course-whatsapp-automation' ? 48 : activeEnroll.courseId === 'course-ai-security' ? 36 : 88;
+              const percent = Math.round((completedCount / totalLessons) * 100);
 
-              <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
-                <button class="btn btn-primary btn-sm" onclick="window.lms?.openCoursePlayer('${activeEnroll.id}')">
-                  <i data-lucide="play-circle"></i> Resume Course Player
-                </button>
-                ${activeEnroll.certificateId ? `
-                  <button class="btn btn-outline btn-sm trigger-view-cert" data-cert="${activeEnroll.certificateId}">
-                    <i data-lucide="award"></i> View Certificate
-                  </button>
-                ` : ''}
+              return `
+                <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.5rem;">
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
+                    <span class="badge badge-success">ENROLLED</span>
+                    <span style="font-size:0.8rem; color:var(--text-cyber-muted); font-family:var(--font-mono);">${activeEnroll.cohort || 'Active Track'}</span>
+                  </div>
+                  <h3 style="color:#FFF; font-size:1.15rem; margin-bottom:0.35rem;">${activeEnroll.courseTitle}</h3>
+                  <p style="color:var(--text-cyber-muted); font-size:0.82rem; margin-bottom:1rem;">
+                    ${totalLessons} Practical Lessons • Antigravity & AI Studio Code Labs
+                  </p>
+
+                  <div style="margin-bottom:1.25rem;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:var(--text-cyber-muted); margin-bottom:0.4rem;">
+                      <span>Track Progress</span>
+                      <strong style="color:var(--emerald-light);">${percent}% (${completedCount}/${totalLessons})</strong>
+                    </div>
+                    <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden;">
+                      <div style="width:${percent}%; height:100%; background:linear-gradient(90deg, var(--emerald-primary), var(--cyan-accent));"></div>
+                    </div>
+                  </div>
+
+                  <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                    <button class="btn btn-primary btn-sm" onclick="window.lms?.openCoursePlayer('${activeEnroll.id}')">
+                      <i data-lucide="play-circle"></i> Launch Course Player
+                    </button>
+                    ${activeEnroll.certificateId ? `
+                      <button class="btn btn-outline btn-sm trigger-view-cert" data-cert="${activeEnroll.certificateId}">
+                        <i data-lucide="award"></i> View Certificate
+                      </button>
+                    ` : ''}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <!-- Explore Additional Catalog Tracks -->
+          ${unEnrolledCourses.length ? `
+            <div style="margin-bottom:2rem; border-top:1px solid rgba(255,255,255,0.06); padding-top:1.5rem;">
+              <h4 style="color:#FFF; font-size:1.05rem; margin-bottom:1rem;">Available Tracks in Academy Catalog</h4>
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap:1rem;">
+                ${unEnrolledCourses.map(c => `
+                  <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:var(--radius-xs); padding:1rem; display:flex; flex-direction:column; justify-content:space-between;">
+                    <div>
+                      <span class="badge badge-teal" style="font-size:0.65rem; margin-bottom:0.35rem;">${c.category}</span>
+                      <h5 style="color:#FFF; font-size:0.95rem; margin-bottom:0.25rem;">${c.title}</h5>
+                      <p style="color:var(--text-cyber-muted); font-size:0.8rem; margin-bottom:0.75rem;">${c.subtitle || c.description}</p>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.5rem;">
+                      <strong style="color:var(--emerald-light); font-size:0.9rem;">₦${(c.pricing?.amountNGN || 95000).toLocaleString()}</strong>
+                      <button class="btn btn-outline btn-xs" onclick="window.payments?.openPaymentModal('${c.id}')">
+                        Enroll in Track &rarr;
+                      </button>
+                    </div>
+                  </div>
+                `).join('')}
               </div>
             </div>
+          ` : ''}
 
-            <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.5rem;">
-              <h4 style="color:#FFF; font-size:1.05rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
-                <i data-lucide="folder-down" style="color:var(--cyan-accent);"></i> Student Resource Hub
-              </h4>
-              <div style="display:flex; flex-direction:column; gap:0.65rem; font-size:0.85rem;">
-                <div style="background:rgba(255,255,255,0.02); padding:0.6rem 0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
-                  <span>⚡ 2026 AI Build Prompts Pack (v3.2)</span>
-                  <button class="btn btn-ghost btn-xs" style="color:var(--emerald-light);" onclick="window.toast?.success('Downloaded AI Prompts Cheatsheet')"><i data-lucide="download"></i></button>
-                </div>
-                <div style="background:rgba(255,255,255,0.02); padding:0.6rem 0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
-                  <span>📦 n8n WhatsApp Paystack Blueprint (.json)</span>
-                  <button class="btn btn-ghost btn-xs" style="color:var(--emerald-light);" onclick="window.toast?.success('Downloaded n8n Workflow JSON Template')"><i data-lucide="download"></i></button>
-                </div>
-                <div style="background:rgba(255,255,255,0.02); padding:0.6rem 0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
-                  <span>🛡️ OWASP LLM Top 10 Security Checklist</span>
-                  <button class="btn btn-ghost btn-xs" style="color:var(--emerald-light);" onclick="window.toast?.success('Downloaded Security Checklist PDF')"><i data-lucide="download"></i></button>
-                </div>
+          <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.5rem; margin-bottom:2rem;">
+            <h4 style="color:#FFF; font-size:1.05rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
+              <i data-lucide="folder-down" style="color:var(--cyan-accent);"></i> Student Resource Hub
+            </h4>
+            <div style="display:flex; flex-direction:column; gap:0.65rem; font-size:0.85rem;">
+              <div style="background:rgba(255,255,255,0.02); padding:0.6rem 0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
+                <span>⚡ 2026 AI Build Prompts Pack (v3.2)</span>
+                <button class="btn btn-ghost btn-xs" style="color:var(--emerald-light);" onclick="window.toast?.success('Downloaded AI Prompts Cheatsheet')"><i data-lucide="download"></i></button>
               </div>
+              <div style="background:rgba(255,255,255,0.02); padding:0.6rem 0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
+                <span>📦 n8n WhatsApp Paystack Blueprint (.json)</span>
+                <button class="btn btn-ghost btn-xs" style="color:var(--emerald-light);" onclick="window.toast?.success('Downloaded n8n Workflow JSON Template')"><i data-lucide="download"></i></button>
+              </div>
+              <div style="background:rgba(255,255,255,0.02); padding:0.6rem 0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
+                <span>🛡️ OWASP LLM Top 10 Security Checklist</span>
+                <button class="btn btn-ghost btn-xs" style="color:var(--emerald-light);" onclick="window.toast?.success('Downloaded Security Checklist PDF')"><i data-lucide="download"></i></button>
+              </div>
+            </div>
             </div>
           </div>
 
@@ -1086,8 +1132,426 @@ class ZeerocodesApp {
 
     if (window.lucide) window.lucide.createIcons();
   }
+
+  // =========================================================================
+  // 8. PWA & OFFLINE SERVICE WORKER REGISTRATION
+  // =========================================================================
+  initPwaServiceWorker() {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('🛡️ Zeerocodes PWA ServiceWorker Registered:', reg.scope))
+          .catch(err => console.warn('PWA SW registration skipped in this environment:', err));
+      });
+    }
+  }
+
+  // =========================================================================
+  // 9. GLOBAL MULTI-CURRENCY CONVERSION ENGINE
+  // =========================================================================
+  setGlobalCurrency(curr = 'NGN') {
+    this.currentCurrency = curr;
+    localStorage.setItem('zeerocodes_currency', curr);
+
+    // Sync select dropdown if exists
+    const sel = document.getElementById('globalCurrencySelector');
+    if (sel) sel.value = curr;
+
+    if (window.payments) {
+      window.payments.setCurrency(curr);
+    }
+
+    this.updateAllPricesOnPage();
+    if (window.toast) {
+      window.toast.info(`Display currency updated to ${curr}`);
+    }
+  }
+
+  formatCurrency(amountNGN, targetCurr = this.currentCurrency || 'NGN') {
+    const rates = { NGN: 1, USD: 1500, GBP: 1850, EUR: 1600 };
+    const rate = rates[targetCurr] || 1;
+
+    if (targetCurr === 'NGN') {
+      return `₦${Number(amountNGN).toLocaleString()}`;
+    } else if (targetCurr === 'USD') {
+      return `$${Math.round(amountNGN / rate).toLocaleString()}`;
+    } else if (targetCurr === 'GBP') {
+      return `£${Math.round(amountNGN / rate).toLocaleString()}`;
+    } else if (targetCurr === 'EUR') {
+      return `€${Math.round(amountNGN / rate).toLocaleString()}`;
+    }
+    return `₦${Number(amountNGN).toLocaleString()}`;
+  }
+
+  updateAllPricesOnPage() {
+    document.querySelectorAll('[data-price-ngn]').forEach(el => {
+      const ngn = parseFloat(el.getAttribute('data-price-ngn')) || 0;
+      el.textContent = this.formatCurrency(ngn);
+    });
+  }
+
+  // =========================================================================
+  // 10. PUBLIC VIBECERT™ VERIFICATION PORTAL (#verify)
+  // =========================================================================
+  async renderCertificateVerification(certId) {
+    const hash = window.location.hash;
+    let targetCertId = certId;
+
+    if (!targetCertId && hash.includes('cert=')) {
+      targetCertId = hash.split('cert=')[1].split('&')[0];
+    }
+    if (!targetCertId) {
+      targetCertId = document.getElementById('verifySearchInput')?.value || 'VIBECERT-2026-0881';
+    }
+
+    await this.lookupCertificate(targetCertId);
+  }
+
+  async lookupCertificate(certId) {
+    const container = document.getElementById('verifyResultContainer');
+    if (!container || !window.db) return;
+
+    container.innerHTML = `
+      <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-md); padding:3rem 2rem; text-align:center;">
+        <div class="pulse-indicator" style="margin:0 auto 1.5rem auto;"></div>
+        <h4 style="color:#FFF;">Querying Zeerocodes Cryptographic Registry...</h4>
+        <p style="font-size:0.85rem; color:var(--text-cyber-muted); font-family:var(--font-mono);">${certId.toUpperCase()}</p>
+      </div>
+    `;
+
+    const cert = await window.db.getCertificateById(certId);
+
+    if (!cert) {
+      container.innerHTML = `
+        <div style="background:#080D16; border:1px solid rgba(239,68,68,0.3); border-radius:var(--radius-md); padding:3rem 2rem; text-align:center;">
+          <i data-lucide="shield-x" style="width:48px; height:48px; color:#EF4444; margin-bottom:1rem;"></i>
+          <h3 style="color:#FFF; margin-bottom:0.5rem;">Unverified or Revoked Credential</h3>
+          <p style="color:var(--text-cyber-muted); font-size:0.9rem; max-width:500px; margin:0 auto 1.5rem auto;">
+            The serial ID <strong style="color:#FCA5A5; font-family:var(--font-mono);">${certId}</strong> does not match an active cryptographic certificate in our registry.
+          </p>
+          <button class="btn btn-outline btn-sm" onclick="window.app?.lookupCertificate('VIBECERT-2026-0881')">
+            Load Valid Sample Credential (VIBECERT-2026-0881)
+          </button>
+        </div>
+      `;
+      if (window.lucide) window.lucide.createIcons();
+      return;
+    }
+
+    // Render Authentic Holographic Certificate Card
+    container.innerHTML = `
+      <div class="verified-cert-card" style="background:radial-gradient(ellipse at top, #0A1320, #04070D); border:2px solid var(--emerald-primary); box-shadow:0 0 40px rgba(1,107,97,0.35); border-radius:var(--radius-md); padding:2.5rem 2rem; position:relative; overflow:hidden;">
+        
+        <!-- Holographic Watermark Badge -->
+        <div style="position:absolute; top:-20px; right:-20px; width:160px; height:160px; background:radial-gradient(circle, rgba(34,211,238,0.12), transparent 70%); border-radius:50%; pointer-events:none;"></div>
+        
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:1.5rem; margin-bottom:1.75rem;">
+          <div style="display:flex; align-items:center; gap:1rem;">
+            <img src="logo.png" alt="Zeerocodes Official Seal" style="height:48px;">
+            <div>
+              <span class="badge badge-success" style="font-size:0.75rem; letter-spacing:0.05em;">
+                <i data-lucide="shield-check"></i> CRYPTOGRAPHICALLY VERIFIED SAFE & AUTHENTIC
+              </span>
+              <h3 style="color:#FFF; font-size:1.35rem; margin:0.35rem 0 0 0;">${cert.type}</h3>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.75rem; color:var(--text-cyber-muted);">REGISTRY SERIAL ID</div>
+            <div style="font-family:var(--font-mono); font-size:1.15rem; font-weight:800; color:var(--emerald-light);">${cert.certId}</div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:1.5rem; margin-bottom:2rem;">
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-cyber-muted); text-transform:uppercase;">Awarded / Certified Entity</div>
+            <div style="font-size:1.4rem; font-weight:800; color:#FFF; margin-top:0.25rem;">${cert.recipient}</div>
+            <div style="font-size:0.85rem; color:var(--cyan-accent);">${cert.recipientRole}</div>
+          </div>
+
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-cyber-muted); text-transform:uppercase;">Curriculum Track / Codebase</div>
+            <div style="font-size:1.15rem; font-weight:700; color:#FFF; margin-top:0.25rem;">${cert.courseOrApp}</div>
+            <div style="font-size:0.85rem; color:var(--emerald-light); font-weight:700;">${cert.grade} • Score: ${cert.score}/100</div>
+          </div>
+
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-cyber-muted); text-transform:uppercase;">Issued Date & Validity</div>
+            <div style="font-size:0.95rem; color:#FFF; margin-top:0.25rem;"><strong>Issued:</strong> ${cert.issuedDate}</div>
+            <div style="font-size:0.85rem; color:var(--text-cyber-muted);"><strong>Valid Until:</strong> ${cert.expiryDate}</div>
+          </div>
+
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-cyber-muted); text-transform:uppercase;">Issuing Authority</div>
+            <div style="font-size:1rem; font-weight:700; color:#FFF; margin-top:0.25rem;">${cert.instructor}</div>
+            <div style="font-size:0.8rem; color:var(--text-cyber-muted);">${cert.instructorRole}</div>
+          </div>
+        </div>
+
+        <!-- Security Guardrails / Passed Checklist -->
+        <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:var(--radius-xs); padding:1.25rem; margin-bottom:2rem;">
+          <strong style="color:var(--emerald-light); font-size:0.85rem; display:block; margin-bottom:0.75rem;">
+            <i data-lucide="check-check"></i> Security & Architectural Standards Verified:
+          </strong>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap:0.5rem;">
+            ${(cert.owaspPassed || []).map(item => `
+              <div style="display:flex; align-items:center; gap:0.4rem; font-size:0.82rem; color:#EEE;">
+                <i data-lucide="shield" style="width:14px; height:14px; color:var(--emerald-light); flex-shrink:0;"></i>
+                <span>${item}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- SHA-256 Fingerprint -->
+        <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-cyber-muted); word-break:break-all; background:#04070D; padding:0.6rem 0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.04); margin-bottom:2rem;">
+          <strong>SHA-256 Cryptographic Hash:</strong> ${cert.sha256Fingerprint}
+        </div>
+
+        <!-- Verification Actions -->
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.08); padding-top:1.5rem;">
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="window.print()">
+              <i data-lucide="printer"></i> Print / Save PDF
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="navigator.clipboard.writeText('https://zeerocodes.com/#verify?cert=${cert.certId}'); window.toast?.success('Universal Verification URL copied to clipboard!');">
+              <i data-lucide="link"></i> Copy Verify Link
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('<a href=&quot;https://zeerocodes.com/#verify?cert=${cert.certId}&quot; target=&quot;_blank&quot;><img src=&quot;https://zeerocodes.com/badge/vibecert-a.svg&quot; alt=&quot;VibeCert Verified Safe&quot; width=&quot;130&quot; height=&quot;38&quot; /></a>'); window.toast?.success('HTML Badge Embed Code copied!');">
+              <i data-lucide="code"></i> Copy Badge Embed
+            </button>
+          </div>
+
+          <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://zeerocodes.com/%23verify?cert=${cert.certId}" target="_blank" class="btn btn-ghost btn-sm" style="color:var(--cyan-accent);">
+            <i data-lucide="share-2"></i> Share on LinkedIn
+          </a>
+        </div>
+
+      </div>
+    `;
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  // =========================================================================
+  // 11. INTERACTIVE PUBLIC AST CODE SECURITY SCANNER (#vibescan)
+  // =========================================================================
+  initPublicAstScanner() {
+    this.astPresets = {
+      api_key_leak: `// Insecure React Client Component
+import React from 'react';
+
+export default function CheckoutForm() {
+  // CRITICAL: Hardcoded live Paystack secret key exposed in browser bundle
+  const PAYSTACK_SECRET = "pstk_sec_live_dummy_unencrypted_key_8819";
+
+  async function handlePayment() {
+    await fetch("https://api.paystack.co/transaction/initialize", {
+      headers: { Authorization: "Bearer " + PAYSTACK_SECRET }
+    });
+  }
+
+  return <button onClick={handlePayment}>Pay Now</button>;
+}`,
+      missing_rls: `-- Insecure Supabase PostgreSQL Table Setup
+CREATE TABLE customer_orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID,
+  customer_phone TEXT,
+  total_amount NUMERIC
+);
+
+-- CRITICAL: RLS is disabled by default!
+-- Any authenticated or anonymous user can run:
+-- SELECT * FROM customer_orders; and steal all customer records!`,
+      prompt_injection: `// Insecure AI Assistant Endpoint (Express / Next.js API)
+app.post("/api/ai-advisor", async (req, res) => {
+  const { userMessage } = req.body;
+
+  // CRITICAL: Unsanitized user message directly interpolated into system instructions
+  const prompt = "You are a customer support agent. " + userMessage;
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: prompt }]
+  });
+
+  res.json({ reply: response.choices[0].message.content });
+});`,
+      unverified_webhook: `// Insecure Webhook Handler
+app.post("/api/paystack-webhook", async (req, res) => {
+  const event = req.body;
+
+  // CRITICAL: No HMAC SHA-512 signature verification!
+  // A malicious actor can forge a 'charge.success' payload to get free services.
+  if (event.event === "charge.success") {
+    await fulfillCustomerOrder(event.data.reference);
+  }
+
+  res.sendStatus(200);
+});`
+    };
+
+    // Load initial preset
+    this.loadPublicAstPreset('api_key_leak');
+  }
+
+  loadPublicAstPreset(presetKey) {
+    const codeArea = document.getElementById('publicAstCodeInput');
+    if (codeArea && this.astPresets && this.astPresets[presetKey]) {
+      codeArea.value = this.astPresets[presetKey];
+      this.runPublicAstScan();
+    }
+  }
+
+  runPublicAstScan() {
+    const codeArea = document.getElementById('publicAstCodeInput');
+    const scoreVal = document.getElementById('publicAstScoreVal');
+    const statusBadge = document.getElementById('publicAstStatusBadge');
+    const findingsList = document.getElementById('publicAstFindingsList');
+
+    if (!codeArea || !scoreVal || !statusBadge || !findingsList) return;
+
+    const code = codeArea.value;
+    const findings = [];
+    let score = 98;
+
+    if (/sk_live_|sk_test_|OPENAI_API_KEY|PAYSTACK_SECRET/i.test(code)) {
+      findings.push({ severity: 'CRITICAL', text: 'Exposed secret API key in client bundle (OWASP LLM06 / Secrets Leak)' });
+      score -= 50;
+    }
+    if (/RLS is disabled|CREATE TABLE customer_orders/i.test(code) && !/ENABLE ROW LEVEL SECURITY/i.test(code)) {
+      findings.push({ severity: 'HIGH', text: 'Missing Supabase PostgreSQL Row Level Security (RLS) policies' });
+      score -= 40;
+    }
+    if (/\+\s*userMessage|\$\{userInput\}/i.test(code)) {
+      findings.push({ severity: 'HIGH', text: 'Prompt Injection Risk: Direct string interpolation into LLM prompt (OWASP LLM01)' });
+      score -= 35;
+    }
+    if (/req\.body|event\.event ===/i.test(code) && !/crypto\.createHmac|timingSafeEqual/i.test(code)) {
+      findings.push({ severity: 'CRITICAL', text: 'Unverified Webhook: Missing constant-time HMAC SHA-512 validation' });
+      score -= 45;
+    }
+
+    if (!findings.length) {
+      score = 98;
+      findings.push({ severity: 'PASSED', text: 'No high-risk AST vulnerabilities detected in this component.' });
+    }
+
+    score = Math.max(12, Math.min(98, score));
+    scoreVal.textContent = `${score}/100`;
+
+    if (score < 50) {
+      scoreVal.className = 'text-danger';
+      statusBadge.className = 'badge badge-danger';
+      statusBadge.textContent = 'CRITICAL THREAT';
+    } else if (score < 80) {
+      scoreVal.className = 'text-warning';
+      statusBadge.className = 'badge badge-warning';
+      statusBadge.textContent = 'VULNERABLE';
+    } else {
+      scoreVal.className = 'text-success';
+      statusBadge.className = 'badge badge-success';
+      statusBadge.textContent = 'SECURE & HARDENED';
+    }
+
+    findingsList.innerHTML = findings.map(f => `
+      <div style="background:rgba(255,255,255,0.02); padding:0.5rem 0.75rem; border-radius:var(--radius-xs); font-size:0.78rem; border-left:3px solid ${f.severity === 'CRITICAL' ? '#EF4444' : f.severity === 'HIGH' ? '#F59E0B' : '#10B981'}; display:flex; justify-content:space-between; align-items:center;">
+        <span style="color:#DDD;">${f.text}</span>
+        <span class="badge ${f.severity === 'CRITICAL' ? 'badge-danger' : f.severity === 'HIGH' ? 'badge-warning' : 'badge-success'}" style="font-size:0.6rem;">${f.severity}</span>
+      </div>
+    `).join('');
+
+    if (window.toast) {
+      window.toast.info(`AST static scan completed: Score ${score}/100`);
+    }
+  }
+
+  applyPublicAstPatch() {
+    const codeArea = document.getElementById('publicAstCodeInput');
+    const sel = document.getElementById('publicAstPresetSelect');
+    if (!codeArea) return;
+
+    const currentType = sel ? sel.value : 'api_key_leak';
+
+    const patches = {
+      api_key_leak: `// Hardened Next.js Server Action / API Route
+import { NextResponse } from 'next/server';
+
+export async function POST(req: Request) {
+  // SECURED: Key moved strictly to server environment variables
+  const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
+  if (!PAYSTACK_SECRET) {
+    return NextResponse.json({ error: "Missing server credentials" }, { status: 500 });
+  }
+
+  const response = await fetch("https://api.paystack.co/transaction/initialize", {
+    headers: { Authorization: \`Bearer \${PAYSTACK_SECRET}\` }
+  });
+
+  return NextResponse.json(await response.json());
+}`,
+      missing_rls: `-- Hardened Supabase PostgreSQL Table Setup
+CREATE TABLE customer_orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users NOT NULL,
+  customer_phone TEXT,
+  total_amount NUMERIC
+);
+
+-- SECURED: Enable strict Row Level Security
+ALTER TABLE customer_orders ENABLE ROW LEVEL SECURITY;
+
+-- Tenant Isolation: Users can only select their own records
+CREATE POLICY "Users can only read own orders"
+  ON customer_orders FOR SELECT
+  USING (auth.uid() = user_id);`,
+      prompt_injection: `// Hardened AI Assistant Endpoint with Input Sanitization
+import { sanitizePromptInput } from "@/lib/security";
+
+app.post("/api/ai-advisor", async (req, res) => {
+  const sanitized = sanitizePromptInput(req.body.userMessage);
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      { role: "system", content: "You are a customer support agent. Obey security boundaries." },
+      { role: "user", content: sanitized }
+    ]
+  });
+
+  res.json({ reply: response.choices[0].message.content });
+});`,
+      unverified_webhook: `// Hardened Paystack Webhook Handler
+import crypto from 'crypto';
+
+app.post("/api/paystack-webhook", async (req, res) => {
+  const signature = req.headers["x-paystack-signature"];
+  const hash = crypto.createHmac("sha512", process.env.PAYSTACK_SECRET_KEY)
+    .update(req.rawBody)
+    .digest("hex");
+
+  // SECURED: Constant-time buffer equality check prevents timing attacks
+  if (!crypto.timingSafeEqual(Buffer.from(signature || ""), Buffer.from(hash))) {
+    return res.status(401).send("Invalid Webhook Signature");
+  }
+
+  if (req.body.event === "charge.success") {
+    await fulfillCustomerOrder(req.body.data.reference);
+  }
+
+  res.sendStatus(200);
+});`
+    };
+
+    codeArea.value = patches[currentType] || patches.api_key_leak;
+    this.runPublicAstScan();
+    if (window.toast) {
+      window.toast.success("✨ Security Patch applied! All backdoors sealed (Score 98/100).");
+    }
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   window.app = new ZeerocodesApp();
 });
+

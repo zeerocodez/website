@@ -259,6 +259,27 @@ class AcademyLMS {
             </p>
           </div>
 
+          <!-- Community Q&A & Mentor Discussion Section -->
+          <div class="lms-qa-section" style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.25rem; margin-bottom:1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+              <h4 style="color:#FFF; font-size:1.05rem; margin:0; display:flex; align-items:center; gap:0.5rem;">
+                <i data-lucide="message-square" style="color:var(--cyan-accent);"></i> Lesson Discussion & Mentor Q&A
+              </h4>
+              <span class="badge badge-teal" style="font-size:0.65rem;">Direct Instructor Access</span>
+            </div>
+
+            <form id="lmsAskQuestionForm" onsubmit="window.lms.handlePostQuestion(event, '${lesson.id}')" style="display:flex; gap:0.5rem; margin-bottom:1.25rem;">
+              <input type="text" id="lmsQuestionInput" placeholder="Ask a question about this build or architectural pattern..." class="form-input" style="flex:1; font-size:0.85rem;" required>
+              <button type="submit" class="btn btn-primary btn-sm" style="flex-shrink:0;">
+                <i data-lucide="send"></i> Post Question
+              </button>
+            </form>
+
+            <div id="lmsLessonQuestionsList" style="display:flex; flex-direction:column; gap:0.75rem;">
+              <!-- Loaded dynamically -->
+            </div>
+          </div>
+
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2rem; padding-top:1.25rem; border-top:1px solid rgba(255,255,255,0.08); flex-wrap:wrap; gap:1rem;">
             <button class="btn btn-outline btn-sm" onclick="window.lms.navigateLesson(-1)" ${index === 0 ? 'disabled' : ''}>
               <i data-lucide="arrow-left"></i> Previous Lesson
@@ -275,9 +296,65 @@ class AcademyLMS {
           </div>
         </div>
       `;
+
+      this.loadLessonQuestions(lesson.id);
     }
 
     if (window.lucide) window.lucide.createIcons();
+  }
+
+  async loadLessonQuestions(lessonId) {
+    const listEl = document.getElementById('lmsLessonQuestionsList');
+    if (!listEl || !window.db) return;
+
+    const questions = await window.db.getLessonQuestions(lessonId);
+    if (!questions.length) {
+      listEl.innerHTML = `<div style="font-size:0.8rem; color:var(--text-cyber-muted); font-style:italic;">No questions posted yet for this lesson. Be the first to ask!</div>`;
+      return;
+    }
+
+    listEl.innerHTML = questions.map(q => `
+      <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:var(--radius-xs); padding:0.85rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <strong style="color:#FFF; font-size:0.85rem;">${q.authorName}</strong>
+            <span class="badge badge-teal" style="font-size:0.6rem;">${q.authorRole}</span>
+          </div>
+          <span style="font-size:0.7rem; color:var(--text-cyber-muted);">${q.createdAt}</span>
+        </div>
+        <p style="color:#DDD; font-size:0.85rem; margin:0 0 0.6rem 0; line-height:1.5;">${q.question}</p>
+        ${(q.replies || []).map(r => `
+          <div style="background:rgba(1,107,97,0.12); border-left:2px solid var(--emerald-light); padding:0.6rem 0.75rem; border-radius:0 4px 4px 0; margin-top:0.4rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.2rem;">
+              <strong style="color:var(--emerald-light); font-size:0.8rem;">${r.authorName}</strong>
+              <span style="font-size:0.68rem; color:var(--text-cyber-muted);">${r.createdAt}</span>
+            </div>
+            <p style="color:#E4EEE7; font-size:0.82rem; margin:0; line-height:1.45;">${r.reply}</p>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  async handlePostQuestion(e, lessonId) {
+    e.preventDefault();
+    const input = document.getElementById('lmsQuestionInput');
+    if (!input || !input.value.trim()) return;
+
+    const user = window.auth?.getUser();
+    await window.db.addLessonQuestion({
+      lessonId,
+      authorName: user?.displayName || 'Student Builder',
+      authorRole: 'Cohort Member',
+      question: input.value.trim()
+    });
+
+    input.value = '';
+    window.toast?.success('Question posted to community thread!');
+    this.loadLessonQuestions(lessonId);
+  }
   }
 
   async toggleCurrentLessonComplete() {

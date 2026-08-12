@@ -91,6 +91,13 @@ class Router {
         keywords: 'contact software agency Lagos, hire automation engineer Nigeria, book discovery session',
         public: true
       },
+      '#verify': {
+        viewId: 'view-verify',
+        title: 'VibeCert™ Public Verification Portal | Zeerocodes',
+        desc: 'Verify authentic Zeerocodes Professional Software Builder certifications and VibeScan AST security audit trust badges.',
+        keywords: 'verify certificate, VibeCert verification, AI software engineer certificate verification, OWASP security seal check',
+        public: true
+      },
       '#dashboard': {
         viewId: 'view-dashboard',
         title: 'Client & Builder Portal | Zeerocodes',
@@ -241,6 +248,8 @@ class Router {
       window.app.renderUserDashboard();
     } else if (cleanHash === '#admin' && window.adminConsole) {
       window.adminConsole.renderAdminConsole();
+    } else if (cleanHash === '#verify' && window.app) {
+      window.app.renderCertificateVerification();
     }
 
     // 8. Re-render Lucide icons

@@ -3252,5 +3252,43 @@ img, svg, video {
   }
 }
 
+/* ==========================================================================
+   PUBLIC CERTIFICATE VERIFICATION PRINT & HOLOGRAPHIC STYLES
+   ========================================================================== */
+.verified-cert-card {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
+.verified-cert-card:hover {
+  box-shadow: 0 0 50px rgba(1, 107, 97, 0.5);
+  border-color: var(--emerald-light);
+}
 
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #view-verify, #view-verify * {
+    visibility: visible;
+  }
+  #view-verify {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #FFF !important;
+    color: #000 !important;
+  }
+  .verified-cert-card {
+    background: #FFF !important;
+    color: #000 !important;
+    border: 2px solid #016B61 !important;
+    box-shadow: none !important;
+  }
+  .verified-cert-card * {
+    color: #000 !important;
+  }
+  .site-header, .site-footer, .live-trust-ticker, #verifySearchInput, .btn, .nav-actions {
+    display: none !important;
+  }
+}

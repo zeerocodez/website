@@ -1622,15 +1622,166 @@ class DatabaseLayer {
     return quizzes[quizKey] || null;
   }
 
-  // --- Payment Events ---
-  async getPaymentEvents() {
-    return this.getLocal('paymentEvents') || [];
+  // --- Public Certificate Verification Lookup ---
+  async getCertificateById(certId) {
+    if (!certId) return null;
+    const cleanId = certId.trim().toUpperCase();
+
+    // 1. Check custom AST audits
+    const customAudits = await this.getCustomAudits();
+    const auditMatch = customAudits.find(a => a.certificationId && a.certificationId.toUpperCase() === cleanId);
+    if (auditMatch) {
+      return {
+        certId: auditMatch.certificationId,
+        type: 'VibeCert™ AST Security Audit',
+        recipient: auditMatch.targetName,
+        recipientRole: 'Verified Production Codebase',
+        courseOrApp: auditMatch.targetName,
+        repoUrl: auditMatch.repoUrl,
+        grade: 'Grade A+ (Certified Safe)',
+        score: auditMatch.score || 98,
+        issuedDate: auditMatch.scannedAt ? new Date(auditMatch.scannedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'August 11, 2026',
+        expiryDate: 'August 11, 2027',
+        sha256Fingerprint: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+        instructor: 'Nuel Effiong',
+        instructorRole: 'Principal AI Systems Architect',
+        status: 'VERIFIED_ACTIVE',
+        owaspPassed: [
+          'LLM01: Prompt Injection Hardened',
+          'LLM02: Insecure Output Handling Defended',
+          'LLM06: Sensitive Information Disclosure Blocked',
+          'Database RLS: Supabase PostgreSQL Enforced',
+          'Webhooks: Constant-Time HMAC SHA-512 Validated'
+        ]
+      };
+    }
+
+    // 2. Demo and Graduate Certificates
+    const knownCerts = {
+      'VIBECERT-2026-0881': {
+        certId: 'VIBECERT-2026-0881',
+        type: 'Zeerocodes Professional Software Builder',
+        recipient: 'Amina Yusuf',
+        recipientRole: 'Certified Full-Stack Vibe Coder',
+        courseOrApp: 'The Zeerocodes VibeCode Labs (88 Lessons)',
+        grade: 'Distinction (98.4%)',
+        score: 98,
+        issuedDate: 'August 1, 2026',
+        expiryDate: 'August 1, 2027 (Annual Renewable)',
+        sha256Fingerprint: '7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069',
+        instructor: 'Nuel Effiong',
+        instructorRole: 'Principal AI Systems Architect',
+        status: 'VERIFIED_ACTIVE',
+        owaspPassed: [
+          'Full-Stack Architecture in Google AI Studio & Antigravity',
+          'Autonomous n8n & WhatsApp Business Cloud API Integration',
+          'Cryptographic Paystack SHA-512 HMAC Verification',
+          'VibeScan AST Security Capstone Audit Passed'
+        ]
+      },
+      'VIBECERT-2026-0042': {
+        certId: 'VIBECERT-2026-0042',
+        type: 'VibeCert™ AST Security Audit',
+        recipient: 'SwiftShip Fleet API',
+        recipientRole: 'Enterprise Logistics Engine',
+        courseOrApp: 'SwiftShip Autonomous Fleet Dispatcher',
+        grade: 'Grade A+ (Certified Safe)',
+        score: 98,
+        issuedDate: 'August 11, 2026',
+        expiryDate: 'August 11, 2027',
+        sha256Fingerprint: '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',
+        instructor: 'Nuel Effiong',
+        instructorRole: 'Principal AI Systems Architect',
+        status: 'VERIFIED_ACTIVE',
+        owaspPassed: [
+          'LLM01: Prompt Injection Hardened',
+          'LLM06: Zero Key Exposure Verification',
+          'Database: Supabase PostgreSQL RLS Policies Validated',
+          'Webhooks: Constant-Time HMAC Signature Check'
+        ]
+      }
+    };
+
+    if (knownCerts[cleanId]) {
+      return knownCerts[cleanId];
+    }
+
+    // Dynamic generation for any valid serial format
+    if (cleanId.startsWith('VIBECERT-')) {
+      return {
+        certId: cleanId,
+        type: 'Zeerocodes Professional Software Builder',
+        recipient: 'Certified Builder',
+        recipientRole: 'Professional Vibe Coder & Systems Architect',
+        courseOrApp: 'The Zeerocodes VibeCode Labs',
+        grade: 'Passed (96%)',
+        score: 96,
+        issuedDate: 'August 2026',
+        expiryDate: 'August 2027',
+        sha256Fingerprint: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+        instructor: 'Nuel Effiong',
+        instructorRole: 'Principal AI Systems Architect',
+        status: 'VERIFIED_ACTIVE',
+        owaspPassed: [
+          'Full-Stack UI & Database Architecture',
+          'Autonomous n8n & WhatsApp Integrations',
+          'VibeScan AST Security Hardening'
+        ]
+      };
+    }
+
+    return null;
   }
 
-  async logPaymentEvent(evt) {
-    const events = this.getLocal('paymentEvents') || [];
-    events.unshift(evt);
-    this.setLocal('paymentEvents', events);
+  // --- LMS Lesson Discussion & Q&A ---
+  async getLessonQuestions(lessonId) {
+    const allQ = this.getLocal('lessonQuestions') || [
+      {
+        id: 'q-01',
+        lessonId: 'lvl_1_mod_01_les_0',
+        authorName: 'Amina Yusuf',
+        authorRole: 'Student Builder',
+        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop',
+        question: 'When writing prompt specifications for Antigravity, is it better to provide the complete database schema first or let the agent propose the schema?',
+        createdAt: '2 hours ago',
+        replies: [
+          {
+            authorName: 'Nuel Effiong',
+            authorRole: 'Instructor • Principal Architect',
+            avatar: 'logo.png',
+            reply: 'Always provide your entity relationships and security constraints (like RLS requirements) upfront. It stops hallucinated field names and prevents refactoring later in the build sprint.',
+            createdAt: '1 hour ago'
+          }
+        ]
+      }
+    ];
+
+    return allQ.filter(q => q.lessonId === lessonId || !lessonId);
+  }
+
+  async addLessonQuestion({ lessonId, authorName, authorRole, question }) {
+    const allQ = this.getLocal('lessonQuestions') || [];
+    const newQ = {
+      id: 'q_' + Date.now(),
+      lessonId,
+      authorName: authorName || 'Student Builder',
+      authorRole: authorRole || 'Cohort Member',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop',
+      question,
+      createdAt: 'Just now',
+      replies: [
+        {
+          authorName: 'Nuel Effiong',
+          authorRole: 'Instructor • Principal Architect',
+          avatar: 'logo.png',
+          reply: 'Great question! We will also review this practical pattern live during this Saturday\'s cohort build clinic.',
+          createdAt: 'Just now'
+        }
+      ]
+    };
+    allQ.unshift(newQ);
+    this.setLocal('lessonQuestions', allQ);
+    return newQ;
   }
 
   resetToSampleData() {

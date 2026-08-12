@@ -7,9 +7,10 @@
   <meta name="description" content="Zeerocodes builds custom web apps, websites, and autonomous business automations that save you hours every day. We also train beginners in The VibeCode Labs to become certified, high-earning builders.">
   <meta name="keywords" content="Zeerocodes, custom web apps, business automation, n8n WhatsApp, Paystack integration, VibeCode Labs, learn AI coding, Nuel Effiong, Lagos software agency">
 
-  <!-- Favicon & Touch Icons -->
+  <!-- Favicon, Touch Icons & PWA Manifest -->
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" href="favicon.png">
+  <link rel="manifest" href="manifest.json">
 
   <!-- Open Graph / Social Preview -->
   <meta property="og:type" content="website">
@@ -151,6 +152,7 @@
         <li><a href="#studio" class="nav-link">Studio (We Build For You)</a></li>
         <li><a href="#academy" class="nav-link">Academy (Learn to Build)</a></li>
         <li><a href="#vibescan" class="nav-link">Security (VibeScan)</a></li>
+        <li><a href="#verify" class="nav-link"><i data-lucide="award" style="width:14px; height:14px; display:inline;"></i> Verify Cert</a></li>
         <li><a href="#blog" class="nav-link">Blog</a></li>
         <li><a href="#about" class="nav-link">About</a></li>
         <li><a href="#contact" class="nav-link">Contact</a></li>
@@ -159,6 +161,14 @@
 
       <!-- Nav Actions -->
       <div class="nav-actions">
+        <!-- Global Multi-Currency Switcher -->
+        <select id="globalCurrencySelector" class="form-select" style="padding:0.35rem 0.65rem; font-size:0.8rem; font-weight:700; width:auto; background:#04070D; color:var(--emerald-light); border-color:rgba(16,185,129,0.3); border-radius:var(--radius-xs);" onchange="window.app?.setGlobalCurrency(this.value)" title="Change Currency">
+          <option value="NGN">₦ NGN</option>
+          <option value="USD">$ USD</option>
+          <option value="GBP">£ GBP</option>
+          <option value="EUR">€ EUR</option>
+        </select>
+
         <button class="cmd-palette-trigger" title="Quick Search (Ctrl+K)">
           <i data-lucide="search" style="width:14px; height:14px;"></i>
           <span>Search</span>
@@ -1515,9 +1525,73 @@ const isValid = crypto.timingSafeEqual(
               <button class="btn btn-primary" onclick="window.payments.openCheckoutModal({ type:'vibescan_audit', itemId:'audit-comprehensive', itemTitle:'VibeScan Comprehensive Audit & VibeCert™', amountNGN:120000, amountUSD:80 })" style="padding:0.85rem 2rem; font-size:1rem;">
                 <i data-lucide="shield-check"></i> Book 48-Hour Security Audit
               </button>
-              <a href="https://vibescan-teal.vercel.app" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="padding:0.85rem 1.75rem; font-size:1rem;">
-                <i data-lucide="terminal"></i> Run Free Quick Scan
+              <a href="#vibescanSandboxSection" class="btn btn-secondary" style="padding:0.85rem 1.75rem; font-size:1rem;">
+                <i data-lucide="terminal"></i> Test Live AST Scanner Sandbox
               </a>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE LIVE AST CODE SCANNER SANDBOX -->
+          <div id="vibescanSandboxSection" style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-md); padding:2rem; margin-bottom:3.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;">
+              <div>
+                <span class="badge badge-teal" style="margin-bottom:0.35rem;"><i data-lucide="terminal"></i> Interactive AST Threat Analyzer</span>
+                <h3 style="color:#FFF; font-size:1.4rem; margin:0;">Live AST Security Sandbox & Threat Fixer</h3>
+                <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0.2rem 0 0 0;">
+                  Paste vibe-coded JavaScript, Python, or SQL to detect and patch OWASP LLM vulnerabilities in real time.
+                </p>
+              </div>
+              <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+                <label style="font-size:0.75rem; color:var(--text-cyber-muted);">Load Vulnerability Sample:</label>
+                <select id="publicAstPresetSelect" class="form-select" style="padding:0.4rem 0.75rem; font-size:0.8rem; background:#04070D; color:#FFF;" onchange="window.app?.loadPublicAstPreset(this.value)">
+                  <option value="api_key_leak">Exposed Paystack Secret Key in Frontend</option>
+                  <option value="missing_rls">Supabase PostgreSQL Missing RLS Policy</option>
+                  <option value="prompt_injection">Prompt Injection via Direct Interpolation</option>
+                  <option value="unverified_webhook">Unverified Webhook Without HMAC Check</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap:1.5rem;">
+              <!-- Code Input / Editor Column -->
+              <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span style="font-size:0.75rem; color:var(--text-cyber-muted); font-family:var(--font-mono);">SOURCE CODE INPUT</span>
+                  <button class="btn btn-ghost btn-xs" style="color:var(--cyan-accent); font-size:0.75rem;" onclick="document.getElementById('publicAstCodeInput').value = '';">Clear</button>
+                </div>
+                <textarea id="publicAstCodeInput" class="form-input" style="height:260px; font-family:var(--font-mono); font-size:0.82rem; background:#04070D; color:#A7F3D0; line-height:1.5; resize:none;" placeholder="// Paste vibe-coded component or function here..."></textarea>
+                <div style="display:flex; gap:0.5rem;">
+                  <button class="btn btn-primary btn-sm btn-block" onclick="window.app?.runPublicAstScan()">
+                    <i data-lucide="play"></i> Execute 14-Point AST Audit
+                  </button>
+                  <button class="btn btn-outline btn-sm btn-block" style="border-color:var(--emerald-light); color:var(--emerald-light);" onclick="window.app?.applyPublicAstPatch()">
+                    <i data-lucide="wand-2"></i> Apply Security Patch
+                  </button>
+                </div>
+              </div>
+
+              <!-- Threat Diagnosis & Score Column -->
+              <div style="background:#04070D; border:1px solid rgba(255,255,255,0.06); border-radius:var(--radius-xs); padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between;">
+                <div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.75rem;">
+                    <div>
+                      <div style="font-size:0.75rem; color:var(--text-cyber-muted);">THREAT RADAR SCORE</div>
+                      <div style="font-size:1.75rem; font-weight:900;" id="publicAstScoreVal" class="text-danger">24/100</div>
+                    </div>
+                    <span class="badge badge-danger" id="publicAstStatusBadge">CRITICAL THREAT</span>
+                  </div>
+
+                  <div style="font-size:0.78rem; color:var(--text-cyber-muted); margin-bottom:0.5rem;">DIAGNOSTIC FINDINGS:</div>
+                  <div id="publicAstFindingsList" style="display:flex; flex-direction:column; gap:0.5rem; max-height:180px; overflow-y:auto;">
+                    <!-- Rendered by app.js -->
+                  </div>
+                </div>
+
+                <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:0.85rem; margin-top:1rem; display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:var(--text-cyber-muted);">
+                  <span>VibeScan AST Static Analyzer v2.4</span>
+                  <a href="#pricing-vibescan" style="color:var(--emerald-light);">Get Full Audit &rarr;</a>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -2083,6 +2157,52 @@ const isValid = crypto.timingSafeEqual(
               <!-- Rendered dynamically by admin.js -->
             </div>
           </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- =======================================================================
+         VIEW 10: VIBECERT™ PUBLIC VERIFICATION PORTAL (#verify)
+         ======================================================================= -->
+    <div id="view-verify" class="page-view">
+      <section class="section-padding">
+        <div class="container" style="max-width:900px;">
+          
+          <!-- Search Header -->
+          <div class="section-header" style="margin-bottom:2.5rem;">
+            <div class="hero-badge-luminous" style="margin-bottom:1rem;">
+              <i data-lucide="award"></i>
+              <span>Official VibeCert™ Credential & AST Audit Registry</span>
+            </div>
+            <h1 style="font-size:clamp(2rem, 4vw, 3.2rem); margin-bottom:1rem;">
+              Public Certificate & Audit Registry
+            </h1>
+            <p class="section-subtitle" style="margin:0 auto 1.5rem auto;">
+              Verify authentic Zeerocodes Professional Software Builder credentials, student capstones, and VibeScan AST cybersecurity trust seals.
+            </p>
+
+            <!-- Verification Lookup Input -->
+            <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1rem; max-width:640px; margin:0 auto; display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <input type="text" id="verifySearchInput" placeholder="Enter Certificate Serial ID (e.g. VIBECERT-2026-0881)..." class="form-input" style="flex:1; min-width:240px; font-family:var(--font-mono); text-transform:uppercase;" value="VIBECERT-2026-0881">
+              <button class="btn btn-primary btn-sm" onclick="window.app?.lookupCertificate(document.getElementById('verifySearchInput').value)">
+                <i data-lucide="search"></i> Verify Credential
+              </button>
+            </div>
+
+            <!-- Demo Quick Links -->
+            <div style="margin-top:0.75rem; display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap; font-size:0.8rem; color:var(--text-cyber-muted);">
+              <span>Sample Credentials:</span>
+              <a href="javascript:void(0)" onclick="window.app?.lookupCertificate('VIBECERT-2026-0881')" style="color:var(--emerald-light); font-family:var(--font-mono);">Amina Yusuf (VIBECERT-2026-0881)</a>
+              <span>•</span>
+              <a href="javascript:void(0)" onclick="window.app?.lookupCertificate('VIBECERT-2026-0042')" style="color:var(--cyan-accent); font-family:var(--font-mono);">SwiftShip Fleet (VIBECERT-2026-0042)</a>
+            </div>
+          </div>
+
+          <!-- Dynamic Verification Result Card -->
+          <div id="verifyResultContainer">
+            <!-- Rendered by app.js -->
+          </div>
+
         </div>
       </section>
     </div>
