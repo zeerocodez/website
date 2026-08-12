@@ -3106,4 +3106,151 @@ img, svg, video {
   color: #FFFFFF;
 }
 
+/* ==========================================================================
+   LMS COURSE PLAYER & STUDENT DASHBOARD SUITE
+   ========================================================================== */
+.modal-xl {
+  width: 96vw;
+  max-width: 1300px;
+}
+
+.dash-tabs-bar {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--obsidian-border);
+  margin-bottom: 1.75rem;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.dash-tab-btn {
+  background: transparent;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  color: var(--text-cyber-muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--transition-smooth);
+}
+
+.dash-tab-btn:hover {
+  color: #FFFFFF;
+}
+
+.dash-tab-btn.active {
+  color: var(--emerald-light);
+  border-bottom-color: var(--emerald-primary);
+}
+
+.dash-tab-panel {
+  display: none;
+}
+
+.dash-tab-panel.active {
+  display: block;
+}
+
+/* LMS Player Components */
+.lms-level-group {
+  margin-bottom: 1.25rem;
+}
+
+.lms-level-header {
+  padding: 0.6rem 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-xs);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.lms-module-block {
+  margin-bottom: 0.75rem;
+}
+
+.lms-module-title {
+  font-size: 0.78rem;
+  color: var(--text-cyber-muted);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.5rem;
+}
+
+.lms-lesson-sublist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.lms-lesson-item {
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius-xs);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--text-cyber-muted);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.lms-lesson-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #FFFFFF;
+}
+
+.lms-lesson-item.active {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.lms-lesson-item.done {
+  color: var(--emerald-light);
+}
+
+.lms-lesson-title-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 190px;
+}
+
+.text-success {
+  color: var(--emerald-light) !important;
+}
+
+.text-emerald {
+  color: var(--emerald-primary) !important;
+}
+
+.text-muted {
+  color: var(--text-cyber-muted) !important;
+}
+
+@media (max-width: 860px) {
+  .lms-player-body {
+    grid-template-columns: 1fr !important;
+    overflow-y: auto !important;
+  }
+  .lms-player-sidebar {
+    max-height: 240px;
+    border-right: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}
+
+
 

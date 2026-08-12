@@ -585,14 +585,48 @@ class ZeerocodesApp {
         const name = document.getElementById('signupName').value.trim();
         const email = document.getElementById('signupEmail').value.trim();
         const pass = document.getElementById('signupPassword').value;
+        const phone = document.getElementById('signupPhone')?.value.trim() || '';
+        const referralSource = document.getElementById('signupReferralSource')?.value || 'direct';
+
         try {
-          await window.auth.signUpWithEmail(email, pass, name);
+          await window.auth.signUpWithEmail(email, pass, name, { phone, referralSource });
           if (window.modal) window.modal.closeAll();
         } catch (err) {
           console.error(err);
         }
       });
     }
+
+    // Forgot Password Form
+    const resetForm = document.getElementById('auth-form-reset');
+    if (resetForm) {
+      resetForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('resetEmail').value.trim();
+        await window.auth.sendPasswordResetEmail(email);
+        if (window.modal) window.modal.closeAll();
+      });
+    }
+
+    // Demo Persona Fast Switchers
+    document.addEventListener('click', (e) => {
+      const demoBtn = e.target.closest('.btn-quick-demo-login');
+      if (demoBtn) {
+        const persona = demoBtn.getAttribute('data-persona') || 'admin';
+        window.auth.quickDemoLogin(persona);
+      }
+
+      // Switch to reset tab
+      if (e.target.closest('.trigger-auth-reset')) {
+        document.querySelectorAll('.auth-tab-btn').forEach(b => b.classList.remove('active'));
+        ['auth-form-login', 'auth-form-signup', 'auth-form-reset'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+        const resetEl = document.getElementById('auth-form-reset');
+        if (resetEl) resetEl.style.display = 'block';
+      }
+    });
 
     // Sign Out
     document.querySelectorAll('.btn-sign-out').forEach(btn => {
@@ -607,16 +641,21 @@ class ZeerocodesApp {
         const tab = btn.getAttribute('data-tab');
         document.querySelectorAll('.auth-tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+
+        ['auth-form-login', 'auth-form-signup', 'auth-form-reset'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+
         if (tab === 'login') {
-          document.getElementById('auth-form-login')?.classList.remove('d-none');
-          if (document.getElementById('auth-form-login')) document.getElementById('auth-form-login').style.display = 'block';
-          document.getElementById('auth-form-signup')?.classList.add('d-none');
-          if (document.getElementById('auth-form-signup')) document.getElementById('auth-form-signup').style.display = 'none';
-        } else {
-          document.getElementById('auth-form-signup')?.classList.remove('d-none');
-          if (document.getElementById('auth-form-signup')) document.getElementById('auth-form-signup').style.display = 'block';
-          document.getElementById('auth-form-login')?.classList.add('d-none');
-          if (document.getElementById('auth-form-login')) document.getElementById('auth-form-login').style.display = 'none';
+          const el = document.getElementById('auth-form-login');
+          if (el) el.style.display = 'block';
+        } else if (tab === 'signup') {
+          const el = document.getElementById('auth-form-signup');
+          if (el) el.style.display = 'block';
+        } else if (tab === 'reset') {
+          const el = document.getElementById('auth-form-reset');
+          if (el) el.style.display = 'block';
         }
       });
     });
@@ -652,7 +691,35 @@ class ZeerocodesApp {
       if (e.target.closest('.btn-toggle-role')) {
         if (window.auth) window.auth.toggleRole();
       }
+
+      // Student/Client Dashboard Tab Switching
+      const dashTabBtn = e.target.closest('.dash-tab-btn');
+      if (dashTabBtn) {
+        document.querySelectorAll('.dash-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.dash-tab-panel').forEach(p => p.classList.remove('active'));
+        dashTabBtn.classList.add('active');
+        const targetTab = dashTabBtn.getAttribute('data-tab');
+        const targetPanel = document.getElementById(targetTab);
+        if (targetPanel) {
+          targetPanel.classList.add('active');
+        }
+      }
     });
+
+    // Account Settings form submit
+    const accForm = document.getElementById('accSettingsForm');
+    if (accForm) {
+      accForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const displayName = document.getElementById('accSettingsName')?.value.trim();
+        const phone = document.getElementById('accSettingsPhone')?.value.trim();
+        const bio = document.getElementById('accSettingsBio')?.value.trim();
+        if (window.auth) {
+          await window.auth.updateProfile({ displayName, phone, bio });
+          this.renderUserDashboard();
+        }
+      });
+    }
 
     this.bindCommandPalette();
     this.bindBackToTop();
@@ -736,117 +803,286 @@ class ZeerocodesApp {
   }
 
   // =========================================================================
-  // 9. CLIENT WORKSPACE & ADMIN DASHBOARD RENDERERS
+  // 9. CLIENT & STUDENT WORKSPACE DASHBOARD RENDERER
   // =========================================================================
   async renderUserDashboard() {
     if (!window.auth || !window.auth.isAuthenticated()) return;
     const user = window.auth.getUser();
 
-    // 1. Studio Projects List
-    const studioListEl = document.getElementById('dashStudioList');
-    if (studioListEl && window.db) {
-      const allProjects = window.db.getLocal('studioProjects') || [];
-      const userProjects = allProjects.filter(p => p.userId === user.uid || p.userEmail === user.email);
+    // 1. Top Profile Header & Quick Stats
+    const nameEl = document.getElementById('dashUserName');
+    const emailEl = document.getElementById('dashUserEmail');
+    const roleBadgeEl = document.getElementById('dashUserRoleBadge');
+    const avatarEl = document.getElementById('dashUserAvatar');
 
-      if (!userProjects.length) {
-        studioListEl.innerHTML = `
-          <p style="color:var(--text-cyber-muted); font-size:0.88rem; margin-bottom:1rem;">No active custom builds or automations yet.</p>
-          <button class="btn btn-primary btn-xs trigger-calendly-booking">
-            <i data-lucide="calendar"></i> Scope Your First Project
-          </button>
-        `;
-      } else {
-        studioListEl.innerHTML = userProjects.map(p => `
-          <div style="background:#080C14; padding:0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.08); margin-bottom:0.65rem;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
-              <strong style="color:#FFF; font-size:0.88rem;">${p.title}</strong>
-              <span class="badge badge-teal" style="font-size:0.68rem;">${p.status.toUpperCase()}</span>
-            </div>
-            <div style="font-size:0.78rem; color:var(--emerald-light);">${p.milestone || 'In Discovery'}</div>
-          </div>
-        `).join('');
-      }
+    if (nameEl) nameEl.textContent = user.displayName || 'Zeerocodes Member';
+    if (emailEl) emailEl.textContent = user.email || 'user@zeerocodes.com';
+    if (roleBadgeEl) {
+      const role = (user.role || 'STUDENT').toUpperCase();
+      roleBadgeEl.textContent = role;
+      roleBadgeEl.className = `badge ${role === 'ADMIN' ? 'badge-danger' : role === 'CLIENT' ? 'badge-teal' : 'badge-success'}`;
+    }
+    if (avatarEl && user.photoURL) {
+      avatarEl.src = user.photoURL;
     }
 
-    // 2. Enrollments List
-    const enrollListEl = document.getElementById('dashEnrollmentsList');
-    if (enrollListEl && window.db) {
-      const enrollments = await window.db.getUserEnrollments(user.uid);
+    // 2. Fetch user data across collections
+    const enrollments = await window.db.getUserEnrollments(user.uid);
+    const labSubs = await window.db.getLabSubmissionsForUser(user.uid);
+    const studioProjects = await window.db.getStudioProjectsForUser(user.uid);
+    const vibescanSubs = await window.db.getSubmissionsForUser(user.uid);
+    const paymentEvents = await window.db.getPaymentEvents();
+    const userPayments = paymentEvents.filter(p => p.customerEmail === user.email);
+
+    // 3. Render Tab 1: Learning Hub (LMS)
+    const lmsContainer = document.getElementById('dashLmsContainer');
+    if (lmsContainer) {
       if (!enrollments.length) {
-        enrollListEl.innerHTML = `
-          <p style="color:var(--text-cyber-muted); font-size:0.88rem; margin-bottom:1rem;">Not enrolled in The VibeCode Labs cohort yet.</p>
-          <a href="#academy" class="btn btn-outline btn-xs">
-            <i data-lucide="graduation-cap"></i> Join Next Cohort
-          </a>
-        `;
-      } else {
-        enrollListEl.innerHTML = enrollments.map(e => `
-          <div style="background:#080C14; padding:0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.08); margin-bottom:0.65rem;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
-              <strong style="color:#FFF; font-size:0.88rem;">${e.courseTitle}</strong>
-              <span class="badge badge-success" style="font-size:0.68rem;">ACTIVE</span>
-            </div>
-            <button class="btn btn-ghost btn-xs" style="color:var(--emerald-light); padding:0;" onclick="window.lms?.openCoursePlayer('${e.id}')">
-              Open LMS Player &rarr;
+        lmsContainer.innerHTML = `
+          <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:2rem; text-align:center;">
+            <i data-lucide="graduation-cap" style="width:40px; height:40px; color:var(--emerald-light); margin-bottom:1rem;"></i>
+            <h4 style="color:#FFF;">Not enrolled in The VibeCode Labs cohort yet</h4>
+            <p style="color:var(--text-cyber-muted); font-size:0.9rem; max-width:480px; margin:0 auto 1.25rem auto;">
+              Learn to build full-stack web applications, n8n automations, and AI security systems from absolute beginner to certified builder.
+            </p>
+            <button class="btn btn-primary btn-sm" onclick="window.payments?.openPaymentModal('course-vibecode-labs')">
+              Enroll Now (₦95,000 / $65) &rarr;
             </button>
           </div>
-        `).join('');
-      }
-    }
-
-    // 3. VibeScan Submissions List
-    const vibescanListEl = document.getElementById('dashVibescanList');
-    if (vibescanListEl && window.db) {
-      const subs = await window.db.getSubmissionsForUser(user.uid);
-      if (!subs.length) {
-        vibescanListEl.innerHTML = `
-          <p style="color:var(--text-cyber-muted); font-size:0.88rem; margin-bottom:1rem;">0 repositories audited for this account.</p>
-          <a href="#vibescan" class="btn btn-outline btn-xs">
-            <i data-lucide="shield-check"></i> Submit Repo for Audit
-          </a>
         `;
       } else {
-        vibescanListEl.innerHTML = subs.map(s => `
-          <div style="background:#080C14; padding:0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.08); margin-bottom:0.65rem;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
-              <strong style="color:#FFF; font-size:0.88rem;">${s.appName}</strong>
-              <span class="badge badge-cyber" style="font-size:0.68rem;">${s.status.toUpperCase()}</span>
+        const activeEnroll = enrollments[0];
+        const completedCount = (activeEnroll.completedLessons || []).length;
+        const totalLessons = 88;
+        const percent = Math.round((completedCount / totalLessons) * 100);
+
+        lmsContainer.innerHTML = `
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap:1.5rem; margin-bottom:1.5rem;">
+            <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.5rem;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
+                <span class="badge badge-success">ACTIVE COHORT</span>
+                <span style="font-size:0.8rem; color:var(--text-cyber-muted);">8-Week Live Masterclass</span>
+              </div>
+              <h3 style="color:#FFF; font-size:1.2rem; margin-bottom:0.4rem;">${activeEnroll.courseTitle}</h3>
+              <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin-bottom:1.25rem;">
+                4 Levels • 20 Modules • 88 Practical Lessons • VibeScan Capstone Audit
+              </p>
+
+              <div style="margin-bottom:1.25rem;">
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-cyber-muted); margin-bottom:0.4rem;">
+                  <span>Curriculum Progress</span>
+                  <strong style="color:var(--emerald-light);">${percent}% (${completedCount}/${totalLessons} Lessons)</strong>
+                </div>
+                <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden;">
+                  <div style="width:${percent}%; height:100%; background:linear-gradient(90deg, var(--emerald-primary), var(--cyan-accent));"></div>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                <button class="btn btn-primary btn-sm" onclick="window.lms?.openCoursePlayer('${activeEnroll.id}')">
+                  <i data-lucide="play-circle"></i> Resume Course Player
+                </button>
+                ${activeEnroll.certificateId ? `
+                  <button class="btn btn-outline btn-sm trigger-view-cert" data-cert="${activeEnroll.certificateId}">
+                    <i data-lucide="award"></i> View Certificate
+                  </button>
+                ` : ''}
+              </div>
             </div>
-            <div style="font-size:0.75rem; color:var(--text-cyber-muted);">${s.certificationId || 'Pending Review'}</div>
+
+            <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.5rem;">
+              <h4 style="color:#FFF; font-size:1.05rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
+                <i data-lucide="folder-down" style="color:var(--cyan-accent);"></i> Student Resource Hub
+              </h4>
+              <div style="display:flex; flex-direction:column; gap:0.65rem; font-size:0.85rem;">
+                <div style="background:rgba(255,255,255,0.02); padding:0.6rem 0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
+                  <span>⚡ 2026 AI Build Prompts Pack (v3.2)</span>
+                  <button class="btn btn-ghost btn-xs" style="color:var(--emerald-light);" onclick="window.toast?.success('Downloaded AI Prompts Cheatsheet')"><i data-lucide="download"></i></button>
+                </div>
+                <div style="background:rgba(255,255,255,0.02); padding:0.6rem 0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
+                  <span>📦 n8n WhatsApp Paystack Blueprint (.json)</span>
+                  <button class="btn btn-ghost btn-xs" style="color:var(--emerald-light);" onclick="window.toast?.success('Downloaded n8n Workflow JSON Template')"><i data-lucide="download"></i></button>
+                </div>
+                <div style="background:rgba(255,255,255,0.02); padding:0.6rem 0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
+                  <span>🛡️ OWASP LLM Top 10 Security Checklist</span>
+                  <button class="btn btn-ghost btn-xs" style="color:var(--emerald-light);" onclick="window.toast?.success('Downloaded Security Checklist PDF')"><i data-lucide="download"></i></button>
+                </div>
+              </div>
+            </div>
           </div>
-        `).join('');
+
+          <div>
+            <h4 style="color:#FFF; font-size:1.1rem; margin-bottom:0.75rem;">Your Submitted Lab Projects (${labSubs.length})</h4>
+            <div style="display:flex; flex-direction:column; gap:0.75rem;">
+              ${labSubs.length ? labSubs.map(lab => `
+                <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-xs); padding:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+                  <div>
+                    <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                      <strong style="color:#FFF; font-size:0.92rem;">${lab.lessonTitle}</strong>
+                      <span class="badge ${lab.status === 'passed' ? 'badge-success' : 'badge-warning'}">${lab.status.toUpperCase()}</span>
+                    </div>
+                    <div style="font-size:0.78rem; color:var(--text-cyber-muted);">
+                      <strong>Repo:</strong> <a href="${lab.repoUrl}" target="_blank" style="color:var(--emerald-light);">${lab.repoUrl}</a>
+                      ${lab.grade ? ` • <strong>Grade:</strong> <span style="color:var(--emerald-light);">${lab.grade}</span>` : ''}
+                    </div>
+                    ${lab.feedback ? `<div style="font-size:0.78rem; color:var(--cyan-accent); margin-top:0.25rem;">Instructor Note: ${lab.feedback}</div>` : ''}
+                  </div>
+                  <button class="btn btn-outline btn-xs" onclick="window.lms?.openLabSubmissionModal()">
+                    Resubmit / Edit Repo
+                  </button>
+                </div>
+              `).join('') : `
+                <div style="padding:1.5rem; text-align:center; color:var(--text-cyber-muted); background:#080D16; border-radius:var(--radius-xs); border:1px solid var(--obsidian-border);">
+                  No lab projects submitted yet. Complete lesson labs in the course player to submit your code for review.
+                </div>
+              `}
+            </div>
+          </div>
+        `;
       }
     }
 
-    if (window.lucide) window.lucide.createIcons();
-  }
+    // 4. Render Tab 2: Studio Projects
+    const studioContainer = document.getElementById('dashStudioContainer');
+    if (studioContainer) {
+      if (!studioProjects.length) {
+        studioContainer.innerHTML = `
+          <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:2rem; text-align:center;">
+            <i data-lucide="workflow" style="width:40px; height:40px; color:var(--cyan-accent); margin-bottom:1rem;"></i>
+            <h4 style="color:#FFF;">No Active Custom Software Builds Yet</h4>
+            <p style="color:var(--text-cyber-muted); font-size:0.9rem; max-width:480px; margin:0 auto 1.25rem auto;">
+              Zeerocodes Studio builds, hosts, and operates high-converting Next.js web applications, client portals, and 90-second WhatsApp automated invoicing bots.
+            </p>
+            <button class="btn btn-primary btn-sm trigger-calendly-booking">
+              <i data-lucide="calendar"></i> Book Free 30-Min Discovery Session
+            </button>
+          </div>
+        `;
+      } else {
+        studioContainer.innerHTML = `
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap:1.5rem;">
+            ${studioProjects.map(p => `
+              <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.5rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                  <span class="badge badge-teal">${p.status.toUpperCase()}</span>
+                  <span style="color:#FFF; font-weight:800;">₦${((p.budgetNGN || 0) / 1000000).toFixed(1)}M</span>
+                </div>
+                <h4 style="color:#FFF; font-size:1.1rem; margin-bottom:0.35rem;">${p.title}</h4>
+                <div style="font-size:0.8rem; color:var(--emerald-light); margin-bottom:0.75rem;">${p.stage}</div>
 
-  async renderAdminDashboard() {
-    const queueEl = document.getElementById('adminReviewQueue');
-    if (!queueEl || !window.db) return;
+                <div style="margin-bottom:1rem;">
+                  <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-cyber-muted); margin-bottom:0.25rem;">
+                    <span>Milestones Completed</span>
+                    <span>${p.progress}%</span>
+                  </div>
+                  <div style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
+                    <div style="width:${p.progress}%; height:100%; background:linear-gradient(90deg, var(--cyan-accent), var(--emerald-light));"></div>
+                  </div>
+                </div>
 
-    const subs = await window.db.getAllPendingSubmissions();
-    if (!subs.length) {
-      queueEl.innerHTML = `<div style="padding:2rem; text-align:center; color:var(--text-cyber-muted); background:#080D16; border-radius:var(--radius-md); border:1px solid var(--obsidian-border);">All audits and reviews are up to date!</div>`;
-      return;
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap; border-top:1px solid rgba(255,255,255,0.06); padding-top:0.85rem;">
+                  ${p.stagingUrl ? `
+                    <a href="${p.stagingUrl}" target="_blank" class="btn btn-outline btn-xs" style="color:var(--cyan-accent);">
+                      <i data-lucide="external-link"></i> Staging URL
+                    </a>
+                  ` : ''}
+                  <button class="btn btn-ghost btn-xs" style="color:var(--text-cyber-muted);" onclick="window.toast?.info('Connecting with Lead Architect Nuel Effiong...')">
+                    <i data-lucide="message-square"></i> Request Revision
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
     }
 
-    queueEl.innerHTML = subs.map(s => `
-      <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-md); padding:1.5rem;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
-          <h4 style="color:#FFF; font-size:1.1rem; margin:0;">${s.appName}</h4>
-          <span class="badge badge-warn">${s.status.toUpperCase()}</span>
+    // 5. Render Tab 3: VibeScan Security
+    const vibescanContainer = document.getElementById('dashVibescanContainer');
+    if (vibescanContainer) {
+      if (!vibescanSubs.length) {
+        vibescanContainer.innerHTML = `
+          <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:2rem; text-align:center;">
+            <i data-lucide="shield-check" style="width:40px; height:40px; color:var(--emerald-light); margin-bottom:1rem;"></i>
+            <h4 style="color:#FFF;">No Repositories Audited Yet</h4>
+            <p style="color:var(--text-cyber-muted); font-size:0.9rem; max-width:480px; margin:0 auto 1.25rem auto;">
+              Ensure your vibe-coded application has no exposed API keys, missing database RLS, or forged webhook vulnerabilities.
+            </p>
+            <a href="#vibescan" class="btn btn-primary btn-sm">
+              <i data-lucide="shield"></i> Request Code Security Audit
+            </a>
+          </div>
+        `;
+      } else {
+        vibescanContainer.innerHTML = `
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap:1.5rem;">
+            ${vibescanSubs.map(s => `
+              <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.5rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                  <span class="badge ${s.status === 'certified' ? 'badge-success' : 'badge-danger'}">${s.status.toUpperCase()}</span>
+                  <span style="color:var(--emerald-light); font-weight:800; font-size:1.1rem;">Score: ${s.securityScore || 95}/100</span>
+                </div>
+                <h4 style="color:#FFF; font-size:1.1rem; margin-bottom:0.35rem;">${s.appName}</h4>
+                <div style="font-size:0.78rem; color:var(--text-cyber-muted); margin-bottom:1rem;">
+                  <strong>Repo:</strong> <a href="${s.appUrl}" target="_blank" style="color:var(--emerald-light);">${s.appUrl}</a>
+                </div>
+
+                <div style="background:rgba(255,255,255,0.02); padding:0.75rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.06); margin-bottom:1rem; font-size:0.8rem;">
+                  <div style="color:var(--text-cyber-muted); margin-bottom:0.25rem;"><strong>Tamper-Proof Badge ID:</strong> ${s.certificationId || 'Pending'}</div>
+                  <div style="color:var(--emerald-light);">✓ OWASP LLM Top 10 Verified</div>
+                </div>
+
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                  <button class="btn btn-outline btn-xs" onclick="navigator.clipboard.writeText('<script src=&quot;https://zeerocodes.com/vibecert.js&quot; data-cert=&quot;${s.certificationId || 'VIBECERT-2026-0042'}&quot;></script>'); window.toast?.success('VibeCert badge embed code copied!');">
+                    <i data-lucide="code"></i> Copy Badge Embed Script
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    }
+
+    // 6. Render Tab 4: Billing & Invoices
+    const billingContainer = document.getElementById('dashBillingContainer');
+    if (billingContainer) {
+      const allPayments = paymentEvents.filter(p => p.customerEmail === user.email || user.role === 'admin');
+      billingContainer.innerHTML = `
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.25rem;">
+          <h4 style="color:#FFF; font-size:1.1rem; margin-bottom:1rem;">Payment & Invoicing Ledger</h4>
+          <div style="display:flex; flex-direction:column; gap:0.75rem;">
+            ${allPayments.length ? allPayments.map(p => `
+              <div style="background:rgba(255,255,255,0.02); padding:0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+                <div>
+                  <div style="display:flex; align-items:center; gap:0.5rem;">
+                    <strong style="color:#FFF; font-size:0.9rem;">${p.item}</strong>
+                    <span class="badge badge-success">PAID</span>
+                  </div>
+                  <div style="font-size:0.75rem; color:var(--text-cyber-muted); font-family:var(--font-mono); margin-top:0.2rem;">
+                    Ref: ${p.reference} • Gateway: ${p.provider} • Date: ${new Date(p.verifiedAt).toLocaleDateString()}
+                  </div>
+                </div>
+                <div style="text-align:right;">
+                  <strong style="color:#FFF; font-size:1.05rem;">₦${(p.amountNGN).toLocaleString()}</strong>
+                  <div><button class="btn btn-ghost btn-xs" style="color:var(--emerald-light); padding:0;" onclick="window.toast?.success('Official Receipt PDF downloaded')"><i data-lucide="download"></i> Receipt</button></div>
+                </div>
+              </div>
+            `).join('') : `
+              <div style="padding:1.5rem; text-align:center; color:var(--text-cyber-muted);">No payment records found for this account.</div>
+            `}
+          </div>
         </div>
-        <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin-bottom:0.75rem;">
-          <strong>Submitter:</strong> ${s.userName} (${s.userEmail}) • <strong>Repo:</strong> <a href="${s.appUrl}" target="_blank" style="color:var(--emerald-light);">${s.appUrl}</a>
-        </p>
-        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-          <button class="btn btn-primary btn-xs" onclick="window.vibescanReview?.openReviewDrawer('${s.id}')">
-            Perform Code Audit & Issue Cert
-          </button>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }
+
+    // 7. Render Tab 5: Account Settings
+    const nameInput = document.getElementById('accSettingsName');
+    const phoneInput = document.getElementById('accSettingsPhone');
+    const bioInput = document.getElementById('accSettingsBio');
+    if (nameInput) nameInput.value = user.displayName || '';
+    if (phoneInput) phoneInput.value = user.phone || '';
+    if (bioInput) bioInput.value = user.bio || '';
 
     if (window.lucide) window.lucide.createIcons();
   }

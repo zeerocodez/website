@@ -1,14 +1,14 @@
 /**
- * Zeerocodes Cloud Firestore & Data Layer
- * Handles the 8 core collections:
- * 1. users
- * 2. courses (The Zeerocodes VibeCode Labs - Flagship Cohort)
- * 3. enrollments
- * 4. studioProjects
- * 5. vibescanSubmissions
- * 6. auditReports
- * 7. certifications
- * 8. paymentEvents
+ * Zeerocodes Unified Database & Data Layer (v2.0)
+ * Handles full persistence for:
+ * 1. users (Admin, Student, Client roles)
+ * 2. courses (The Zeerocodes VibeCode Labs - 4 Levels • 20 Modules • 88 Lessons)
+ * 3. enrollments & student progress
+ * 4. labSubmissions & assignment grading
+ * 5. studioProjects & milestone pipeline
+ * 6. vibescanSubmissions, auditReports & certifications
+ * 7. blogPosts (CMS support)
+ * 8. paymentEvents & webhook logs
  */
 
 const DB_STORAGE_PREFIX = 'zeerocodes_db_';
@@ -285,28 +285,425 @@ const DEFAULT_COURSES = [
       'Direct Client Acquisition & Proposal Templates Tailored for African SME Markets'
     ],
     featured: true,
-    enrolledCount: 450
+    enrolledCount: 1450
   }
 ];
 
-const DEFAULT_SUBMISSIONS = [
+const DEFAULT_USERS = [
   {
-    id: 'sub-demo-001',
-    userId: 'user-sample-01',
-    userEmail: 'kemi.adebayo@payquick.ng',
-    userName: 'Kemi Adebayo',
-    appName: 'PayQuick Africa Micro-Lending Portal',
+    uid: 'user-admin-01',
+    displayName: 'Nuel Effiong',
+    email: 'admin@zeerocodes.com',
+    role: 'admin',
+    photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop',
+    title: 'Principal AI Systems Architect',
+    phone: '+234 812 345 6789',
+    referralSource: 'direct',
+    joinedAt: '2026-01-10T08:00:00Z'
+  },
+  {
+    uid: 'user-student-01',
+    displayName: 'Amina Yusuf',
+    email: 'student@zeerocodes.com',
+    role: 'student',
+    photoURL: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop',
+    title: 'Certified Builder in Training',
+    phone: '+234 809 112 3344',
+    referralSource: 'academy',
+    joinedAt: '2026-07-15T14:20:00Z',
+    bio: 'Building an automated medical appointment dispatcher for clinics across Lagos.'
+  },
+  {
+    uid: 'user-client-01',
+    displayName: 'Tunde Balogun',
+    email: 'client@zeerocodes.com',
+    role: 'client',
+    photoURL: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop',
+    title: 'COO, PayQuick Africa',
+    phone: '+234 803 555 7788',
+    referralSource: 'studio',
+    joinedAt: '2026-06-01T09:15:00Z',
+    bio: 'Partnering with Zeerocodes Studio to scale our automated Paystack micro-lending engine.'
+  }
+];
+
+const DEFAULT_ENROLLMENTS = [
+  {
+    id: 'enroll-amina-01',
+    userId: 'user-student-01',
+    userEmail: 'student@zeerocodes.com',
+    userName: 'Amina Yusuf',
+    courseId: 'course-vibecode-labs',
+    courseTitle: 'The Zeerocodes VibeCode Labs',
+    enrolledAt: '2026-07-15T14:30:00Z',
+    status: 'active',
+    completedLessons: [
+      'lvl_1_mod_01_les_0',
+      'lvl_1_mod_01_les_1',
+      'lvl_1_mod_01_les_2',
+      'lvl_1_mod_01_les_3',
+      'lvl_1_mod_01_les_4',
+      'lvl_1_mod_02_les_0',
+      'lvl_1_mod_02_les_1',
+      'lvl_1_mod_02_les_2',
+      'lvl_1_mod_02_les_3',
+      'lvl_1_mod_03_les_0',
+      'lvl_1_mod_03_les_1',
+      'lvl_1_mod_03_les_2',
+      'lvl_1_mod_03_les_3',
+      'lvl_1_mod_04_les_0',
+      'lvl_1_mod_04_les_1',
+      'lvl_2_mod_05_les_0',
+      'lvl_2_mod_05_les_1',
+      'lvl_2_mod_05_les_2',
+      'lvl_2_mod_06_les_0',
+      'lvl_2_mod_06_les_1',
+      'lvl_3_mod_11_les_0',
+      'lvl_3_mod_11_les_1',
+      'lvl_3_mod_13_les_0'
+    ],
+    quizScores: {
+      'level_1_quiz': 100,
+      'level_2_quiz': 90
+    },
+    certificateId: 'VIBECERT-2026-0881',
+    certifiedAt: '2026-08-10T12:00:00Z'
+  }
+];
+
+const DEFAULT_LAB_SUBMISSIONS = [
+  {
+    id: 'lab-sub-001',
+    userId: 'user-student-01',
+    userEmail: 'student@zeerocodes.com',
+    userName: 'Amina Yusuf',
+    courseId: 'course-vibecode-labs',
+    levelNumber: 3,
+    moduleTitle: 'Module 16: Capstone Build',
+    lessonTitle: '16.1 Capstone Brief: MedLagos Clinic Appointment Bot',
+    repoUrl: 'https://github.com/amina-yusuf/medlagos-whatsapp-bot',
+    liveUrl: 'https://medlagos-triage.vercel.app',
+    notes: 'Built with Next.js, n8n webhook routing, Paystack consultation fee payment, and VibeScan secret shield.',
+    submittedAt: '2026-08-11T16:00:00Z',
+    status: 'passed',
+    grade: 'A+ (98%)',
+    feedback: 'Exceptional constant-time HMAC check on the Paystack webhook and clean Supabase RLS policies! Approved for VibeCert™ issuance.',
+    reviewedBy: 'Nuel Effiong',
+    reviewedAt: '2026-08-11T18:30:00Z'
+  },
+  {
+    id: 'lab-sub-002',
+    userId: 'user-sample-02',
+    userEmail: 'emeka.okafor@gmail.com',
+    userName: 'Emeka Okafor',
+    courseId: 'course-vibecode-labs',
+    levelNumber: 2,
+    moduleTitle: 'Module 08: Full-Stack Build in AI Studio',
+    lessonTitle: '8.4 Managing Secrets & API Keys',
+    repoUrl: 'https://github.com/emeka-builds/estate-rent-tracker',
+    liveUrl: 'https://estate-tracker-lagos.web.app',
+    notes: 'Please review my Firestore security rules and Paystack public key configuration.',
+    submittedAt: '2026-08-12T06:15:00Z',
+    status: 'pending',
+    grade: null,
+    feedback: null,
+    reviewedBy: null,
+    reviewedAt: null
+  }
+];
+
+const DEFAULT_STUDIO_PROJECTS = [
+  {
+    id: 'proj-payquick-01',
+    title: 'PayQuick Africa Micro-Lending Portal & Automated Ledger',
+    clientName: 'Tunde Balogun',
+    clientCompany: 'PayQuick Africa',
+    userEmail: 'client@zeerocodes.com',
+    userId: 'user-client-01',
+    budgetNGN: 4800000,
+    budgetUSD: 3200,
+    status: 'development',
+    stage: 'Phase 3: Webhook Automation & n8n Engine',
+    progress: 75,
+    milestones: [
+      { name: 'Architecture & System Blueprint', done: true },
+      { name: 'Interactive UI & Client Portal', done: true },
+      { name: 'Paystack & WhatsApp Webhook Automation', done: true },
+      { name: 'VibeScan AI Security & RLS Lockdown', done: false },
+      { name: 'Production Launch & SLA Handover', done: false }
+    ],
+    repoUrl: 'https://github.com/zeerocodez/payquick-portal',
+    stagingUrl: 'https://staging.payquick.zeerocodes.com',
+    startDate: '2026-07-01',
+    targetLaunch: '2026-08-28'
+  },
+  {
+    id: 'proj-medlagos-02',
+    title: 'MedLagos 90-Second WhatsApp Patient Intake & Billing Bot',
+    clientName: 'Dr. Folake Davies',
+    clientCompany: 'MedLagos Health Systems',
+    userEmail: 'dr.davies@medlagos.ng',
+    userId: 'user-client-02',
+    budgetNGN: 2750000,
+    budgetUSD: 1850,
+    status: 'qa_audit',
+    stage: 'Phase 4: VibeScan Security Hardening',
+    progress: 90,
+    milestones: [
+      { name: 'Triage Flow Mapping', done: true },
+      { name: 'WhatsApp Cloud API Node Setup', done: true },
+      { name: 'HIPAA / NDPR Sensitive Data Scrubbing', done: true },
+      { name: 'VibeScan Audit & Cryptographic Badge', done: true },
+      { name: 'Go-Live Handover', done: false }
+    ],
+    repoUrl: 'https://github.com/zeerocodez/medlagos-bot',
+    stagingUrl: 'https://medlagos.zeerocodes.com',
+    startDate: '2026-07-15',
+    targetLaunch: '2026-08-20'
+  }
+];
+
+const DEFAULT_VIBESCAN_SUBMISSIONS = [
+  {
+    id: 'sub-vibescan-001',
+    userId: 'user-client-01',
+    userEmail: 'client@zeerocodes.com',
+    userName: 'Tunde Balogun',
+    appName: 'PayQuick Africa Micro-Lending Engine',
     appUrl: 'https://github.com/payquick-africa/portal-app',
     liveUrl: 'https://payquick.ng',
-    techStack: 'Next.js 14, Supabase Auth, Paystack API, Tailwind',
+    techStack: 'Next.js 14, Supabase Auth, Paystack API, PostgreSQL RLS',
     buildMethod: 'AI-assisted / vibe-coded (Cursor + Claude 3.5)',
-    referralSource: 'academy',
+    referralSource: 'studio',
     submittedAt: '2026-08-01T10:00:00Z',
     status: 'certified',
     certificationId: 'VIBECERT-2026-0042',
-    notes: 'Pre-seed pitch audit requested. Customer data encryption validated.'
+    vulnerabilitiesFound: 3,
+    vulnerabilitiesFixed: 3,
+    securityScore: 98,
+    auditReport: {
+      auditor: 'Nuel Effiong',
+      auditDate: '2026-08-03',
+      findings: [
+        { id: 'F1', title: 'Hardcoded Paystack Secret Key in Client Bundle', severity: 'CRITICAL', status: 'FIXED' },
+        { id: 'F2', title: 'Missing PostgreSQL Row-Level Security on User Wallets', severity: 'HIGH', status: 'FIXED' },
+        { id: 'F3', title: 'Non-Constant-Time HMAC Webhook Comparison', severity: 'MEDIUM', status: 'FIXED' }
+      ]
+    }
+  },
+  {
+    id: 'sub-vibescan-002',
+    userId: 'user-student-01',
+    userEmail: 'student@zeerocodes.com',
+    userName: 'Amina Yusuf',
+    appName: 'MedLagos WhatsApp Triage Bot',
+    appUrl: 'https://github.com/amina-yusuf/medlagos-whatsapp-bot',
+    liveUrl: 'https://medlagos-triage.vercel.app',
+    techStack: 'Node.js, n8n, WhatsApp Cloud API, Paystack',
+    buildMethod: 'The Zeerocodes VibeCode Labs (Antigravity + AI Studio)',
+    referralSource: 'academy',
+    submittedAt: '2026-08-11T16:30:00Z',
+    status: 'in_review',
+    certificationId: 'VIBECERT-2026-0881',
+    vulnerabilitiesFound: 1,
+    vulnerabilitiesFixed: 1,
+    securityScore: 99,
+    auditReport: null
   }
 ];
+
+const DEFAULT_BLOG_POSTS = [
+  {
+    id: 'post-whatsapp-paystack-automation',
+    title: 'How We Built an Autonomous WhatsApp & Paystack Invoicing System That Processes ₦180M+',
+    slug: 'autonomous-whatsapp-paystack-invoicing-automation-n8n',
+    category: 'Automations',
+    categoryBadge: 'badge-success',
+    author: 'Nuel Effiong',
+    authorRole: 'Principal AI Systems Architect',
+    date: 'August 10, 2026',
+    readTime: '6 min read',
+    featuredImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop',
+    excerpt: 'Step-by-step breakdown of how Zeerocodes replaced 28 hours of manual bank reconciliation per week with a 90-second event-driven n8n & WhatsApp Cloud API bot for PayQuick Africa.',
+    tags: ['WhatsApp Business API', 'Paystack', 'n8n', 'FinTech Automation', 'Lagos Business'],
+    status: 'published',
+    content: `
+      <h2>The Real Pain: 4 Accountants Matching Bank SMS Alerts by Hand</h2>
+      <p>PayQuick Africa processes hundreds of customer deposits every day across Nigeria. Before partnering with Zeerocodes Studio, their finance team spent 28 hours every week manually opening bank transfer receipts, checking SMS notifications, and replying to customer WhatsApp messages with PDF invoices.</p>
+      
+      <p>During month-end reconciliation, their calculation error rate hit 14%, leading to frustrated customers and delayed order deliveries.</p>
+
+      <h2>The Architecture: Event-Driven Webhooks & n8n</h2>
+      <p>Instead of relying on clunky third-party tools that break when carriers drop connections, we engineered a dedicated self-hosted n8n automation cluster with constant-time HMAC verification:</p>
+      
+      <ol>
+        <li><strong>Inbound Event:</strong> When a customer pays via Paystack, a cryptographic webhook fires to our hardened endpoint.</li>
+        <li><strong>HMAC SHA-512 Verification:</strong> Our server evaluates the payload in constant time to guarantee the event came directly from Paystack before touching customer accounts.</li>
+        <li><strong>Database Sync:</strong> PostgreSQL ledger updates the transaction in real time with Row-Level Security tenant isolation.</li>
+        <li><strong>WhatsApp Dispatch:</strong> The WhatsApp Cloud API generates and sends an official branded PDF receipt to the customer's phone number within 90 seconds.</li>
+      </ol>
+
+      <h2>The Transformation & Quantifiable ROI</h2>
+      <p>Since deployment, PayQuick Africa has processed over <strong>₦180,000,000 NGN</strong> across thousands of transactions with <strong>0 failed deliveries</strong>. The company reclaimed 112 hours every month and re-allocated 4 staff members to high-margin client growth.</p>
+
+      <div class="article-cta-box" style="background:#080D16; border:1px solid var(--emerald-primary); padding:1.5rem; border-radius:var(--radius-sm); margin:2rem 0;">
+        <h4 style="color:#FFF; margin-bottom:0.4rem;">Want to automate your WhatsApp & payment workflows?</h4>
+        <p style="color:var(--text-cyber-muted); font-size:0.9rem; margin-bottom:1rem;">Zeerocodes Studio builds, hosts, and operates autonomous business engines with a 99.99% uptime guarantee.</p>
+        <button class="btn btn-primary btn-sm trigger-calendly-booking" data-service="WhatsApp & Payment Workflow Automation">
+          Book a Free 30-Min Automation Scope
+        </button>
+      </div>
+    `
+  },
+  {
+    id: 'post-ai-vibe-coding-security',
+    title: 'Why 40% of AI-Generated Code Has Dangerous Security Leaks (And How to Fix Them)',
+    slug: 'ai-vibe-coding-security-vulnerabilities-owasp-llm',
+    category: 'AI Security',
+    categoryBadge: 'badge-danger',
+    author: 'Nuel Effiong',
+    authorRole: 'Principal AI Systems Architect',
+    date: 'August 8, 2026',
+    readTime: '7 min read',
+    featuredImage: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop',
+    excerpt: 'Cursor, Claude, and Lovable make coding effortless. But when AI tools skip Row-Level Security and expose private API keys in frontend bundles, disaster follows. Here is how to audit your vibe-coded app.',
+    tags: ['Vibe Coding', 'OWASP Top 10', 'Cybersecurity', 'Supabase RLS', 'VibeScan'],
+    status: 'published',
+    content: `
+      <h2>The Rise of Vibe Coding & The Hidden Nightmare</h2>
+      <p>In 2026, anyone can build a software prototype in a weekend using AI coding assistants like Cursor, Claude 3.7, Lovable, and Bolt. You describe what you want, and the model writes hundreds of lines of code.</p>
+
+      <p>However, recent audits by <strong>VibeScan</strong> revealed that over <strong>40% of vibe-coded applications contain critical security flaws</strong> that could expose founders to catastrophic data breaches and regulatory fines under NDPR and GDPR.</p>
+
+      <h2>The Top 3 Flaws We Find in AI Codebases</h2>
+      
+      <h3>1. Exposed API Keys in Client Bundles</h3>
+      <p>AI assistants frequently write code that imports <code>process.env.OPENAI_API_KEY</code> or <code>PAYSTACK_SECRET_KEY</code> inside frontend React components. When the app compiles, that secret is baked into the public JavaScript file where any attacker can view it using Chrome DevTools.</p>
+
+      <h3>2. Missing Database Row-Level Security (RLS)</h3>
+      <p>When you ask an AI to create a database table, it creates the table without tenant isolation policies. Unless you explicitly enable RLS, any visitor with your public API key can query and download every customer's private phone number, order history, and passwords.</p>
+
+      <h3>3. Payment Webhook Spoofing</h3>
+      <p>AI assistants frequently write webhook handlers that parse JSON without checking cryptographic HMAC signatures. An attacker can forge a POST request claiming their payment succeeded and receive paid products for free.</p>
+
+      <h2>How VibeScan Protects Your App</h2>
+      <p>Before launching your app to real paying users or pitching angel investors, run a repository scan with <strong>VibeScan</strong>. We inspect your code against the OWASP Top 10 for LLMs, provide exact code patches, and issue the tamper-proof <strong>VibeCert™ Verified Badge</strong>.</p>
+    `
+  },
+  {
+    id: 'post-zero-to-ai-builder-roadmap',
+    title: 'From Zero to Certified AI Builder: The 2026 Developer Roadmap for Africa',
+    slug: 'zero-to-certified-ai-builder-developer-roadmap-africa',
+    category: 'Career & Training',
+    categoryBadge: 'badge-teal',
+    author: 'Nuel Effiong',
+    authorRole: 'Principal AI Systems Architect',
+    date: 'August 5, 2026',
+    readTime: '8 min read',
+    featuredImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1000&auto=format&fit=crop',
+    excerpt: 'You no longer need 4 years of computer science theory to build production software. Discover how modern AI visual engineering and The VibeCode Labs turn beginners into high-earning certified software builders.',
+    tags: ['The VibeCode Labs', 'Google Stitch', 'AI Studio', 'No-Code Career', 'Lagos Tech'],
+    status: 'published',
+    content: `
+      <h2>The Old Way vs. The Modern AI Engineering Way</h2>
+      <p>For decades, breaking into software development meant spending 2 to 4 years memorizing syntax, data structures, and compiler quirks before ever shipping a real project to a client.</p>
+
+      <p>In 2026, the paradigm has completely flipped. What matters today is not how fast you type syntax, but how clearly you think as a product architect. By leveraging the <strong>Zeerocodes 4-Level AI Build Pipeline</strong>, builders can ship enterprise-grade software in weeks.</p>
+
+      <h2>The 4 Pillars of a High-Earning Builder in 2026</h2>
+      <ul>
+        <li><strong>Visual UI Prototyping:</strong> Designing clean, conversion-focused mobile interfaces using Google Stitch.</li>
+        <li><strong>Full-Stack Generation:</strong> Prompting AI Studio and Antigravity with exact data models and API contracts.</li>
+        <li><strong>Autonomous Automations:</strong> Connecting n8n, WhatsApp Cloud API, and Paystack for hands-off business operations.</li>
+        <li><strong>Security & Monetization:</strong> Validating apps with VibeScan audits and pitching value-based retainer contracts.</li>
+      </ul>
+    `
+  }
+];
+
+const DEFAULT_QUIZZES = {
+  'level_1_quiz': {
+    title: 'Level 1 Foundations: Prompting & Architecture Quiz',
+    questions: [
+      {
+        question: 'Which of the following describes the proper anatomy of a production-grade build prompt?',
+        options: [
+          'Just a 1-sentence request like "Build me an Uber clone"',
+          'Context, Architecture & Data Constraints, Precise UI Components, and Error Handling Rules',
+          'A copy-pasted screenshot without instructions',
+          'Asking the AI to write everything in assembly language'
+        ],
+        correct: 1,
+        explanation: 'Effective prompts act as complete engineering specifications detailing context, architectural constraints, data schemas, and edge case handling.'
+      },
+      {
+        question: 'Where should sensitive secrets like PAYSTACK_SECRET_KEY and database passwords be stored?',
+        options: [
+          'Directly inside frontend JavaScript files so they run fast',
+          'In public GitHub repositories for open-source transparency',
+          'Strictly in server-side .env files blocked by .gitignore and never exposed client-side',
+          'In local browser cookies without encryption'
+        ],
+        correct: 2,
+        explanation: 'Non-negotiable rule: Secrets must live solely in server-side environment variables and never be bundled into client-side JS.'
+      }
+    ]
+  },
+  'level_2_quiz': {
+    title: 'Level 2 Builder: Full-Stack & UI/UX Quiz',
+    questions: [
+      {
+        question: 'Why is mobile-first design and low-bandwidth optimization crucial for Nigerian software users?',
+        options: [
+          'Because all users only use desktop workstations with gigabit fiber',
+          'Because mobile accounts for over 85% of African internet traffic and bandwidth costs are high',
+          'It is not important in modern web apps',
+          'Because search engines penalize mobile apps'
+        ],
+        correct: 1,
+        explanation: 'Over 85% of internet traffic in Nigeria and Africa is mobile-first; apps must load fast with minimal payload on 3G/4G connections.'
+      },
+      {
+        question: 'What is the purpose of Checkpoints when developing full-stack apps in AI Studio or Antigravity?',
+        options: [
+          'They delete all previous code files',
+          'They create safe recovery rollback points before agent refactors so you never lose working functionality',
+          'They slow down the compilation speed',
+          'They are only used for marketing screenshots'
+        ],
+        correct: 1,
+        explanation: 'Checkpoints allow rapid safe prototyping with instant rollback if an AI agent introduces unexpected regressions.'
+      }
+    ]
+  },
+  'level_3_quiz': {
+    title: 'Level 3 Professional: AI Security & Webhook Engineering Quiz',
+    questions: [
+      {
+        question: 'How MUST incoming payment webhooks from Paystack or Flutterwave be validated before provisioning user access?',
+        options: [
+          'By checking if the event object has status: "success" on the client',
+          'By computing HMAC SHA-512 with the secret key and verifying signatures in constant time on the server',
+          'By trusting the user\'s local storage flag',
+          'By skipping verification if the amount is less than ₦100,000'
+        ],
+        correct: 1,
+        explanation: 'Rule FR-ACAD-03: Webhook verification MUST occur server-side using constant-time cryptographic HMAC signature comparisons.'
+      },
+      {
+        question: 'What is Row-Level Security (RLS) in PostgreSQL/Supabase and why is it mandatory?',
+        options: [
+          'A tool to make table headers colored in green',
+          'A database security policy ensuring users can only read or write their own isolated data rows',
+          'A frontend CSS grid alignment rule',
+          'A method to remove passwords from the database'
+        ],
+        correct: 1,
+        explanation: 'RLS isolates tenant rows at the database engine level so that even with public client keys, unauthorized users cannot query foreign records.'
+      }
+    ]
+  }
+};
 
 class DatabaseLayer {
   constructor() {
@@ -314,14 +711,58 @@ class DatabaseLayer {
   }
 
   init() {
-    // Populate localStorage with initial seed data if not present or if outdated
-    const storedCourses = this.getLocal('courses');
-    if (!storedCourses || storedCourses.length === 0 || !storedCourses[0].levels) {
+    // Populate localStorage with initial seed data if not present
+    if (!this.getLocal('courses') || !this.getLocal('courses')[0]?.levels) {
       this.setLocal('courses', DEFAULT_COURSES);
     }
-
-    if (!this.getLocal('submissions')) {
-      this.setLocal('submissions', DEFAULT_SUBMISSIONS);
+    if (!this.getLocal('users')) {
+      this.setLocal('users', DEFAULT_USERS);
+    }
+    if (!this.getLocal('enrollments')) {
+      this.setLocal('enrollments', DEFAULT_ENROLLMENTS);
+    }
+    if (!this.getLocal('labSubmissions')) {
+      this.setLocal('labSubmissions', DEFAULT_LAB_SUBMISSIONS);
+    }
+    if (!this.getLocal('studioProjects')) {
+      this.setLocal('studioProjects', DEFAULT_STUDIO_PROJECTS);
+    }
+    if (!this.getLocal('vibescanSubmissions')) {
+      this.setLocal('vibescanSubmissions', DEFAULT_VIBESCAN_SUBMISSIONS);
+    }
+    if (!this.getLocal('blogPosts')) {
+      this.setLocal('blogPosts', DEFAULT_BLOG_POSTS);
+    }
+    if (!this.getLocal('quizzes')) {
+      this.setLocal('quizzes', DEFAULT_QUIZZES);
+    }
+    if (!this.getLocal('paymentEvents')) {
+      this.setLocal('paymentEvents', [
+        {
+          id: 'pay-evt-001',
+          reference: 'ZC_PSK_88492041_99',
+          provider: 'Paystack',
+          customerEmail: 'student@zeerocodes.com',
+          amountNGN: 95000,
+          currency: 'NGN',
+          status: 'success',
+          verifiedAt: '2026-07-15T14:29:45Z',
+          hmacSignatureVerified: true,
+          item: 'The Zeerocodes VibeCode Labs - 8-Week Cohort'
+        },
+        {
+          id: 'pay-evt-002',
+          reference: 'ZC_FLW_19402845_12',
+          provider: 'Flutterwave',
+          customerEmail: 'dr.davies@medlagos.ng',
+          amountNGN: 2750000,
+          currency: 'NGN',
+          status: 'success',
+          verifiedAt: '2026-07-15T10:12:00Z',
+          hmacSignatureVerified: true,
+          item: 'Studio Project Deposit: MedLagos WhatsApp Bot'
+        }
+      ]);
     }
   }
 
@@ -343,6 +784,7 @@ class DatabaseLayer {
     }
   }
 
+  // --- Courses ---
   async getCourses() {
     const local = this.getLocal('courses');
     if (local && local.length > 0 && local[0].levels) return local;
@@ -355,14 +797,32 @@ class DatabaseLayer {
     return courses.find(c => c.id === id) || courses[0];
   }
 
+  async saveCourse(course) {
+    const courses = await this.getCourses();
+    const idx = courses.findIndex(c => c.id === course.id);
+    if (idx >= 0) {
+      courses[idx] = { ...courses[idx], ...course };
+    } else {
+      courses.push(course);
+    }
+    this.setLocal('courses', courses);
+  }
+
+  // --- Users ---
   async getUser(uid) {
     const users = this.getLocal('users') || [];
     return users.find(u => u.uid === uid) || null;
   }
 
+  async getUserByEmail(email) {
+    const users = this.getLocal('users') || [];
+    const clean = String(email).toLowerCase().trim();
+    return users.find(u => u.email.toLowerCase() === clean) || null;
+  }
+
   async saveUser(user) {
     const users = this.getLocal('users') || [];
-    const index = users.findIndex(u => u.uid === user.uid);
+    const index = users.findIndex(u => u.uid === user.uid || u.email === user.email);
     if (index >= 0) {
       users[index] = { ...users[index], ...user };
     } else {
@@ -375,48 +835,186 @@ class DatabaseLayer {
     return this.getLocal('users') || [];
   }
 
+  // --- Enrollments ---
   async saveEnrollment(enrollment) {
     const enrollments = this.getLocal('enrollments') || [];
-    enrollments.push(enrollment);
+    const idx = enrollments.findIndex(e => e.id === enrollment.id || (e.userId === enrollment.userId && e.courseId === enrollment.courseId));
+    if (idx >= 0) {
+      enrollments[idx] = { ...enrollments[idx], ...enrollment };
+    } else {
+      enrollments.push(enrollment);
+    }
     this.setLocal('enrollments', enrollments);
   }
 
   async getUserEnrollments(userId) {
     const enrollments = this.getLocal('enrollments') || [];
-    return enrollments.filter(e => e.userId === userId);
+    return enrollments.filter(e => e.userId === userId || e.userEmail === userId);
   }
 
-  async saveSubmission(sub) {
-    const submissions = this.getLocal('submissions') || [];
-    submissions.push(sub);
-    this.setLocal('submissions', submissions);
+  async getAllEnrollments() {
+    return this.getLocal('enrollments') || [];
   }
 
+  async updateEnrollmentProgress(enrollmentId, lessonId) {
+    const enrollments = this.getLocal('enrollments') || [];
+    const idx = enrollments.findIndex(e => e.id === enrollmentId);
+    if (idx >= 0) {
+      const e = enrollments[idx];
+      e.completedLessons = e.completedLessons || [];
+      if (!e.completedLessons.includes(lessonId)) {
+        e.completedLessons.push(lessonId);
+      }
+      this.setLocal('enrollments', enrollments);
+      return e;
+    }
+    return null;
+  }
+
+  // --- Lab Submissions ---
+  async getLabSubmissionsForUser(userId) {
+    const subs = this.getLocal('labSubmissions') || [];
+    return subs.filter(s => s.userId === userId || s.userEmail === userId);
+  }
+
+  async getAllLabSubmissions() {
+    return this.getLocal('labSubmissions') || [];
+  }
+
+  async saveLabSubmission(sub) {
+    const subs = this.getLocal('labSubmissions') || [];
+    const idx = subs.findIndex(s => s.id === sub.id);
+    if (idx >= 0) {
+      subs[idx] = { ...subs[idx], ...sub };
+    } else {
+      subs.unshift(sub);
+    }
+    this.setLocal('labSubmissions', subs);
+  }
+
+  async gradeLabSubmission(submissionId, { grade, status, feedback, reviewedBy }) {
+    const subs = this.getLocal('labSubmissions') || [];
+    const idx = subs.findIndex(s => s.id === submissionId);
+    if (idx >= 0) {
+      subs[idx].grade = grade;
+      subs[idx].status = status; // 'passed' | 'revisions'
+      subs[idx].feedback = feedback;
+      subs[idx].reviewedBy = reviewedBy || 'Nuel Effiong';
+      subs[idx].reviewedAt = new Date().toISOString();
+      this.setLocal('labSubmissions', subs);
+      return subs[idx];
+    }
+    return null;
+  }
+
+  // --- Studio Projects ---
+  async getStudioProjectsForUser(userId) {
+    const projects = this.getLocal('studioProjects') || [];
+    return projects.filter(p => p.userId === userId || p.userEmail === userId);
+  }
+
+  async getAllStudioProjects() {
+    return this.getLocal('studioProjects') || [];
+  }
+
+  async saveStudioProject(proj) {
+    const projects = this.getLocal('studioProjects') || [];
+    const idx = projects.findIndex(p => p.id === proj.id);
+    if (idx >= 0) {
+      projects[idx] = { ...projects[idx], ...proj };
+    } else {
+      projects.unshift(proj);
+    }
+    this.setLocal('studioProjects', projects);
+  }
+
+  // --- VibeScan Submissions ---
   async getSubmissionsForUser(userId) {
-    const submissions = this.getLocal('submissions') || [];
-    return submissions.filter(s => s.userId === userId);
+    const subs = this.getLocal('vibescanSubmissions') || [];
+    return subs.filter(s => s.userId === userId || s.userEmail === userId);
   }
 
   async getAllPendingSubmissions() {
-    return this.getLocal('submissions') || [];
+    const subs = this.getLocal('vibescanSubmissions') || [];
+    return subs;
+  }
+
+  async saveSubmission(sub) {
+    const subs = this.getLocal('vibescanSubmissions') || [];
+    const idx = subs.findIndex(s => s.id === sub.id);
+    if (idx >= 0) {
+      subs[idx] = { ...subs[idx], ...sub };
+    } else {
+      subs.unshift(sub);
+    }
+    this.setLocal('vibescanSubmissions', subs);
   }
 
   async updateSubmission(id, updates) {
-    const submissions = this.getLocal('submissions') || [];
-    const idx = submissions.findIndex(s => s.id === id);
+    const subs = this.getLocal('vibescanSubmissions') || [];
+    const idx = subs.findIndex(s => s.id === id);
     if (idx >= 0) {
-      submissions[idx] = { ...submissions[idx], ...updates };
-      this.setLocal('submissions', submissions);
+      subs[idx] = { ...subs[idx], ...updates };
+      this.setLocal('vibescanSubmissions', subs);
     }
   }
 
-  async getStudioProjectsForUser(userId) {
-    return this.getLocal('studioProjects') || [];
+  // --- Blog Posts ---
+  async getBlogPosts() {
+    const posts = this.getLocal('blogPosts');
+    if (posts && posts.length > 0) return posts;
+    this.setLocal('blogPosts', DEFAULT_BLOG_POSTS);
+    return DEFAULT_BLOG_POSTS;
+  }
+
+  async getBlogPostBySlug(slug) {
+    const posts = await this.getBlogPosts();
+    return posts.find(p => p.slug === slug || p.id === slug) || null;
+  }
+
+  async saveBlogPost(post) {
+    const posts = await this.getBlogPosts();
+    const idx = posts.findIndex(p => p.id === post.id);
+    if (idx >= 0) {
+      posts[idx] = { ...posts[idx], ...post };
+    } else {
+      posts.unshift(post);
+    }
+    this.setLocal('blogPosts', posts);
+  }
+
+  async deleteBlogPost(postId) {
+    const posts = await this.getBlogPosts();
+    const filtered = posts.filter(p => p.id !== postId);
+    this.setLocal('blogPosts', filtered);
+  }
+
+  // --- Quizzes ---
+  async getQuiz(quizKey) {
+    const quizzes = this.getLocal('quizzes') || DEFAULT_QUIZZES;
+    return quizzes[quizKey] || null;
+  }
+
+  // --- Payment Events ---
+  async getPaymentEvents() {
+    return this.getLocal('paymentEvents') || [];
+  }
+
+  async logPaymentEvent(evt) {
+    const events = this.getLocal('paymentEvents') || [];
+    events.unshift(evt);
+    this.setLocal('paymentEvents', events);
   }
 
   resetToSampleData() {
     this.setLocal('courses', DEFAULT_COURSES);
-    this.setLocal('submissions', DEFAULT_SUBMISSIONS);
+    this.setLocal('users', DEFAULT_USERS);
+    this.setLocal('enrollments', DEFAULT_ENROLLMENTS);
+    this.setLocal('labSubmissions', DEFAULT_LAB_SUBMISSIONS);
+    this.setLocal('studioProjects', DEFAULT_STUDIO_PROJECTS);
+    this.setLocal('vibescanSubmissions', DEFAULT_VIBESCAN_SUBMISSIONS);
+    this.setLocal('blogPosts', DEFAULT_BLOG_POSTS);
+    this.setLocal('quizzes', DEFAULT_QUIZZES);
   }
 }
 

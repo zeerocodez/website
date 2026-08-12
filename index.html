@@ -1867,43 +1867,92 @@ const isValid = crypto.timingSafeEqual(
     </div>
 
     <!-- =======================================================================
-         VIEW 8: DASHBOARD (#dashboard) — CLIENT HUB
+         VIEW 8: DASHBOARD (#dashboard) — STUDENT & CLIENT PORTAL
          ======================================================================= -->
     <div id="view-dashboard" class="page-view">
       <section class="section-padding">
         <div class="container">
-          <div class="section-header" style="text-align:left; margin-bottom:2.5rem;">
-            <span class="section-tag"><i data-lucide="layout-dashboard"></i> Client Portal</span>
-            <h2>Your Project Dashboard</h2>
-            <p class="section-subtitle">View your active Studio builds, enrolled builder lessons, and VibeScan security audit reports.</p>
+          <!-- Profile Card Banner -->
+          <div class="dash-profile-banner" style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-md); padding:1.75rem; margin-bottom:2rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1.5rem;">
+            <div style="display:flex; align-items:center; gap:1.25rem;">
+              <div style="width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg, var(--emerald-primary), var(--cyan-accent)); display:flex; align-items:center; justify-content:center; color:#FFF; font-weight:800; font-size:1.4rem; overflow:hidden; border:2px solid rgba(255,255,255,0.2);">
+                <img id="dashUserAvatar" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop" alt="Profile" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'">
+              </div>
+              <div>
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <h2 style="font-size:1.4rem; color:#FFF; margin:0;" id="dashUserName">Amina Yusuf</h2>
+                  <span id="dashUserRoleBadge" class="badge badge-success">STUDENT</span>
+                </div>
+                <div style="font-size:0.85rem; color:var(--text-cyber-muted); margin-top:0.2rem;" id="dashUserEmail">student@zeerocodes.com</div>
+              </div>
+            </div>
+
+            <!-- Demo Persona Switcher & Actions -->
+            <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+              <span style="font-size:0.75rem; color:var(--text-cyber-muted);">Switch Persona:</span>
+              <button type="button" class="btn btn-outline btn-xs btn-quick-demo-login" data-persona="admin"><i data-lucide="shield-alert"></i> Admin</button>
+              <button type="button" class="btn btn-outline btn-xs btn-quick-demo-login" data-persona="student"><i data-lucide="graduation-cap"></i> Student</button>
+              <button type="button" class="btn btn-outline btn-xs btn-quick-demo-login" data-persona="client"><i data-lucide="workflow"></i> Client</button>
+              <button type="button" class="btn btn-secondary btn-xs btn-sign-out"><i data-lucide="log-out"></i> Sign Out</button>
+            </div>
           </div>
 
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap:2rem;">
-            <div class="pricing-card">
-              <h3 style="display:flex; align-items:center; gap:0.5rem; font-size:1.2rem; color:var(--cyan-accent);">
-                <i data-lucide="workflow"></i> Studio Projects & Deliverables
-              </h3>
-              <div id="dashStudioList" style="margin-top:1rem; font-size:0.9rem; color:var(--text-cyber-muted);">
-                <!-- Rendered dynamically -->
-              </div>
-            </div>
+          <!-- Dashboard Navigation Tabs -->
+          <div class="dash-tabs-bar" style="display:flex; gap:0.5rem; border-bottom:1px solid var(--obsidian-border); margin-bottom:1.75rem; overflow-x:auto; padding-bottom:2px;">
+            <button class="dash-tab-btn active" data-tab="dashTabLms"><i data-lucide="graduation-cap"></i> Learning Hub (LMS)</button>
+            <button class="dash-tab-btn" data-tab="dashTabStudio"><i data-lucide="workflow"></i> Studio Projects</button>
+            <button class="dash-tab-btn" data-tab="dashTabVibescan"><i data-lucide="shield-check"></i> Security Audits & Badges</button>
+            <button class="dash-tab-btn" data-tab="dashTabBilling"><i data-lucide="receipt"></i> Invoices & Billing</button>
+            <button class="dash-tab-btn" data-tab="dashTabSettings"><i data-lucide="settings"></i> Profile Settings</button>
+          </div>
 
-            <div class="pricing-card">
-              <h3 style="display:flex; align-items:center; gap:0.5rem; font-size:1.2rem; color:var(--emerald-light);">
-                <i data-lucide="graduation-cap"></i> Enrolled Cohorts & Labs
-              </h3>
-              <div id="dashEnrollmentsList" style="margin-top:1rem; font-size:0.9rem; color:var(--text-cyber-muted);">
-                <!-- Rendered dynamically -->
-              </div>
+          <!-- Tab 1: LMS Learning Hub -->
+          <div id="dashTabLms" class="dash-tab-panel active">
+            <div id="dashLmsContainer">
+              <!-- Rendered dynamically by app.js -->
             </div>
+          </div>
 
-            <div class="pricing-card">
-              <h3 style="display:flex; align-items:center; gap:0.5rem; font-size:1.2rem; color:var(--emerald-light);">
-                <i data-lucide="shield-check"></i> Security Audits & Badges
-              </h3>
-              <div id="dashVibescanList" style="margin-top:1rem; font-size:0.9rem; color:var(--text-cyber-muted);">
-                <!-- Rendered dynamically -->
-              </div>
+          <!-- Tab 2: Studio Projects -->
+          <div id="dashTabStudio" class="dash-tab-panel">
+            <div id="dashStudioContainer">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+          </div>
+
+          <!-- Tab 3: VibeScan Security -->
+          <div id="dashTabVibescan" class="dash-tab-panel">
+            <div id="dashVibescanContainer">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+          </div>
+
+          <!-- Tab 4: Billing & Invoices -->
+          <div id="dashTabBilling" class="dash-tab-panel">
+            <div id="dashBillingContainer">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+          </div>
+
+          <!-- Tab 5: Account Settings -->
+          <div id="dashTabSettings" class="dash-tab-panel">
+            <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.75rem; max-width:600px;">
+              <h4 style="color:#FFF; font-size:1.15rem; margin-bottom:1.25rem;">Account & Profile Details</h4>
+              <form id="accSettingsForm">
+                <div class="form-group">
+                  <label class="form-label" for="accSettingsName">Full Name</label>
+                  <input type="text" id="accSettingsName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="accSettingsPhone">WhatsApp / Phone Number</label>
+                  <input type="tel" id="accSettingsPhone" class="form-input" placeholder="+234 812 000 0000">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="accSettingsBio">Bio / Builder Goal</label>
+                  <textarea id="accSettingsBio" class="form-textarea" rows="3" placeholder="Tell us what you are building..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Save Profile Changes</button>
+              </form>
             </div>
           </div>
         </div>
@@ -1917,11 +1966,19 @@ const isValid = crypto.timingSafeEqual(
       <section class="section-padding">
         <div class="container">
           <div class="section-header" style="text-align:left; margin-bottom:2rem;">
-            <span class="section-tag" style="background:rgba(239,68,68,0.15); color:#F87171; border-color:rgba(239,68,68,0.3);">
-              <i data-lucide="shield-alert"></i> Zeerocodes Command Hub
-            </span>
-            <h2>Enterprise Admin Console</h2>
-            <p class="section-subtitle">Manage client Studio builds, perform code audits, track student enrollments, and monitor webhook health.</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+              <div>
+                <span class="section-tag" style="background:rgba(239,68,68,0.15); color:#F87171; border-color:rgba(239,68,68,0.3);">
+                  <i data-lucide="shield-alert"></i> Zeerocodes Command Hub
+                </span>
+                <h2>Enterprise Admin Console</h2>
+                <p class="section-subtitle">Manage client Studio builds, grade student code labs, review security audits, and publish blog articles.</p>
+              </div>
+              <div style="display:flex; gap:0.5rem;">
+                <button type="button" class="btn btn-outline btn-xs btn-quick-demo-login" data-persona="student"><i data-lucide="graduation-cap"></i> Student View</button>
+                <button type="button" class="btn btn-outline btn-xs btn-quick-demo-login" data-persona="client"><i data-lucide="workflow"></i> Client View</button>
+              </div>
+            </div>
           </div>
 
           <!-- Metrics Telemetry Bar -->
@@ -1961,33 +2018,47 @@ const isValid = crypto.timingSafeEqual(
 
           <!-- Admin Tabs Bar -->
           <div class="admin-tabs-bar">
-            <button class="admin-tab-btn active" data-tab="adminTabStudio"><i data-lucide="workflow"></i> Studio Projects Queue</button>
+            <button class="admin-tab-btn active" data-tab="adminTabOverview"><i data-lucide="layout-dashboard"></i> Overview</button>
+            <button class="admin-tab-btn" data-tab="adminTabAcademy"><i data-lucide="graduation-cap"></i> LMS & Student Grading</button>
+            <button class="admin-tab-btn" data-tab="adminTabStudio"><i data-lucide="workflow"></i> Studio Projects Pipeline</button>
             <button class="admin-tab-btn" data-tab="adminTabVibescan"><i data-lucide="shield-check"></i> VibeScan Audits</button>
-            <button class="admin-tab-btn" data-tab="adminTabAcademy"><i data-lucide="graduation-cap"></i> Academy Enrollments</button>
-            <button class="admin-tab-btn" data-tab="adminTabWebhooks"><i data-lucide="activity"></i> Webhook & Security Telemetry</button>
+            <button class="admin-tab-btn" data-tab="adminTabBlog"><i data-lucide="newspaper"></i> Blog CMS</button>
+            <button class="admin-tab-btn" data-tab="adminTabWebhooks"><i data-lucide="activity"></i> Webhook & Security Logs</button>
           </div>
 
           <!-- Tab Panels -->
-          <div id="adminTabStudio" class="admin-tab-panel active">
-            <div id="adminStudioQueueContainer">
-              <!-- Rendered dynamically by admin.js -->
-            </div>
-          </div>
-
-          <div id="adminTabVibescan" class="admin-tab-panel">
-            <div id="adminVibescanQueueContainer">
+          <div id="adminTabOverview" class="admin-tab-panel active">
+            <div id="adminOverviewContent">
               <!-- Rendered dynamically by admin.js -->
             </div>
           </div>
 
           <div id="adminTabAcademy" class="admin-tab-panel">
-            <div id="adminEnrollmentsContainer">
+            <div id="adminLmsContent">
+              <!-- Rendered dynamically by admin.js -->
+            </div>
+          </div>
+
+          <div id="adminTabStudio" class="admin-tab-panel">
+            <div id="adminStudioContent">
+              <!-- Rendered dynamically by admin.js -->
+            </div>
+          </div>
+
+          <div id="adminTabVibescan" class="admin-tab-panel">
+            <div id="adminVibescanContent">
+              <!-- Rendered dynamically by admin.js -->
+            </div>
+          </div>
+
+          <div id="adminTabBlog" class="admin-tab-panel">
+            <div id="adminBlogContent">
               <!-- Rendered dynamically by admin.js -->
             </div>
           </div>
 
           <div id="adminTabWebhooks" class="admin-tab-panel">
-            <div id="adminWebhookLogsContainer">
+            <div id="adminWebhookContent">
               <!-- Rendered dynamically by admin.js -->
             </div>
           </div>
@@ -2067,9 +2138,22 @@ const isValid = crypto.timingSafeEqual(
         <button class="modal-close-btn">&times;</button>
       </div>
       <div class="modal-body">
+        <!-- Quick Demo Switchers Bar -->
+        <div style="background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2); border-radius:var(--radius-xs); padding:0.75rem; margin-bottom:1.25rem; text-align:center;">
+          <div style="font-size:0.75rem; color:var(--emerald-light); font-weight:700; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">
+            ⚡ Quick 1-Click Demo Login
+          </div>
+          <div style="display:flex; gap:0.4rem; justify-content:center; flex-wrap:wrap;">
+            <button type="button" class="btn btn-outline btn-xs btn-quick-demo-login" data-persona="admin"><i data-lucide="shield-alert"></i> Admin (Nuel)</button>
+            <button type="button" class="btn btn-outline btn-xs btn-quick-demo-login" data-persona="student"><i data-lucide="graduation-cap"></i> Student (Amina)</button>
+            <button type="button" class="btn btn-outline btn-xs btn-quick-demo-login" data-persona="client"><i data-lucide="workflow"></i> Client (Tunde)</button>
+          </div>
+        </div>
+
         <div style="display:flex; gap:0.5rem; margin-bottom:1.25rem;">
           <button type="button" class="btn btn-outline btn-sm auth-tab-btn active" data-tab="login" style="flex:1;">Sign In</button>
           <button type="button" class="btn btn-outline btn-sm auth-tab-btn" data-tab="signup" style="flex:1;">Create Account</button>
+          <button type="button" class="btn btn-outline btn-sm auth-tab-btn" data-tab="reset" style="flex:1;">Forgot Password</button>
         </div>
 
         <!-- Login Form -->
@@ -2079,14 +2163,17 @@ const isValid = crypto.timingSafeEqual(
             <input type="email" id="loginEmail" class="form-input" placeholder="you@company.com" required>
           </div>
           <div class="form-group">
-            <label class="form-label" for="loginPassword">Password</label>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <label class="form-label" for="loginPassword">Password</label>
+              <a href="javascript:void(0)" class="trigger-auth-reset" style="font-size:0.75rem; color:var(--emerald-light);">Forgot?</a>
+            </div>
             <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required>
           </div>
-          <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+          <button type="submit" class="btn btn-primary btn-block">Sign In to Dashboard</button>
         </form>
 
         <!-- Signup Form -->
-        <form id="auth-form-signup" class="auth-form d-none" style="display:none;">
+        <form id="auth-form-signup" class="auth-form" style="display:none;">
           <div class="form-group">
             <label class="form-label" for="signupName">Full Name</label>
             <input type="text" id="signupName" class="form-input" placeholder="e.g. Babatunde Lawal" required>
@@ -2096,10 +2183,38 @@ const isValid = crypto.timingSafeEqual(
             <input type="email" id="signupEmail" class="form-input" placeholder="you@company.com" required>
           </div>
           <div class="form-group">
+            <label class="form-label" for="signupPhone">WhatsApp / Phone Number</label>
+            <input type="tel" id="signupPhone" class="form-input" placeholder="+234 812 000 0000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signupReferralSource">How did you hear about Zeerocodes?</label>
+            <select id="signupReferralSource" class="form-select">
+              <option value="direct">Direct Website Visit</option>
+              <option value="academy">The VibeCode Labs / Academy</option>
+              <option value="studio">Automation Studio Consulting</option>
+              <option value="vibescan">VibeScan Security Tool</option>
+              <option value="friend">Friend / Colleague Referral</option>
+              <option value="twitter">X / Twitter (@zeerocodes)</option>
+              <option value="linkedin">LinkedIn</option>
+            </select>
+          </div>
+          <div class="form-group">
             <label class="form-label" for="signupPassword">Create Password</label>
             <input type="password" id="signupPassword" class="form-input" placeholder="Min 8 characters" required>
           </div>
           <button type="submit" class="btn btn-primary btn-block">Create Free Account</button>
+        </form>
+
+        <!-- Forgot Password Form -->
+        <form id="auth-form-reset" class="auth-form" style="display:none;">
+          <p style="font-size:0.85rem; color:var(--text-cyber-muted); margin-bottom:1rem;">
+            Enter your account email and we'll dispatch password reset instructions.
+          </p>
+          <div class="form-group">
+            <label class="form-label" for="resetEmail">Email Address</label>
+            <input type="email" id="resetEmail" class="form-input" placeholder="you@company.com" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Send Reset Link</button>
         </form>
       </div>
     </div>
@@ -2289,6 +2404,314 @@ const isValid = crypto.timingSafeEqual(
         <div id="articleReaderBody">
           <!-- Populated by blog.js -->
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LMS COURSE PLAYER MODAL (DEDICATED FULL-SCREEN LEARNING SUITE) -->
+  <div id="modal-lms-player" class="modal-backdrop">
+    <div class="modal-card modal-xl" style="max-height:94vh; height:94vh; max-width:min(96vw, 1300px); display:flex; flex-direction:column; padding:0; overflow:hidden;">
+      <!-- LMS Top Bar -->
+      <div class="lms-player-header" style="padding:1rem 1.5rem; background:#04070D; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <div style="display:flex; align-items:center; gap:1rem;">
+          <div style="width:36px; height:36px; border-radius:var(--radius-xs); background:var(--emerald-primary); display:flex; align-items:center; justify-content:center; color:#FFF;">
+            <i data-lucide="graduation-cap"></i>
+          </div>
+          <div>
+            <h3 id="lmsPlayerCourseTitle" style="font-size:1.15rem; color:#FFF; margin:0;">The Zeerocodes VibeCode Labs</h3>
+            <span id="lmsCurrentModuleText" style="font-size:0.75rem; color:var(--emerald-light);">Level 1: Foundations → Module 01</span>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:1.25rem;">
+          <div style="display:flex; align-items:center; gap:0.6rem;">
+            <div style="width:120px; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
+              <div id="lmsProgressBar" style="width:25%; height:100%; background:linear-gradient(90deg, var(--emerald-primary), var(--cyan-accent));"></div>
+            </div>
+            <span id="lmsProgressPercent" style="font-size:0.78rem; color:var(--text-cyber-muted);">25%</span>
+          </div>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+      </div>
+
+      <!-- LMS Player Body (2 Columns: Sidebar + Main Stage) -->
+      <div class="lms-player-body" style="display:grid; grid-template-columns:320px 1fr; flex:1; overflow:hidden;">
+        <!-- Left Sidebar: Curriculum List -->
+        <aside class="lms-player-sidebar" style="background:#080D16; border-right:1px solid rgba(255,255,255,0.08); overflow-y:auto; padding:1.25rem 1rem;">
+          <div style="font-size:0.75rem; font-weight:700; color:var(--text-cyber-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
+            <span>Curriculum (88 Lessons)</span>
+            <button class="btn btn-ghost btn-xs" id="btnTakeModuleQuiz" data-quiz="level_1_quiz" style="color:var(--cyan-accent); padding:0;">
+              <i data-lucide="help-circle"></i> Quiz
+            </button>
+          </div>
+          <div id="lmsSidebarCurriculum">
+            <!-- Rendered dynamically by lms.js -->
+          </div>
+        </aside>
+
+        <!-- Right Main Stage: Content, Blueprint & Prompt Sandbox -->
+        <main class="lms-player-main" style="overflow-y:auto; padding:1.75rem; background:#04070D;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
+            <div>
+              <span id="lmsCurrentLessonTag" class="badge badge-teal" style="margin-bottom:0.4rem;">Level 1 • Module 01</span>
+              <h2 id="lmsCurrentLessonTitle" style="font-size:1.5rem; color:#FFF; margin:0.25rem 0;">What Vibe Coding Is (and Isn't)</h2>
+              <div id="lmsCurrentLessonDuration" style="font-size:0.8rem; color:var(--text-cyber-muted);">18 min video stream & blueprint</div>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="btn btn-primary btn-sm" id="btnLmsToggleComplete" onclick="window.lms.toggleCurrentLessonComplete()">
+                <i data-lucide="check"></i> Mark Lesson Complete
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Lesson Content -->
+          <div id="lmsLessonBodyContent">
+            <!-- Injected by lms.js -->
+          </div>
+
+          <!-- Interactive Prompt Sandbox -->
+          <div class="lms-prompt-sandbox" style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.25rem; margin-top:2rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+              <h4 style="color:#FFF; font-size:1rem; margin:0; display:flex; align-items:center; gap:0.4rem;">
+                <i data-lucide="sparkles" style="color:var(--emerald-light);"></i> AI Studio & Antigravity Build Prompt Template
+              </h4>
+              <button class="btn btn-outline btn-xs" onclick="window.lms.copyPromptTemplate()">
+                <i data-lucide="copy"></i> Copy Prompt
+              </button>
+            </div>
+            <textarea id="lmsPromptSandboxCode" class="form-textarea" rows="4" style="font-family:var(--font-mono); font-size:0.82rem; background:#04070D; color:var(--emerald-light);" readonly></textarea>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAB SUBMISSION MODAL -->
+  <div id="modal-lab-submit" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 style="margin:0;">Submit Practical Lab Project</h3>
+          <span id="labSubmitModuleTitle" style="font-size:0.75rem; color:var(--emerald-light);">Level 3 • Module 16</span>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.85rem; color:var(--text-cyber-muted); margin-bottom:1.25rem;">
+          Submit your codebase for <strong id="labSubmitLessonTitle" style="color:#FFF;">Capstone Build</strong>. Instructor Nuel Effiong will inspect your webhook HMAC signatures, RLS policies, and code structure.
+        </p>
+        <form onsubmit="window.lms.handleLabSubmit(event)">
+          <div class="form-group">
+            <label class="form-label" for="labSubmitRepoUrl">GitHub Repository URL</label>
+            <input type="url" id="labSubmitRepoUrl" class="form-input" placeholder="https://github.com/username/project" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="labSubmitLiveUrl">Live Deployment URL (Optional)</label>
+            <input type="url" id="labSubmitLiveUrl" class="form-input" placeholder="https://your-app.vercel.app">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="labSubmitNotes">Notes & Implementation Details</label>
+            <textarea id="labSubmitNotes" class="form-textarea" rows="3" placeholder="Tell us how you configured your Paystack webhook or n8n nodes..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            <i data-lucide="upload-cloud"></i> Submit Lab for Review
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE QUIZ / KNOWLEDGE CHECKER MODAL -->
+  <div id="modal-quiz" class="modal-backdrop">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 id="quizModalTitle" style="margin:0;">Level 1 Foundations Quiz</h3>
+          <span style="font-size:0.75rem; color:var(--emerald-light);">80% score required to pass</span>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="window.lms.handleQuizSubmit(event, 'level_1_quiz')">
+          <div id="quizQuestionsContainer">
+            <!-- Injected by lms.js -->
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Submit Answers & Calculate Score</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- CERTIFICATE MODAL (TAMPER-PROOF VIBECERT™) -->
+  <div id="modal-certificate" class="modal-backdrop">
+    <div class="modal-card modal-lg" style="background:#080D16; border:2px solid var(--emerald-primary); padding:2rem; position:relative; overflow:hidden;">
+      <div style="position:absolute; top:-40px; right:-40px; width:160px; height:160px; background:radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 70%); pointer-events:none;"></div>
+      <button class="modal-close-btn" style="position:absolute; top:1rem; right:1rem;">&times;</button>
+
+      <div style="text-align:center; padding:1.5rem 0;">
+        <div style="display:inline-flex; align-items:center; gap:0.5rem; background:rgba(16,185,129,0.1); border:1px solid var(--emerald-primary); padding:0.4rem 1rem; border-radius:100px; margin-bottom:1.25rem;">
+          <i data-lucide="award" style="color:var(--emerald-light);"></i>
+          <span style="color:var(--emerald-light); font-size:0.8rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;">Official Certificate of Completion</span>
+        </div>
+
+        <h2 style="font-size:2rem; color:#FFF; font-family:var(--font-display); margin-bottom:0.5rem;">The Zeerocodes VibeCode Labs</h2>
+        <p style="color:var(--text-cyber-muted); font-size:0.9rem; margin-bottom:1.5rem;">This certifies that</p>
+        
+        <div style="font-size:2.2rem; font-weight:900; color:var(--emerald-light); font-family:var(--font-display); border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:0.75rem; margin-bottom:1.25rem;" id="certStudentName">
+          Amina Yusuf
+        </div>
+
+        <p style="color:var(--text-cyber-muted); font-size:0.92rem; max-width:560px; margin:0 auto 2rem auto; line-height:1.6;">
+          Has successfully completed the 8-Week Professional AI Builder Masterclass, demonstrating proficiency in Google AI Studio, Antigravity, n8n webhook engineering, Paystack payment automation, and OWASP LLM security hardening.
+        </p>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.1); padding-top:1.5rem; flex-wrap:wrap; gap:1rem; text-align:left;">
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-cyber-muted);">Serial Number:</div>
+            <strong style="color:#FFF; font-family:var(--font-mono); font-size:0.85rem;" id="certSerialId">VIBECERT-2026-0881</strong>
+            <div style="font-size:0.75rem; color:var(--text-cyber-muted); margin-top:0.25rem;">Issued: <span id="certIssueDate">August 10, 2026</span></div>
+          </div>
+
+          <div style="text-align:right;">
+            <div style="font-family:var(--font-serif); font-size:1.4rem; color:var(--emerald-light); font-style:italic;">Nuel Effiong</div>
+            <div style="font-size:0.75rem; color:var(--text-cyber-muted);">Principal AI Systems Architect, Zeerocodes</div>
+          </div>
+        </div>
+
+        <div style="margin-top:2rem; display:flex; justify-content:center; gap:0.75rem;">
+          <button class="btn btn-primary btn-sm" onclick="window.lms.printCertificate()">
+            <i data-lucide="printer"></i> Print / Save PDF
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="navigator.clipboard.writeText('https://zeerocodes.com/verify?cert=' + document.getElementById('certSerialId').textContent); window.toast?.success('Verification link copied to clipboard!');">
+            <i data-lucide="share-2"></i> Copy Verification Link
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN GRADE LAB MODAL -->
+  <div id="modal-admin-grade-lab" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Grade Student Lab Submission</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="adminLabGradeForm">
+          <input type="hidden" id="gradeLabId">
+          <div style="margin-bottom:1rem; font-size:0.85rem;">
+            <strong style="color:#FFF; display:block;" id="gradeLabTitle">16.1 Capstone Brief</strong>
+            <div style="color:var(--text-cyber-muted);" id="gradeLabStudentName">Amina Yusuf</div>
+            <div style="margin-top:0.35rem;"><a id="gradeLabRepoLink" href="#" target="_blank" style="color:var(--emerald-light);">View GitHub Repository</a></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="gradeStatusSelect">Review Decision</label>
+            <select id="gradeStatusSelect" class="form-select">
+              <option value="passed">Passed (Approve & Validate)</option>
+              <option value="revisions">Revisions Required</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="gradeScoreInput">Grade Score (e.g. A+ (98%))</label>
+            <input type="text" id="gradeScoreInput" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="gradeFeedbackInput">Instructor Feedback & Security Notes</label>
+            <textarea id="gradeFeedbackInput" class="form-textarea" rows="3" required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">Save Grade & Dispatch Notification</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN NEW STUDIO PROJECT MODAL -->
+  <div id="modal-admin-new-project" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Initialize Studio Client Build</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="adminNewProjectForm">
+          <div class="form-group">
+            <label class="form-label" for="newProjTitle">Project Name</label>
+            <input type="text" id="newProjTitle" class="form-input" placeholder="e.g. MedLagos WhatsApp Bot" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="newProjClientName">Client Full Name</label>
+            <input type="text" id="newProjClientName" class="form-input" placeholder="Dr. Folake Davies" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="newProjClientEmail">Client Email Address</label>
+            <input type="email" id="newProjClientEmail" class="form-input" placeholder="client@company.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="newProjBudgetNGN">Budget (NGN)</label>
+            <input type="number" id="newProjBudgetNGN" class="form-input" placeholder="2500000" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Create Project in Pipeline</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN BLOG EDITOR MODAL -->
+  <div id="modal-admin-blog-editor" class="modal-backdrop">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <h3>Engineering Blog CMS Publisher</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="adminBlogPostForm">
+          <input type="hidden" id="adminPostId">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap:1rem; margin-bottom:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="adminPostTitle">Article Title</label>
+              <input type="text" id="adminPostTitle" class="form-input" placeholder="How We Built an Autonomous..." required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="adminPostSlug">URL Slug</label>
+              <input type="text" id="adminPostSlug" class="form-input" placeholder="autonomous-whatsapp-paystack-invoicing">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap:1rem; margin-bottom:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="adminPostCategory">Category</label>
+              <select id="adminPostCategory" class="form-select">
+                <option value="Automations">Automations</option>
+                <option value="AI Security">AI Security</option>
+                <option value="Career & Training">Career & Training</option>
+                <option value="Case Studies">Case Studies</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="adminPostTags">Tags (Comma-Separated)</label>
+              <input type="text" id="adminPostTags" class="form-input" placeholder="WhatsApp, Paystack, n8n, Lagos">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="adminPostExcerpt">Excerpt / Summary (Meta Description)</label>
+            <textarea id="adminPostExcerpt" class="form-textarea" rows="2" placeholder="Brief 1-2 sentence overview for SEO..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="adminPostContent">Article Body (HTML/Markdown Supported)</label>
+            <textarea id="adminPostContent" class="form-textarea" rows="6" placeholder="<h2>The Problem</h2><p>Article paragraphs...</p>" required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">
+            <i data-lucide="send"></i> Publish Article to Blog
+          </button>
+        </form>
       </div>
     </div>
   </div>

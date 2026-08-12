@@ -1,7 +1,8 @@
 /**
- * Zeerocodes Unified Firebase Authentication Manager
- * Handles Email/Password sign-up/in, Google Sign-in, email verification,
- * user roles ('user' vs 'admin'), and live session persistence.
+ * Zeerocodes Unified Authentication & Identity Manager (v2.0)
+ * Handles Email/Password sign-up/in, Google Sign-in, Password Resets,
+ * Demo Persona Fast-Switchers (Admin, Student, Client), Referral Tracking,
+ * Role Guards ('admin', 'student', 'client', 'user'), and Live Firebase/Local Persistence.
  */
 
 const AUTH_USER_KEY = 'zeerocodes_current_user';
@@ -27,12 +28,11 @@ class AuthService {
   }
 
   init() {
-    // 1. Try loading cached user session
+    // 1. Load cached user session or default to student for interactive exploration
     try {
       const stored = localStorage.getItem(AUTH_USER_KEY);
       if (stored) {
         this.currentUser = JSON.parse(stored);
-        // Ensure master admin emails are always upgraded to admin
         if (this.currentUser && isMasterAdminEmail(this.currentUser.email)) {
           this.currentUser.role = 'admin';
           localStorage.setItem(AUTH_USER_KEY, JSON.stringify(this.currentUser));
@@ -52,7 +52,6 @@ class AuthService {
               const profile = await this.syncUserProfile(fbUser);
               this.setUser(profile);
             } else {
-              // Only clear if we were live
               if (this.currentUser && !this.currentUser.isLocalMock) {
                 this.setUser(null);
               }
@@ -106,14 +105,17 @@ class AuthService {
     return !!this.currentUser && (this.currentUser.role === 'admin' || isMasterAdminEmail(this.currentUser.email));
   }
 
-  isEmailVerified() {
-    return !!this.currentUser && !!this.currentUser.emailVerified;
+  isStudent() {
+    return !!this.currentUser && (this.currentUser.role === 'student' || this.currentUser.role === 'user');
   }
 
-  // Sync profile document with Firestore
+  isClient() {
+    return !!this.currentUser && this.currentUser.role === 'client';
+  }
+
+  // Sync profile document with Firestore / Local DB
   async syncUserProfile(fbUser, extra = {}) {
-    let role = isMasterAdminEmail(fbUser.email) ? 'admin' : 'user';
-    // Check if user already exists in Firestore/db
+    let role = isMasterAdminEmail(fbUser.email) ? 'admin' : 'student';
     if (window.db && role !== 'admin') {
       const existing = await window.db.getUser(fbUser.uid);
       if (existing && existing.role) {
@@ -128,6 +130,8 @@ class AuthService {
       photoURL: fbUser.photoURL || null,
       emailVerified: !!fbUser.emailVerified,
       role: role,
+      phone: extra.phone || '+234 800 000 0000',
+      referralSource: extra.referralSource || 'direct',
       lastLogin: new Date().toISOString(),
       ...extra
     };
@@ -140,10 +144,12 @@ class AuthService {
   }
 
   // =========================================================================
-  // AUTH ACTIONS (Email/Password & Google)
+  // AUTH ACTIONS (Email/Password, Google, Password Reset, Demo Fast Switcher)
   // =========================================================================
 
-  async signUpWithEmail(email, password, displayName = '') {
+  async signUpWithEmail(email, password, displayName = '', extraData = {}) {
+    const { phone = '', referralSource = 'direct' } = extraData;
+
     if (window.zeerocodesFirebase?.isLive()) {
       try {
         const firebaseAuth = window.zeerocodesFirebase.getAuth();
@@ -152,7 +158,7 @@ class AuthService {
           await cred.user.updateProfile({ displayName });
         }
         await cred.user.sendEmailVerification();
-        const profile = await this.syncUserProfile(cred.user, { displayName });
+        const profile = await this.syncUserProfile(cred.user, { displayName, phone, referralSource });
         this.setUser(profile);
         if (window.toast) window.toast.success("Account created! Verification link sent to " + email);
         return profile;
@@ -163,20 +169,41 @@ class AuthService {
     } else {
       // Local Sandbox Simulation
       const uid = 'usr_' + Date.now();
-      const role = isMasterAdminEmail(email) ? 'admin' : 'user';
+      const role = isMasterAdminEmail(email) ? 'admin' : 'student';
       const profile = {
         uid: uid,
         email: email,
         displayName: displayName || email.split('@')[0],
         role: role,
+        phone: phone || '+234 812 000 0000',
+        referralSource: referralSource || 'direct',
         emailVerified: true,
         isLocalMock: true,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        lastLogin: new Date().toISOString()
       };
 
-      if (window.db) await window.db.saveUser(profile);
+      if (window.db) {
+        await window.db.saveUser(profile);
+        // Automatically enroll newly registered student into VibeCode Labs
+        if (role === 'student') {
+          await window.db.saveEnrollment({
+            id: 'enroll_' + Date.now(),
+            userId: uid,
+            userEmail: email,
+            userName: profile.displayName,
+            courseId: 'course-vibecode-labs',
+            courseTitle: 'The Zeerocodes VibeCode Labs',
+            enrolledAt: new Date().toISOString(),
+            status: 'active',
+            completedLessons: ['lvl_1_mod_01_les_0'],
+            quizScores: {}
+          });
+        }
+      }
+
       this.setUser(profile);
-      if (window.toast) window.toast.success(`Account registered with ${role.toUpperCase()} privileges!`);
+      if (window.toast) window.toast.success(`Account registered! Signed in as ${role.toUpperCase()}.`);
       return profile;
     }
   }
@@ -196,18 +223,19 @@ class AuthService {
       }
     } else {
       // Local Sandbox Simulation
-      let role = isMasterAdminEmail(email) ? 'admin' : 'user';
+      let role = isMasterAdminEmail(email) ? 'admin' : 'student';
       
-      // Check existing user in local db
-      const allUsers = (window.db && window.db.getLocal('users')) || [];
+      const allUsers = (window.db && await window.db.getAllUsers()) || [];
       const match = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-      if (match && match.role === 'admin') role = 'admin';
+      if (match && match.role) role = match.role;
       
-      const profile = {
-        uid: match ? match.uid : 'usr_' + Date.now(),
+      const profile = match ? { ...match, lastLogin: new Date().toISOString() } : {
+        uid: 'usr_' + Date.now(),
         email: email,
-        displayName: match ? match.displayName : email.split('@')[0],
+        displayName: email.split('@')[0],
         role: role,
+        phone: '+234 812 000 0000',
+        referralSource: 'direct',
         emailVerified: true,
         isLocalMock: true,
         lastLogin: new Date().toISOString()
@@ -236,43 +264,97 @@ class AuthService {
         throw err;
       }
     } else {
-      // Local Sandbox Simulation
-      const profile = {
-        uid: 'google_user_' + Date.now(),
-        email: 'zeerocodes@gmail.com',
-        displayName: 'Zeerocodes Admin',
-        role: 'admin',
-        emailVerified: true,
-        isLocalMock: true,
-        provider: 'google.com',
-        lastLogin: new Date().toISOString()
-      };
-      if (window.db) await window.db.saveUser(profile);
-      this.setUser(profile);
-      if (window.toast) window.toast.success("Signed in as zeerocodes@gmail.com (ADMIN Access Granted)");
-      return profile;
+      // Instant Admin Simulation
+      return this.quickDemoLogin('admin');
     }
   }
 
-  async sendVerificationEmail() {
-    if (!this.currentUser) return;
+  async sendPasswordResetEmail(email) {
+    if (!email) {
+      if (window.toast) window.toast.error("Please provide your account email address.");
+      return;
+    }
     if (window.zeerocodesFirebase?.isLive()) {
       try {
-        const fbUser = window.zeerocodesFirebase.getAuth().currentUser;
-        if (fbUser) {
-          await fbUser.sendEmailVerification();
-          if (window.toast) window.toast.success("Verification link sent to " + this.currentUser.email);
-        }
+        await window.zeerocodesFirebase.getAuth().sendPasswordResetEmail(email);
+        if (window.toast) window.toast.success("Password reset instructions sent to " + email);
       } catch (e) {
-        if (window.toast) window.toast.error("Error sending verification: " + e.message);
+        if (window.toast) window.toast.error(e.message || "Failed to send reset email");
       }
     } else {
-      // Simulate verification mark
-      this.currentUser.emailVerified = true;
-      this.setUser({ ...this.currentUser });
-      if (window.db) await window.db.saveUser(this.currentUser);
-      if (window.toast) window.toast.success("Email marked as verified in sandbox!");
+      if (window.toast) window.toast.success(`Password reset token dispatched to ${email} (Simulation Mode).`);
     }
+  }
+
+  async quickDemoLogin(persona = 'admin') {
+    let profile;
+    if (persona === 'admin') {
+      profile = {
+        uid: 'user-admin-01',
+        displayName: 'Nuel Effiong',
+        email: 'admin@zeerocodes.com',
+        role: 'admin',
+        title: 'Principal AI Systems Architect',
+        phone: '+234 812 345 6789',
+        referralSource: 'direct',
+        photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop',
+        emailVerified: true,
+        isLocalMock: true
+      };
+    } else if (persona === 'client') {
+      profile = {
+        uid: 'user-client-01',
+        displayName: 'Tunde Balogun',
+        email: 'client@zeerocodes.com',
+        role: 'client',
+        title: 'COO, PayQuick Africa',
+        phone: '+234 803 555 7788',
+        referralSource: 'studio',
+        photoURL: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop',
+        emailVerified: true,
+        isLocalMock: true
+      };
+    } else {
+      // Student
+      profile = {
+        uid: 'user-student-01',
+        displayName: 'Amina Yusuf',
+        email: 'student@zeerocodes.com',
+        role: 'student',
+        title: 'Certified Builder in Training',
+        phone: '+234 809 112 3344',
+        referralSource: 'academy',
+        photoURL: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop',
+        emailVerified: true,
+        isLocalMock: true
+      };
+    }
+
+    if (window.db) await window.db.saveUser(profile);
+    this.setUser(profile);
+    if (window.modal) window.modal.close('modal-auth');
+
+    if (window.toast) {
+      window.toast.success(`Switched to ${persona.toUpperCase()} demo persona (${profile.displayName})`);
+    }
+
+    if (persona === 'admin') {
+      window.location.hash = '#admin';
+    } else {
+      window.location.hash = '#dashboard';
+    }
+
+    return profile;
+  }
+
+  async updateProfile(updates = {}) {
+    if (!this.currentUser) return;
+    this.currentUser = { ...this.currentUser, ...updates };
+    this.setUser({ ...this.currentUser });
+    if (window.db) {
+      await window.db.saveUser(this.currentUser);
+    }
+    if (window.toast) window.toast.success("Profile details updated successfully!");
   }
 
   async signOut() {
@@ -287,25 +369,6 @@ class AuthService {
     if (window.toast) window.toast.info("You have signed out.");
     if (window.location.hash.includes('dashboard') || window.location.hash.includes('admin')) {
       window.location.hash = '#home';
-    }
-  }
-
-  // Developer / Reviewer role switcher helper
-  async toggleRole(targetRole = null) {
-    if (!this.currentUser) return;
-    const newRole = targetRole || (this.currentUser.role === 'admin' ? 'user' : 'admin');
-    this.currentUser.role = newRole;
-    this.setUser({ ...this.currentUser });
-    if (window.db) {
-      await window.db.saveUser(this.currentUser);
-    }
-    if (window.toast) window.toast.info(`Switched active role to: ${newRole.toUpperCase()}`);
-    
-    // Auto route if switching to admin or demoting from admin view
-    if (newRole === 'admin' && window.location.hash === '#dashboard') {
-      window.location.hash = '#admin';
-    } else if (newRole === 'user' && window.location.hash === '#admin') {
-      window.location.hash = '#dashboard';
     }
   }
 
@@ -332,8 +395,9 @@ class AuthService {
       });
 
       userRoleBadges.forEach(el => {
-        el.textContent = (this.currentUser.role || 'USER').toUpperCase();
-        el.className = `user-role-badge badge badge-teal`;
+        const role = (this.currentUser.role || 'USER').toUpperCase();
+        el.textContent = role;
+        el.className = `user-role-badge badge ${role === 'ADMIN' ? 'badge-danger' : role === 'CLIENT' ? 'badge-teal' : 'badge-success'}`;
       });
 
       if (this.currentUser.role === 'admin') {
