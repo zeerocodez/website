@@ -2016,7 +2016,7 @@ const isValid = crypto.timingSafeEqual(
             </div>
           </div>
 
-          <!-- Admin Tabs Bar (8 Operations Hubs) -->
+          <!-- Admin Tabs Bar (9 Operations Hubs) -->
           <div class="admin-tabs-bar">
             <button class="admin-tab-btn active" data-tab="adminTabOverview"><i data-lucide="layout-dashboard"></i> Overview</button>
             <button class="admin-tab-btn" data-tab="adminTabLmsEditor"><i data-lucide="book-open"></i> LMS Curriculum & Videos</button>
@@ -2024,6 +2024,7 @@ const isValid = crypto.timingSafeEqual(
             <button class="admin-tab-btn" data-tab="adminTabFinancials"><i data-lucide="wallet"></i> Sales, Invoices & Profits</button>
             <button class="admin-tab-btn" data-tab="adminTabStudio"><i data-lucide="workflow"></i> Studio Projects</button>
             <button class="admin-tab-btn" data-tab="adminTabVibescan"><i data-lucide="shield-check"></i> VibeScan Engine</button>
+            <button class="admin-tab-btn" data-tab="adminTabEmails"><i data-lucide="mail"></i> Transactional Emails</button>
             <button class="admin-tab-btn" data-tab="adminTabBlog"><i data-lucide="newspaper"></i> Blog CMS</button>
             <button class="admin-tab-btn" data-tab="adminTabWebhooks"><i data-lucide="activity"></i> Webhook & Logs</button>
           </div>
@@ -2061,6 +2062,12 @@ const isValid = crypto.timingSafeEqual(
 
           <div id="adminTabVibescan" class="admin-tab-panel">
             <div id="adminVibescanContent">
+              <!-- Rendered dynamically by admin.js -->
+            </div>
+          </div>
+
+          <div id="adminTabEmails" class="admin-tab-panel">
+            <div id="adminEmailHubContent">
               <!-- Rendered dynamically by admin.js -->
             </div>
           </div>
@@ -2985,6 +2992,108 @@ const isValid = crypto.timingSafeEqual(
     </div>
   </div>
 
+  <!-- ADMIN CREATE COURSE MODAL -->
+  <div id="modal-admin-create-course" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Create New LMS Curriculum & Course Track</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="adminCreateCourseForm">
+          <div class="form-group">
+            <label class="form-label" for="newCourseTitle">Course Title</label>
+            <input type="text" id="newCourseTitle" class="form-input" placeholder="e.g. Next.js 15 & Supabase AI SaaS Architecture" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="newCourseSubtitle">Course Subtitle / Tagline</label>
+            <input type="text" id="newCourseSubtitle" class="form-input" placeholder="From Zero to Verified Production Deployment in 6 Weeks" required>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="newCourseCategory">Track / Category</label>
+              <select id="newCourseCategory" class="form-select">
+                <option value="Full-Stack Vibe Coding">Full-Stack Vibe Coding</option>
+                <option value="Business Workflow Automation">Business Workflow Automation</option>
+                <option value="Cybersecurity & AST Auditing">Cybersecurity & AST Auditing</option>
+                <option value="Mobile & AI App Development">Mobile & AI App Development</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="newCoursePriceNGN">Tuition Fee (NGN)</label>
+              <input type="number" id="newCoursePriceNGN" class="form-input" value="95000" required>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="newCourseDuration">Cohort Duration</label>
+              <input type="text" id="newCourseDuration" class="form-input" value="6-Week Masterclass" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="newCourseInstructor">Lead Instructor</label>
+              <input type="text" id="newCourseInstructor" class="form-input" value="Nuel Effiong" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="newCourseDesc">Course Overview Description</label>
+            <textarea id="newCourseDesc" class="form-input" rows="3" placeholder="Describe the practical skills and outcomes students will master..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            <i data-lucide="book-plus"></i> Initialize Course & Generate Curriculum
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN TRANSACTIONAL EMAIL PREVIEW & TEST DISPATCH MODAL -->
+  <div id="modal-admin-email-preview" class="modal-backdrop">
+    <div class="modal-card" style="max-width:min(94vw, 750px); max-height:90vh; display:flex; flex-direction:column;">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="mail" style="color:var(--emerald-light);"></i>
+          <h3 style="margin:0;">Transactional Email Sandbox</h3>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" style="overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:1rem;">
+        <form id="adminSendTestEmailForm" style="background:#04070D; padding:1rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; gap:0.75rem;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <div>
+              <label class="form-label" for="testEmailTemplateSelect">Select Email Template</label>
+              <select id="testEmailTemplateSelect" class="form-select" onchange="window.adminConsole.refreshEmailPreview()">
+                <option value="welcome_student">Welcome Student & Cohort Pass</option>
+                <option value="payment_receipt">Cryptographic Payment & Invoice Receipt</option>
+                <option value="lab_graded">Code Lab Review Inspection Report</option>
+                <option value="certificate_issued">Official VibeCert™ Award Notification</option>
+                <option value="studio_milestone">Studio Project Sprint Milestone</option>
+                <option value="vibescan_cert">VibeScan AST Security Certification</option>
+                <option value="cohort_reminder">Weekly Cohort Sprint Accountability</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="testEmailRecipient">Test Recipient Email</label>
+              <input type="email" id="testEmailRecipient" class="form-input" value="student@zeerocodes.com" required>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:flex-end;">
+            <button type="submit" class="btn btn-primary btn-sm">
+              <i data-lucide="send"></i> Dispatch Simulated Email
+            </button>
+          </div>
+        </form>
+
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+            <span style="font-size:0.78rem; color:var(--text-cyber-muted); text-transform:uppercase; letter-spacing:0.05em;">Live Email Render Sandbox:</span>
+            <span class="badge badge-success" style="font-size:0.65rem;">Dark Mode • Responsive 600px</span>
+          </div>
+          <iframe id="emailPreviewFrame" style="width:100%; height:420px; border:1px solid var(--obsidian-border); border-radius:var(--radius-xs); background:#04070D;"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- COMMAND PALETTE -->
   <div id="modal-cmd-palette" class="modal-backdrop">
     <div class="modal-card" style="max-width:min(92vw, 600px); padding:0;">
@@ -3019,6 +3128,7 @@ const isValid = crypto.timingSafeEqual(
   <script src="js/firebase-config.js"></script>
   <script src="js/db.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/emails.js"></script>
   <script src="js/notifications.js"></script>
   <script src="js/payments.js"></script>
   <script src="js/lms.js"></script>

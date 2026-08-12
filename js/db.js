@@ -13,7 +13,7 @@
 
 const DB_STORAGE_PREFIX = 'zeerocodes_db_';
 
-// Flagship Cohort Course: The Zeerocodes VibeCode Labs (4 Levels • 20 Modules • 88 Lessons)
+// Flagship Cohort Courses Catalog
 const DEFAULT_COURSES = [
   {
     id: 'course-vibecode-labs',
@@ -25,11 +25,14 @@ const DEFAULT_COURSES = [
     priceUSD: 65,
     originalPriceUSD: 105,
     priceGBP: 55,
+    category: 'Full-Stack Vibe Coding',
     level: 'Beginner → Builder → Certified Professional',
     duration: '8-Week Live Cohort (88 Lessons)',
     cohortDate: 'October 15, 2026',
     seatsTotal: 30,
     seatsRemaining: 8,
+    instructor: 'Nuel Effiong',
+    instructorRole: 'Principal AI Systems Architect',
     shortDesc: 'We take you from absolute beginner to a certified builder who ships real, secure software for paying clients in 8 weeks.',
     description: "You don't need a computer science degree or years of coding experience. In 8 weeks, we guide you step-by-step to design clean apps with Google Stitch & AI Studio, build full-stack web applications with Antigravity, automate business operations with n8n and WhatsApp, lock down security with VibeScan, and package your skills to earn paying client revenue.",
     levels: [
@@ -178,65 +181,65 @@ const DEFAULT_COURSES = [
               '12.1 From Automation to Agents: What Actually Changes',
               '12.2 Building Custom Agents With the Antigravity SDK',
               '12.3 The Managed Agents API: One Call, One Fully Equipped Agent',
-              '12.4 Scheduling Background Agent Tasks',
-              '12.5 Guardrails: Keeping Autonomous Agents From Doing Something Dumb'
+              '12.4 Designing Fallbacks: What Happens When the Agent Hallucinates or Fails'
             ]
           },
           {
             number: '13',
-            title: 'AI Security Fundamentals',
+            title: 'Security Mindset for Vibe Coders',
             lessons: [
-              '13.1 Why Vibe-Coded Apps Get Hacked (real failure patterns)',
-              '13.2 The OWASP LLM Top 10, Explained for Non-Engineers',
-              '13.3 Prompt Injection: What It Is and How to Defend Against It',
-              '13.4 Secrets Hygiene: API Keys, Environment Variables, .env Files',
-              '13.5 Authentication Done Right: Hashing, Sessions, Common Mistakes',
-              '13.6 NDPR and Data Protection Basics for Nigerian Builders'
+              '13.1 The Hidden Cost of Vibe Coding: Vulnerabilities Nobody Wrote Manually',
+              '13.2 The OWASP Top 10 for LLMs Explained for Non-Engineers',
+              '13.3 API Keys: Where They Belong and Where They Should Never Appear',
+              '13.4 Database Permissions (RLS): Why Default Open Is a Disaster'
             ]
           },
           {
             number: '14',
-            title: 'Auditing With VibeScan',
+            title: 'VibeScan: Your AI Security Auditor',
             lessons: [
-              '14.1 Introducing VibeScan: VibeAudit, SecretShield, AgentGuard',
-              '14.2 Running Your First Security Scan',
-              '14.3 Reading a VibeCert Report and Fixing What It Finds',
-              '14.4 Case Study: Catching a Non-Bcrypt Password Bug Before Launch'
+              '14.1 Introduction to VibeScan: What It Catches and How It Works',
+              '14.2 Scanning Your App Before Shipping: Step-by-Step Workflow',
+              '14.3 Reading a VibeScan Report and Fixing Every Flagged Issue',
+              '14.4 The VibeCert™ Process: Earning and Displaying the Trust Badge',
+              '14.5 Practice Lab: Audit a Vulnerable Demo App and Fix All Five Flaws'
             ]
           },
           {
             number: '15',
-            title: 'Deployment, Cost Control, and Local Payments',
+            title: 'Testing and Quality Assurance',
             lessons: [
-              '15.1 Deploying to Cloud Run and Firebase Hosting',
-              '15.2 Reading Your Gemini and Firebase Bill Before It Surprises You',
-              '15.3 Integrating Paystack and Flutterwave',
-              '15.4 Designing for Nigerian Bandwidth and Data Costs'
+              '15.1 Writing Effective Test Scenarios in Plain English for Your Agent',
+              '15.2 Edge Cases Non-Engineers Miss (and How to Catch Them)',
+              '15.3 Performance Basics: Page Load Times, Image Optimization, Mobile Feel'
             ]
           },
           {
             number: '16',
-            title: 'Capstone Build',
+            title: 'The Capstone Build',
             lessons: [
-              '16.1 Capstone Brief: Build, Automate, Secure, and Ship a Real Business App',
-              '16.2 Peer Review and Client-Style Presentation',
-              '16.3 VibeScan Certification Audit'
+              '16.1 Capstone Brief: Choose Your Track (SaaS MVP, Business Automation, Client Portal)',
+              '16.2 Spec Writing and Stitch Design (Instructor Review Checkpoint)',
+              '16.3 Full-Stack Build in AI Studio / Antigravity With Firebase Backend',
+              '16.4 Automation Integration (n8n + WhatsApp)',
+              '16.5 VibeScan Security Audit (Must Pass to Graduate)',
+              '16.6 Production Deployment to Custom Domain'
             ]
           }
         ]
       },
       {
         levelNumber: 4,
-        title: 'Level 4: Launch (Earn, Sell, Scale)',
-        tagline: 'Monetization, Client Acquisition & Certification',
+        title: 'Level 4: Launch',
+        tagline: 'Client Acquisition, Pricing, Proposals & Certification',
         lessonCount: 20,
         modules: [
           {
             number: '17',
-            title: 'Turning Skill Into Income',
+            title: 'Packaging Your Skills',
             lessons: [
-              '17.1 Packaging What You Build Into a Sellable Service',
-              '17.2 Pricing in Naira: Value-Based vs Hourly vs Retainer',
+              '17.1 How to Describe What You Do Without Using Jargon',
+              '17.2 Pricing Your Services: Fixed-Price vs Retainer vs Value-Based',
               '17.3 Building a Portfolio That Sells Itself',
               '17.4 Case Study: Pricing a Booking App for a Nigerian Clinic'
             ]
@@ -286,6 +289,198 @@ const DEFAULT_COURSES = [
     ],
     featured: true,
     enrolledCount: 1450
+  },
+  {
+    id: 'course-whatsapp-automation',
+    title: 'WhatsApp & Paystack Business Automation Masterclass',
+    subtitle: 'Build Autonomous WhatsApp Invoicing Bots & n8n Operational Pipelines for African SMEs',
+    slug: 'whatsapp-automation',
+    priceNGN: 75000,
+    originalPriceNGN: 120000,
+    priceUSD: 50,
+    originalPriceUSD: 85,
+    priceGBP: 40,
+    category: 'Business Workflow Automation',
+    level: 'Intermediate Builder',
+    duration: '4-Week Practical Sprint (48 Lessons)',
+    cohortDate: 'November 5, 2026',
+    seatsTotal: 25,
+    seatsRemaining: 12,
+    instructor: 'Nuel Effiong',
+    instructorRole: 'Principal AI Systems Architect',
+    shortDesc: 'Master n8n webhooks, Meta WhatsApp Cloud API, and cryptographic Paystack verification to run enterprise sales workflows in under 90 seconds.',
+    description: 'Transform manual customer follow-ups and invoicing into autonomous revenue machines. Learn how to architect multi-tenant WhatsApp bots, issue PDF receipts automatically, and configure fail-safe webhook HMAC verification.',
+    levels: [
+      {
+        levelNumber: 1,
+        title: 'Level 1: Webhook Architecture & Meta API',
+        tagline: 'Meta WhatsApp Cloud API setup, token security & n8n nodes',
+        lessonCount: 16,
+        modules: [
+          {
+            number: '01',
+            title: 'WhatsApp Cloud API Setup',
+            lessons: [
+              '1.1 Meta Developer Console & Business Verification',
+              '1.2 Permanent Token Generation & System User Security',
+              '1.3 Inbound Webhook Handlers with Fastify and n8n',
+              '1.4 Template Message Approvals and Marketing Broadcast Rules'
+            ]
+          },
+          {
+            number: '02',
+            title: 'n8n Workflow Engineering',
+            lessons: [
+              '2.1 Self-Hosted vs Cloud n8n Infrastructure',
+              '2.2 Conditional Routing, Switch Nodes & Error Trigger Hooks',
+              '2.3 PostgreSQL & Supabase Real-Time State Sync',
+              '2.4 Rate Limiting & 90-Second Conversation Flow Design'
+            ]
+          }
+        ]
+      },
+      {
+        levelNumber: 2,
+        title: 'Level 2: Payment Gateways & Dynamic Invoicing',
+        tagline: 'Paystack, Flutterwave, HMAC SHA-512 & PDF generation',
+        lessonCount: 16,
+        modules: [
+          {
+            number: '03',
+            title: 'Cryptographic Payment Integration',
+            lessons: [
+              '3.1 Initializing Paystack Transactions with WhatsApp Callback URLs',
+              '3.2 Verifying `x-paystack-signature` HMAC SHA-512 in Node.js',
+              '3.3 Preventing Double-Spending & Idempotent Event Processing',
+              '3.4 Multi-Currency Settlement (NGN, USD, GHS, KES)'
+            ]
+          },
+          {
+            number: '04',
+            title: 'Automated Invoice Generation',
+            lessons: [
+              '4.1 Dynamic PDF Generation with Puppeteer & HTML Templates',
+              '4.2 Delivering Branded Receipts into WhatsApp Chat Streams',
+              '4.3 Automated Accounting Sync to QuickBooks & Google Sheets',
+              '4.4 24-Hour Payment Abandonment Recovery Sequences'
+            ]
+          }
+        ]
+      },
+      {
+        levelNumber: 3,
+        title: 'Level 3: Client Production Delivery',
+        tagline: 'SLA Retainers, High Availability & Enterprise Client Contracts',
+        lessonCount: 16,
+        modules: [
+          {
+            number: '05',
+            title: 'Enterprise Deployment & SLAs',
+            lessons: [
+              '5.1 Multi-Tenant Bot Architecture for Multiple Clients',
+              '5.2 Uptime Monitoring, Sentry Alerting & Fallback Failovers',
+              '5.3 Pricing Automation Retainers (₦250k - ₦1.5M/month)',
+              '5.4 Delivering Production Handover Ceremonies'
+            ]
+          }
+        ]
+      }
+    ],
+    features: [
+      '4-Week Intensive n8n & WhatsApp Build Sprint',
+      'Plug-and-Play Production n8n Workflow JSON Templates',
+      'Paystack & Flutterwave Cryptographic HMAC Webhook Handlers',
+      'Automated PDF Invoice Generator with WhatsApp Media Dispatch',
+      'Client Retainer Proposal & SLA Contract Blueprints'
+    ],
+    featured: true,
+    enrolledCount: 680
+  },
+  {
+    id: 'course-ai-security',
+    title: 'OWASP LLM & AI Cybersecurity Hardening',
+    subtitle: 'Audit, Penetrate, and Secure AI & Vibe-Coded Web Applications Against Critical Vulnerabilities',
+    slug: 'ai-security',
+    priceNGN: 110000,
+    originalPriceNGN: 180000,
+    priceUSD: 75,
+    originalPriceUSD: 125,
+    priceGBP: 60,
+    category: 'Cybersecurity & AST Auditing',
+    level: 'Advanced Builder / DevSecOps',
+    duration: '6-Week Threat Modeling Masterclass (36 Lessons)',
+    cohortDate: 'December 1, 2026',
+    seatsTotal: 20,
+    seatsRemaining: 7,
+    instructor: 'Nuel Effiong',
+    instructorRole: 'Principal AI Systems Architect',
+    shortDesc: 'Learn how to threat model, scan, and patch vibe-coded codebases using the OWASP LLM Top 10 framework and VibeScan AST tools.',
+    description: 'Vibe coding produces software at 10x speed, but introduces critical vulnerabilities: API keys baked into client bundles, missing PostgreSQL RLS, prompt injection vulnerabilities, and spoofed webhooks. Master defensive engineering to certify production applications.',
+    levels: [
+      {
+        levelNumber: 1,
+        title: 'Level 1: OWASP LLM Top 10 Deep Dive',
+        tagline: 'Prompt injection, data leakage & unvalidated outputs',
+        lessonCount: 12,
+        modules: [
+          {
+            number: '01',
+            title: 'LLM Vulnerability Architecture',
+            lessons: [
+              '1.1 Direct vs Indirect Prompt Injection Attacks',
+              '1.2 Sensitive Information Disclosure & Model Extraction',
+              '1.3 Insecure Output Handling (XSS & Server-Side Execution)',
+              '1.4 Supply Chain Vulnerabilities in AI Packages'
+            ]
+          }
+        ]
+      },
+      {
+        levelNumber: 2,
+        title: 'Level 2: Database & API Hardening',
+        tagline: 'Supabase PostgreSQL RLS, timing attacks & key management',
+        lessonCount: 12,
+        modules: [
+          {
+            number: '02',
+            title: 'PostgreSQL Row Level Security (RLS)',
+            lessons: [
+              '2.1 Writing Granular RLS Policies for Supabase & Firebase',
+              '2.2 Defeating IDOR (Insecure Direct Object Reference) in Next.js',
+              '2.3 Secrets Management: Zero-Exposure Environment Architecture',
+              '2.4 Timing Attacks & Constant-Time Token Comparison'
+            ]
+          }
+        ]
+      },
+      {
+        levelNumber: 3,
+        title: 'Level 3: VibeScan AST Auditing & Certification',
+        tagline: 'Static AST analysis, threat modeling & issuing VibeCert™ badges',
+        lessonCount: 12,
+        modules: [
+          {
+            number: '03',
+            title: 'AST Auditing & Certification',
+            lessons: [
+              '3.1 Building Custom ESLint & Babel AST Security Rules',
+              '3.2 Automated Vulnerability Remediation Workflows',
+              '3.3 Issuing Verifiable VibeCert™ Cryptographic Badges',
+              '3.4 Conducting Paid Security Audits for Startups & Scaleups'
+            ]
+          }
+        ]
+      }
+    ],
+    features: [
+      '6-Week Threat Modeling & DevSecOps Masterclass',
+      'Complete OWASP LLM Top 10 Attack & Defense Sandbox',
+      'Automated Supabase PostgreSQL RLS Policy Generator',
+      'VibeScan AST Scanner SDK & Automated CI/CD Action Hooks',
+      'Certified AI Security Practitioner (VibeCert™ Lead Auditor)'
+    ],
+    featured: false,
+    enrolledCount: 340
   }
 ];
 
@@ -907,10 +1102,107 @@ class DatabaseLayer {
     return null;
   }
 
-  // --- Lesson & Curriculum Management ---
+  // --- Course & Curriculum Catalog Management ---
+  async getCourses() {
+    const courses = this.getLocal('courses');
+    if (courses && courses.length > 0) return courses;
+    this.setLocal('courses', DEFAULT_COURSES);
+    return DEFAULT_COURSES;
+  }
+
+  async getAllCourses() {
+    return this.getCourses();
+  }
+
   async getCourse(courseId = 'course-vibecode-labs') {
     const courses = await this.getCourses();
-    return courses.find(c => c.id === courseId) || courses[0];
+    return courses.find(c => c.id === courseId || c.slug === courseId) || courses[0];
+  }
+
+  async getCourseById(courseId) {
+    return this.getCourse(courseId);
+  }
+
+  async createCourse(courseData) {
+    const courses = await this.getCourses();
+    const id = courseData.id || ('course_' + Date.now());
+    const slug = courseData.slug || courseData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    // Initialize default structure if not provided
+    const levels = courseData.levels || [
+      {
+        levelNumber: 1,
+        title: 'Level 1: Core Fundamentals',
+        tagline: 'Foundations & Toolchain Architecture',
+        lessonCount: 4,
+        modules: [
+          {
+            number: '01',
+            title: 'System Architecture & Setup',
+            lessons: [
+              '1.1 Introduction & Course Objectives',
+              '1.2 Environment & Secret Key Management',
+              '1.3 Core Toolchain & Workspace Walkthrough',
+              '1.4 Module 01 Practice Lab'
+            ]
+          }
+        ]
+      },
+      {
+        levelNumber: 2,
+        title: 'Level 2: Advanced Implementation',
+        tagline: 'Practical Full-Stack Engineering',
+        lessonCount: 4,
+        modules: [
+          {
+            number: '02',
+            title: 'Production Build & Integration',
+            lessons: [
+              '2.1 Full-Stack UI Implementation',
+              '2.2 Database RLS & Secure Webhooks',
+              '2.3 Automated Testing & Edge QA',
+              '2.4 Production Deployment & SLA'
+            ]
+          }
+        ]
+      }
+    ];
+
+    const newCourse = {
+      id,
+      title: courseData.title,
+      subtitle: courseData.subtitle || 'Professional Masterclass & Builder Training',
+      slug,
+      priceNGN: parseInt(courseData.priceNGN) || 95000,
+      originalPriceNGN: parseInt(courseData.originalPriceNGN) || (parseInt(courseData.priceNGN || 95000) * 1.5),
+      priceUSD: Math.round((parseInt(courseData.priceNGN) || 95000) / 1500),
+      originalPriceUSD: Math.round(((parseInt(courseData.priceNGN) || 95000) * 1.5) / 1500),
+      priceGBP: Math.round((parseInt(courseData.priceNGN) || 95000) / 1800),
+      category: courseData.category || 'AI Software Development',
+      level: courseData.level || 'Beginner → Builder',
+      duration: courseData.duration || '6-Week Masterclass',
+      cohortDate: courseData.cohortDate || 'October 15, 2026',
+      seatsTotal: parseInt(courseData.seatsTotal) || 25,
+      seatsRemaining: parseInt(courseData.seatsTotal) || 25,
+      instructor: courseData.instructor || 'Nuel Effiong',
+      instructorRole: courseData.instructorRole || 'Principal AI Systems Architect',
+      shortDesc: courseData.shortDesc || courseData.description || 'Hands-on practical builder training shipping real software.',
+      description: courseData.description || 'Comprehensive step-by-step masterclass with real-world builds, webhooks, and security hardening.',
+      levels,
+      features: courseData.features || [
+        'Live Cohort Sessions with Weekend Build Workshops',
+        'Hands-on Practical Code Labs with 1-on-1 Instructor Reviews',
+        'Direct Client Acquisition & Proposal Blueprints',
+        'Official Verifiable VibeCert™ Developer Credential'
+      ],
+      featured: courseData.featured || false,
+      enrolledCount: 0,
+      createdAt: new Date().toISOString()
+    };
+
+    courses.unshift(newCourse);
+    this.setLocal('courses', courses);
+    return newCourse;
   }
 
   async saveCourse(updatedCourse) {
@@ -919,10 +1211,20 @@ class DatabaseLayer {
     if (idx >= 0) {
       courses[idx] = updatedCourse;
     } else {
-      courses.push(updatedCourse);
+      courses.unshift(updatedCourse);
     }
     this.setLocal('courses', courses);
     return updatedCourse;
+  }
+
+  async deleteCourse(courseId) {
+    const courses = await this.getCourses();
+    if (courses.length <= 1) {
+      throw new Error('Cannot delete the last remaining course in the catalog.');
+    }
+    const filtered = courses.filter(c => c.id !== courseId);
+    this.setLocal('courses', filtered);
+    return true;
   }
 
   async updateLessonData(courseId, levelIndex, moduleIndex, lessonIndex, updatedTitle) {
@@ -955,6 +1257,65 @@ class DatabaseLayer {
       return true;
     }
     return false;
+  }
+
+  // --- Transactional Email Logs ---
+  async getEmailLogs() {
+    return this.getLocal('emailLogs') || [
+      {
+        id: 'eml-01',
+        template: 'welcome_student',
+        subject: '🎉 Welcome to The Zeerocodes VibeCode Labs — Cohort Pass Activated',
+        to: 'student@zeerocodes.com',
+        recipientName: 'Amina Yusuf',
+        status: 'DELIVERED',
+        hmacVerified: true,
+        sentAt: new Date(Date.now() - 3600000).toISOString()
+      },
+      {
+        id: 'eml-02',
+        template: 'payment_receipt',
+        subject: '🧾 Cryptographic Payment Receipt & Verified Invoice INV-2026-001',
+        to: 'tunde@payquick.africa',
+        recipientName: 'Tunde Balogun',
+        status: 'OPENED',
+        hmacVerified: true,
+        sentAt: new Date(Date.now() - 7200000).toISOString()
+      },
+      {
+        id: 'eml-03',
+        template: 'certificate_issued',
+        subject: '🏆 Official VibeCert™ Security Certificate Issued: VIBECERT-2026-0881',
+        to: 'student@zeerocodes.com',
+        recipientName: 'Amina Yusuf',
+        status: 'CLICKED',
+        hmacVerified: true,
+        sentAt: new Date(Date.now() - 86400000).toISOString()
+      }
+    ];
+  }
+
+  async saveEmailLog(logEntry) {
+    const logs = await this.getEmailLogs();
+    logs.unshift({
+      id: logEntry.id || ('eml_' + Date.now()),
+      template: logEntry.template || 'custom_dispatch',
+      subject: logEntry.subject || 'Zeerocodes Notification',
+      to: logEntry.to,
+      recipientName: logEntry.recipientName || 'Client / Student',
+      status: logEntry.status || 'DELIVERED',
+      hmacVerified: true,
+      sentAt: logEntry.sentAt || new Date().toISOString()
+    });
+    this.setLocal('emailLogs', logs);
+    return logEntry;
+  }
+
+  async deleteEmailLog(logId) {
+    const logs = await this.getEmailLogs();
+    const filtered = logs.filter(l => l.id !== logId);
+    this.setLocal('emailLogs', filtered);
+    return true;
   }
 
   // --- Student Admissions & Removal ---

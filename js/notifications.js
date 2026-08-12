@@ -38,69 +38,47 @@ class NotificationService {
    * Transactional Email Engine (HTML Template Dispatcher)
    */
   async sendTransactionalEmail(eventType, data) {
-    let subject = "Notification from Zeerocodes";
-    let body = "";
+    const emailTo = data.userEmail || data.customerEmail || data.to || 'student@zeerocodes.com';
+    let templateId = 'welcome_student';
 
     switch (eventType) {
       case 'enrollment_confirmed':
-        subject = `🎉 Enrollment Confirmed: ${data.courseTitle}`;
-        body = `
-          <h3>Welcome to Zeerocodes Academy!</h3>
-          <p>Your payment has been verified via webhook. Your access to <strong>${data.courseTitle}</strong> is now active.</p>
-          <p><a href="https://zeerocodes.com#dashboard" style="background:#016B61; color:#fff; padding:10px 18px; text-decoration:none; border-radius:6px; display:inline-block;">Launch Course Player &rarr;</a></p>
-        `;
+      case 'student_admitted':
+        templateId = 'welcome_student';
         break;
-
-      case 'vibescan_received':
-        subject = `🛡️ VibeScan Audit Queued: ${data.appName}`;
-        body = `
-          <h3>Your App Security Submission is in Review</h3>
-          <p>We received your submission for <strong>${data.appName}</strong>. Our security team in Lagos is auditing your repository against the OWASP LLM Top 10.</p>
-          <p>Turnaround time: 24-48 hours. Check status anytime on your dashboard.</p>
-        `;
+      case 'payment_received':
+      case 'invoice_issued':
+      case 'invoice_paid':
+        templateId = 'payment_receipt';
         break;
-
-      case 'vibescan_report_ready':
-        const isCert = data.outcome === 'certified';
-        subject = isCert ? `🏆 VibeCert™ Security Certificate Issued for ${data.appName}` : `⚠️ VibeScan Remediation Report Ready for ${data.appName}`;
-        body = `
-          <h3>Your VibeScan Security Report is Ready</h3>
-          <p>Outcome: <strong>${isCert ? 'Certified Safe (Grade A)' : 'Remediation Required'}</strong></p>
-          <p>Notes: ${data.notes || 'Full OWASP breakdown available on your dashboard.'}</p>
-          <p><a href="https://zeerocodes.com#dashboard" style="background:#016B61; color:#fff; padding:10px 18px; text-decoration:none; border-radius:6px; display:inline-block;">View Audit Report & Embed Code &rarr;</a></p>
-        `;
+      case 'lab_reviewed':
+      case 'lab_graded':
+        templateId = 'lab_graded';
         break;
-
+      case 'certificate_issued':
+      case 'vibecert_issued':
+        templateId = 'certificate_issued';
+        break;
       case 'studio_booking_received':
-        subject = `📅 Zeerocodes Automation Discovery Session Scheduled`;
-        body = `
-          <h3>Discovery Call Confirmed</h3>
-          <p>Thank you for booking with Zeerocodes Automation Studio. Nuel Effiong and our engineering team will connect with you on WhatsApp/Google Meet.</p>
-        `;
-        break;
-
       case 'studio_delivery_completed':
-        subject = `🚀 Your Studio Automation is Live! Protect it with VibeScan`;
-        body = `
-          <h3>Automation Deployed to Production</h3>
-          <p>Your custom system has been deployed! As your operations scale, ensure your webhooks and data endpoints are certified with a VibeScan security audit.</p>
-        `;
+      case 'studio_milestone':
+        templateId = 'studio_milestone';
+        break;
+      case 'vibescan_received':
+      case 'vibescan_report_ready':
+      case 'vibescan_cert':
+        templateId = 'vibescan_cert';
+        break;
+      case 'weekly_reminder':
+      case 'cohort_reminder':
+        templateId = 'cohort_reminder';
         break;
     }
 
-    const emailRecord = {
-      id: 'eml_' + Date.now(),
-      to: data.userEmail,
-      subject: subject,
-      body: body,
-      sentAt: new Date().toISOString()
-    };
-
-    this.history.unshift(emailRecord);
-    console.log(`📧 [Transactional Email] Sent to ${data.userEmail}: "${subject}"`);
-
-    if (window.toast) {
-      window.toast.info(`Transactional Email Dispatched to ${data.userEmail}`);
+    if (window.emailEngine) {
+      await window.emailEngine.dispatchEmail(templateId, emailTo, data);
+    } else {
+      console.log(`📧 [Transactional Email] Sent template "${templateId}" to ${emailTo}`);
     }
   }
 

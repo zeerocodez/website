@@ -1,19 +1,22 @@
 /**
- * Zeerocodes Unified Enterprise Admin Command Console (v3.0)
+ * Zeerocodes Unified Enterprise Admin Command Console (v3.5)
  * Handles complete operational control:
  * 1. Overview Telemetry & Revenue Metrics
- * 2. LMS Curriculum, Lesson & Video Content Editor
+ * 2. LMS Multi-Course Catalog, Curriculum, Lesson & Video Content Editor
  * 3. Student Admissions, Directory & Lab Grading Queue
  * 4. Financials, Invoicing & Net Profit Analytics
  * 5. Studio Client Projects Pipeline & Milestone Manager
  * 6. On-Demand Custom VibeScan Security Engine & AST Auditor
- * 7. Engineering Blog CMS Publisher
- * 8. Live Webhook & Security Diagnostic Logs
+ * 7. Transactional Email Hub & Template Sandbox (Inspired by teacher/zeerocodez)
+ * 8. Engineering Blog CMS Publisher
+ * 9. Live Webhook & Security Diagnostic Logs
  */
 
 class AdminConsoleManager {
   constructor() {
     this.activeTab = 'adminTabOverview';
+    this.selectedCourseId = 'course-vibecode-labs';
+    this.activePreviewTemplateId = 'welcome_student';
     this.init();
   }
 
@@ -40,6 +43,11 @@ class AdminConsoleManager {
     });
 
     // Form Submissions
+    const courseForm = document.getElementById('adminCreateCourseForm');
+    if (courseForm) {
+      courseForm.addEventListener('submit', (e) => this.handleCreateCourse(e));
+    }
+
     const projForm = document.getElementById('adminNewProjectForm');
     if (projForm) {
       projForm.addEventListener('submit', (e) => this.handleCreateProject(e));
@@ -84,6 +92,11 @@ class AdminConsoleManager {
     if (customScanForm) {
       customScanForm.addEventListener('submit', (e) => this.handleRunCustomScan(e));
     }
+
+    const testEmailForm = document.getElementById('adminSendTestEmailForm');
+    if (testEmailForm) {
+      testEmailForm.addEventListener('submit', (e) => this.handleSendTestEmail(e));
+    }
   }
 
   async renderAdminConsole() {
@@ -91,7 +104,10 @@ class AdminConsoleManager {
     if (!adminView || !window.db) return;
 
     // Fetch all collections
-    const course = await window.db.getCourse();
+    const allCourses = await window.db.getCourses();
+    const currentCourse = await window.db.getCourse(this.selectedCourseId) || allCourses[0];
+    this.selectedCourseId = currentCourse.id;
+
     const projects = await window.db.getAllStudioProjects();
     const vibescanSubs = await window.db.getAllPendingSubmissions();
     const enrollments = await window.db.getAllEnrollments();
@@ -102,6 +118,7 @@ class AdminConsoleManager {
     const invoices = await window.db.getInvoices();
     const expenses = await window.db.getExpenses();
     const customAudits = await window.db.getCustomAudits();
+    const emailLogs = await window.db.getEmailLogs();
 
     // 1. Calculate Telemetry & Financials
     const academyRevNGN = enrollments.reduce((acc, e) => acc + (e.amountNGN || 95000), 0);
@@ -128,12 +145,13 @@ class AdminConsoleManager {
     if (stuEl) stuEl.textContent = `${totalStudentsCount.toLocaleString()} Students`;
 
     // 2. Render Specialized Tabs
-    this.renderOverviewTab(projects, vibescanSubs, enrollments, labSubs, paymentEvents, netProfitNGN, profitMargin, totalRevNGN);
-    this.renderLmsEditorTab(course);
+    this.renderOverviewTab(projects, vibescanSubs, enrollments, labSubs, paymentEvents, netProfitNGN, profitMargin, totalRevNGN, emailLogs);
+    this.renderLmsEditorTab(currentCourse, allCourses);
     this.renderStudentsTab(enrollments, labSubs, users);
     this.renderFinancialsTab(totalRevNGN, totalExpensesNGN, netProfitNGN, profitMargin, academyRevNGN, studioRevNGN, vibescanRevNGN, invoices, expenses);
     this.renderStudioTab(projects);
     this.renderVibescanTab(vibescanSubs, customAudits);
+    this.renderEmailHubTab(emailLogs);
     this.renderBlogCmsTab(blogPosts);
     this.renderWebhookTab(paymentEvents);
 
@@ -143,7 +161,7 @@ class AdminConsoleManager {
   // =========================================================================
   // TAB 1: OVERVIEW & MISSION CONTROL
   // =========================================================================
-  renderOverviewTab(projects, vibescanSubs, enrollments, labSubs, paymentEvents, netProfitNGN, profitMargin, totalRevNGN) {
+  renderOverviewTab(projects, vibescanSubs, enrollments, labSubs, paymentEvents, netProfitNGN, profitMargin, totalRevNGN, emailLogs) {
     const container = document.getElementById('adminOverviewContent');
     if (!container) return;
 
@@ -188,10 +206,10 @@ class AdminConsoleManager {
             </div>
             <div style="background:rgba(255,255,255,0.02); padding:0.65rem 0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
               <div>
-                <strong style="color:#FFF; font-size:0.85rem;">VibeScan Security Audits</strong>
-                <div style="font-size:0.75rem; color:var(--text-cyber-muted);">${vibescanSubs.length} client repos in queue</div>
+                <strong style="color:#FFF; font-size:0.85rem;">Transactional Email Engine</strong>
+                <div style="font-size:0.75rem; color:var(--text-cyber-muted);">${emailLogs.length} automated messages logged</div>
               </div>
-              <button class="btn btn-outline btn-xs" onclick="document.querySelector('[data-tab=adminTabVibescan]').click()">Audit</button>
+              <button class="btn btn-outline btn-xs" onclick="document.querySelector('[data-tab=adminTabEmails]').click()">Emails</button>
             </div>
           </div>
         </div>
@@ -202,10 +220,10 @@ class AdminConsoleManager {
             <i data-lucide="zap" style="color:var(--emerald-light);"></i> Rapid Actions
           </h4>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+            <button class="btn btn-outline btn-xs" onclick="window.adminConsole.openCreateCourseModal()"><i data-lucide="book-plus"></i> New Course</button>
             <button class="btn btn-outline btn-xs" onclick="window.adminConsole.openAdmitStudentModal()"><i data-lucide="user-plus"></i> Admit Student</button>
             <button class="btn btn-outline btn-xs" onclick="window.adminConsole.openNewProjectModal()"><i data-lucide="folder-plus"></i> New Project</button>
             <button class="btn btn-outline btn-xs" onclick="window.adminConsole.openNewInvoiceModal()"><i data-lucide="receipt"></i> New Invoice</button>
-            <button class="btn btn-outline btn-xs" onclick="window.adminConsole.openAddExpenseModal()"><i data-lucide="minus-circle"></i> Log Expense</button>
             <button class="btn btn-outline btn-xs" onclick="window.adminConsole.openCustomScanModal()"><i data-lucide="shield-check"></i> Custom Scan</button>
             <button class="btn btn-outline btn-xs" onclick="window.adminConsole.openBlogEditorModal()"><i data-lucide="edit-3"></i> New Article</button>
           </div>
@@ -241,33 +259,52 @@ class AdminConsoleManager {
   }
 
   // =========================================================================
-  // TAB 2: LMS CURRICULUM, LESSON & VIDEO EDITOR
+  // TAB 2: LMS MULTI-COURSE CURRICULUM, LESSON & VIDEO EDITOR
   // =========================================================================
-  renderLmsEditorTab(course) {
+  renderLmsEditorTab(currentCourse, allCourses) {
     const container = document.getElementById('adminLmsEditorContent');
     if (!container) return;
 
     container.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
-        <div>
-          <h3 style="color:#FFF; font-size:1.25rem; margin:0;">${course.title}</h3>
-          <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0.2rem 0 0 0;">
-            Edit video URLs, blueprints, security callouts, prompts, or add/delete lessons across all 4 levels.
-          </p>
+      <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.5rem; margin-bottom:2rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+          <div style="flex:1; min-width:280px;">
+            <label style="font-size:0.75rem; color:var(--text-cyber-muted); text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:0.4rem;">Select Active LMS Course to Manage:</label>
+            <select id="adminCourseSelector" class="form-select" style="font-weight:700; color:#FFF; background:#04070D;" onchange="window.adminConsole.switchCourse(this.value)">
+              ${allCourses.map(c => `
+                <option value="${c.id}" ${c.id === currentCourse.id ? 'selected' : ''}>${c.title} (₦${(c.priceNGN || 95000).toLocaleString()})</option>
+              `).join('')}
+            </select>
+          </div>
+          <div style="display:flex; gap:0.6rem;">
+            <button class="btn btn-primary btn-sm" onclick="window.adminConsole.openCreateCourseModal()">
+              <i data-lucide="plus-circle"></i> + Create New Course
+            </button>
+            ${allCourses.length > 1 ? `
+              <button class="btn btn-outline btn-sm" style="color:#F87171; border-color:rgba(239,68,68,0.3);" onclick="window.adminConsole.handleDeleteCourse('${currentCourse.id}')" title="Delete current course">
+                <i data-lucide="trash-2"></i> Delete
+              </button>
+            ` : ''}
+          </div>
         </div>
-        <div style="display:flex; gap:0.5rem;">
-          <input type="text" id="adminLessonSearchInput" placeholder="Filter lessons..." class="form-input" style="width:220px; font-size:0.8rem; padding:0.4rem 0.75rem;" oninput="window.adminConsole.filterLmsLessons(this.value)">
+
+        <div style="margin-top:1.25rem; border-top:1px solid rgba(255,255,255,0.06); padding-top:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; font-size:0.85rem;">
+          <div>
+            <span class="badge badge-teal">${currentCourse.category || 'Curriculum Track'}</span>
+            <span style="color:var(--text-cyber-muted); margin-left:0.5rem;">Duration: <strong>${currentCourse.duration}</strong> • Instructor: <strong>${currentCourse.instructor || 'Nuel Effiong'}</strong></span>
+          </div>
+          <input type="text" id="adminLessonSearchInput" placeholder="Filter lessons in this course..." class="form-input" style="width:240px; font-size:0.8rem; padding:0.4rem 0.75rem;" oninput="window.adminConsole.filterLmsLessons(this.value)">
         </div>
       </div>
 
       <div style="display:flex; flex-direction:column; gap:1.5rem;" id="adminLmsLevelsContainer">
-        ${course.levels.map((lvl, lIdx) => `
+        ${(currentCourse.levels || []).map((lvl, lIdx) => `
           <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.25rem;">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.75rem; margin-bottom:1rem;">
               <div>
                 <span class="badge badge-teal" style="font-size:0.7rem;">LEVEL ${lvl.levelNumber}</span>
                 <strong style="color:#FFF; font-size:1.05rem; margin-left:0.5rem;">${lvl.title}</strong>
-                <span style="font-size:0.8rem; color:var(--text-cyber-muted); margin-left:0.5rem;">— ${lvl.tagline}</span>
+                <span style="font-size:0.8rem; color:var(--text-cyber-muted); margin-left:0.5rem;">— ${lvl.tagline || ''}</span>
               </div>
               <span style="font-size:0.8rem; color:var(--emerald-light); font-weight:700;">${lvl.lessonCount || lvl.modules.reduce((a, m) => a + m.lessons.length, 0)} Lessons</span>
             </div>
@@ -277,7 +314,7 @@ class AdminConsoleManager {
                 <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:var(--radius-xs); padding:1rem;">
                   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
                     <strong style="color:var(--cyan-accent); font-size:0.85rem;">Module ${mod.number}: ${mod.title}</strong>
-                    <button class="btn btn-ghost btn-xs" style="color:var(--emerald-light); padding:0 0.4rem;" onclick="window.adminConsole.openAddLessonModal(${lIdx}, ${mIdx}, '${mod.title}')" title="Add lesson">
+                    <button class="btn btn-ghost btn-xs" style="color:var(--emerald-light); padding:0 0.4rem;" onclick="window.adminConsole.openAddLessonModal(${lIdx}, ${mIdx}, '${mod.title.replace(/'/g, "\\'")}')" title="Add lesson">
                       <i data-lucide="plus"></i> Add
                     </button>
                   </div>
@@ -306,12 +343,61 @@ class AdminConsoleManager {
     `;
   }
 
+  switchCourse(courseId) {
+    this.selectedCourseId = courseId;
+    this.renderAdminConsole();
+  }
+
   filterLmsLessons(query) {
     const lower = query.toLowerCase().trim();
     document.querySelectorAll('.admin-lesson-item-row').forEach(el => {
       const text = el.textContent.toLowerCase();
       el.style.display = text.includes(lower) ? 'flex' : 'none';
     });
+  }
+
+  openCreateCourseModal() {
+    if (window.modal) window.modal.open('modal-admin-create-course');
+  }
+
+  async handleCreateCourse(e) {
+    e.preventDefault();
+    const title = document.getElementById('newCourseTitle').value.trim();
+    const subtitle = document.getElementById('newCourseSubtitle').value.trim();
+    const category = document.getElementById('newCourseCategory').value;
+    const priceNGN = parseInt(document.getElementById('newCoursePriceNGN').value) || 95000;
+    const duration = document.getElementById('newCourseDuration').value.trim() || '6-Week Masterclass';
+    const instructor = document.getElementById('newCourseInstructor').value.trim() || 'Nuel Effiong';
+    const description = document.getElementById('newCourseDesc').value.trim();
+
+    const created = await window.db.createCourse({
+      title,
+      subtitle,
+      category,
+      priceNGN,
+      duration,
+      instructor,
+      description
+    });
+
+    this.selectedCourseId = created.id;
+    window.toast?.success(`Course "${title}" initialized and live in LMS catalog!`);
+    if (window.modal) window.modal.closeAll();
+    this.renderAdminConsole();
+  }
+
+  async handleDeleteCourse(courseId) {
+    if (confirm('Are you sure you want to delete this course from the LMS catalog?')) {
+      try {
+        await window.db.deleteCourse(courseId);
+        window.toast?.info('Course deleted from catalog.');
+        const allCourses = await window.db.getCourses();
+        this.selectedCourseId = allCourses[0].id;
+        this.renderAdminConsole();
+      } catch (err) {
+        window.toast?.error(err.message);
+      }
+    }
   }
 
   openEditLessonModal(levelIndex, moduleIndex, lessonIndex, lessonTitle) {
@@ -343,10 +429,10 @@ class AdminConsoleManager {
     const title = document.getElementById('editLessonTitleInput').value.trim();
 
     if (lessonIndex >= 0) {
-      await window.db.updateLessonData('course-vibecode-labs', levelIndex, moduleIndex, lessonIndex, title);
+      await window.db.updateLessonData(this.selectedCourseId, levelIndex, moduleIndex, lessonIndex, title);
       window.toast?.success('Lesson updated successfully!');
     } else {
-      await window.db.addLessonToModule('course-vibecode-labs', levelIndex, moduleIndex, title);
+      await window.db.addLessonToModule(this.selectedCourseId, levelIndex, moduleIndex, title);
       window.toast?.success('New lesson added to module!');
     }
 
@@ -356,7 +442,7 @@ class AdminConsoleManager {
 
   async handleDeleteLesson(levelIndex, moduleIndex, lessonIndex) {
     if (confirm('Are you sure you want to delete this lesson from the curriculum?')) {
-      await window.db.deleteLessonFromModule('course-vibecode-labs', levelIndex, moduleIndex, lessonIndex);
+      await window.db.deleteLessonFromModule(this.selectedCourseId, levelIndex, moduleIndex, lessonIndex);
       window.toast?.info('Lesson removed from curriculum');
       this.renderAdminConsole();
     }
@@ -439,7 +525,7 @@ class AdminConsoleManager {
                 </div>
                 ${lab.grade ? `<div style="font-size:0.8rem; color:var(--cyan-accent); margin-top:0.25rem;">Grade: <strong>${lab.grade}</strong> — Notes: ${lab.feedback}</div>` : ''}
               </div>
-              <button class="btn btn-outline btn-xs" onclick="window.adminConsole.openGradeLabModal('${lab.id}', '${lab.lessonTitle.replace(/'/g, "\\'")}', '${lab.studentName || lab.userEmail}', '${lab.repoUrl}')">
+              <button class="btn btn-outline btn-xs" onclick="window.adminConsole.openGradeLabModal('${lab.id}')">
                 <i data-lucide="check-circle"></i> Grade Submission
               </button>
             </div>
@@ -463,7 +549,19 @@ class AdminConsoleManager {
     const amountNGN = parseInt(document.getElementById('admitStudentAmount').value) || 95000;
 
     await window.db.admitStudent({ name, email, phone, cohort, paymentMethod, amountNGN });
-    window.toast?.success(`Student ${name} successfully admitted to ${cohort}!`);
+
+    // Trigger transactional welcome email
+    if (window.notifications) {
+      await window.notifications.dispatch('student_admitted', {
+        studentName: name,
+        userEmail: email,
+        phoneNumber: phone,
+        cohort,
+        courseTitle: 'The Zeerocodes VibeCode Labs'
+      });
+    }
+
+    window.toast?.success(`Student ${name} successfully admitted & welcome email dispatched!`);
 
     if (window.modal) window.modal.closeAll();
     this.renderAdminConsole();
@@ -477,15 +575,19 @@ class AdminConsoleManager {
     }
   }
 
-  openGradeLabModal(labId, lessonTitle, studentName, repoUrl) {
-    document.getElementById('gradeLabId').value = labId;
-    document.getElementById('gradeLabTitle').textContent = lessonTitle;
-    document.getElementById('gradeLabStudentName').textContent = `Student: ${studentName}`;
-    const repoLink = document.getElementById('gradeLabRepoLink');
-    if (repoLink) {
-      repoLink.href = repoUrl;
-      repoLink.textContent = repoUrl;
-    }
+  openGradeLabModal(labId) {
+    const labSubs = window.db.getLocal('labSubmissions') || [];
+    const lab = labSubs.find(l => l.id === labId);
+    if (!lab) return;
+
+    document.getElementById('gradeLabId').value = lab.id;
+    document.getElementById('gradeLabStudentName').textContent = `${lab.userName} (${lab.userEmail})`;
+    document.getElementById('gradeLabTitle').textContent = lab.lessonTitle;
+    document.getElementById('gradeLabRepoLink').href = lab.repoUrl;
+    document.getElementById('gradeLabRepoLink').textContent = lab.repoUrl;
+    document.getElementById('gradeScoreInput').value = lab.grade || 'A+ (98%)';
+    document.getElementById('gradeFeedbackInput').value = lab.feedback || 'Great implementation of secure webhooks!';
+
     if (window.modal) window.modal.open('modal-admin-grade-lab');
   }
 
@@ -496,8 +598,25 @@ class AdminConsoleManager {
     const grade = document.getElementById('gradeScoreInput').value.trim();
     const feedback = document.getElementById('gradeFeedbackInput').value.trim();
 
-    await window.db.gradeLabSubmission(labId, status, feedback, grade, 'Nuel Effiong');
-    window.toast?.success('Lab review saved & student notified!');
+    await window.db.gradeLabSubmission(labId, {
+      grade,
+      status,
+      feedback,
+      reviewedBy: 'Nuel Effiong'
+    });
+
+    if (window.notifications) {
+      await window.notifications.dispatch('lab_graded', {
+        studentName: 'Student',
+        userEmail: 'student@zeerocodes.com',
+        lessonTitle: document.getElementById('gradeLabTitle').textContent,
+        grade,
+        status,
+        feedback
+      });
+    }
+
+    window.toast?.success('Lab review saved & student notification dispatched!');
     if (window.modal) window.modal.closeAll();
     this.renderAdminConsole();
   }
@@ -683,7 +802,18 @@ class AdminConsoleManager {
     };
 
     await window.db.saveInvoice(newInvoice);
-    window.toast?.success(`Invoice ${id} created and dispatched!`);
+
+    if (window.notifications) {
+      await window.notifications.dispatch('invoice_issued', {
+        invoiceId: id,
+        clientName,
+        userEmail: clientEmail,
+        amountNGN,
+        projectTitle
+      });
+    }
+
+    window.toast?.success(`Invoice ${id} created and dispatched via email!`);
     if (window.modal) window.modal.closeAll();
     this.renderAdminConsole();
   }
@@ -882,7 +1012,18 @@ class AdminConsoleManager {
       else proj.status = 'development';
 
       await window.db.saveStudioProject(proj);
-      window.toast?.success(`Project advanced to: ${proj.stage}`);
+
+      if (window.notifications) {
+        await window.notifications.dispatch('studio_milestone', {
+          clientName: proj.clientName,
+          userEmail: proj.userEmail,
+          projectTitle: proj.title,
+          stage: proj.stage,
+          progress: proj.progress
+        });
+      }
+
+      window.toast?.success(`Project advanced to: ${proj.stage} & client notified!`);
       this.renderAdminConsole();
     } else {
       window.toast?.info('Project is already at final production stage.');
@@ -1003,13 +1144,169 @@ class AdminConsoleManager {
       };
 
       await window.db.saveCustomAudit(newAudit);
+
+      if (window.notifications) {
+        await window.notifications.dispatch('vibescan_cert', {
+          appName: targetName,
+          userEmail: 'security@zeerocodes.com',
+          score: 98,
+          certificationId: certId
+        });
+      }
+
       window.toast?.success(`Audit complete: 0 Critical Vulnerabilities! Issued ${certId}`);
       this.renderAdminConsole();
     }, 1500);
   }
 
   // =========================================================================
-  // TAB 7: BLOG CMS PUBLISHER
+  // TAB 7: TRANSACTIONAL EMAIL STUDIO & TEMPLATES
+  // =========================================================================
+  renderEmailHubTab(emailLogs) {
+    const container = document.getElementById('adminEmailHubContent');
+    if (!container) return;
+
+    const templates = window.emailEngine ? window.emailEngine.templates : {};
+
+    container.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <h3 style="color:#FFF; font-size:1.25rem; margin:0;">Enterprise Transactional Email Engine</h3>
+          <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0.2rem 0 0 0;">
+            Responsive HTML transactional email templates with cryptographic HMAC receipts, instant sandboxing & dispatch telemetry.
+          </p>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="window.adminConsole.openEmailPreviewModal('welcome_student')">
+          <i data-lucide="send"></i> Test Dispatch Console
+        </button>
+      </div>
+
+      <!-- 7 Template Cards -->
+      <h4 style="color:#FFF; font-size:1.05rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
+        <i data-lucide="layout-template" style="color:var(--emerald-light);"></i> Active HTML Transactional Email Templates (7)
+      </h4>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:1.25rem; margin-bottom:2rem;">
+        ${Object.keys(templates).map(k => {
+          const t = templates[k];
+          return `
+            <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+                  <span class="badge badge-teal" style="font-size:0.7rem;">${t.category}</span>
+                  <span class="badge badge-success" style="font-size:0.65rem;">ACTIVE</span>
+                </div>
+                <h4 style="color:#FFF; font-size:1rem; margin-bottom:0.4rem;">${t.name}</h4>
+                <p style="color:var(--text-cyber-muted); font-size:0.78rem; font-family:var(--font-mono); margin:0 0 1rem 0; line-height:1.4;">${t.defaultSubject}</p>
+              </div>
+
+              <div style="display:flex; gap:0.5rem; border-top:1px solid rgba(255,255,255,0.06); padding-top:0.85rem;">
+                <button class="btn btn-outline btn-xs" style="flex:1;" onclick="window.adminConsole.openEmailPreviewModal('${t.id}')">
+                  <i data-lucide="eye"></i> Preview & Send
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <!-- Dispatched Emails Telemetry Table -->
+      <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.25rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <h4 style="color:#FFF; font-size:1.1rem; margin:0; display:flex; align-items:center; gap:0.5rem;">
+            <i data-lucide="activity" style="color:var(--cyan-accent);"></i> Transactional Email Dispatch Trail (${emailLogs.length})
+          </h4>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.85rem; text-align:left;">
+            <thead>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:var(--text-cyber-muted);">
+                <th style="padding:0.75rem;">Template</th>
+                <th style="padding:0.75rem;">Subject Line</th>
+                <th style="padding:0.75rem;">Recipient</th>
+                <th style="padding:0.75rem;">Delivery Status</th>
+                <th style="padding:0.75rem;">Sent At</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${emailLogs.map(log => `
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                  <td style="padding:0.75rem;"><span class="badge badge-teal">${log.template}</span></td>
+                  <td style="padding:0.75rem; color:#FFF; font-weight:600;">${log.subject}</td>
+                  <td style="padding:0.75rem; color:var(--text-cyber-muted);">${log.to}</td>
+                  <td style="padding:0.75rem;"><span class="badge badge-success"><i data-lucide="check"></i> ${log.status}</span></td>
+                  <td style="padding:0.75rem; color:var(--text-cyber-muted);">${new Date(log.sentAt).toLocaleTimeString()}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }
+
+  openEmailPreviewModal(templateId) {
+    this.activePreviewTemplateId = templateId;
+    const tmpl = window.emailEngine ? window.emailEngine.templates[templateId] : null;
+    if (!tmpl) return;
+
+    document.getElementById('testEmailTemplateSelect').value = templateId;
+    document.getElementById('testEmailRecipient').value = 'student@zeerocodes.com';
+
+    this.refreshEmailPreview();
+
+    if (window.modal) window.modal.open('modal-admin-email-preview');
+  }
+
+  refreshEmailPreview() {
+    const templateId = document.getElementById('testEmailTemplateSelect').value;
+    const previewContainer = document.getElementById('emailPreviewFrame');
+    if (!window.emailEngine || !previewContainer) return;
+
+    const sampleData = {
+      studentName: 'Amina Yusuf',
+      userEmail: 'student@zeerocodes.com',
+      clientName: 'Tunde Balogun',
+      courseTitle: 'The Zeerocodes VibeCode Labs',
+      invoiceId: 'INV-2026-001',
+      amountNGN: '95,000',
+      lessonTitle: 'Module 16 Capstone Brief',
+      grade: 'A+ (98%)',
+      certificateId: 'VIBECERT-2026-0881',
+      projectTitle: 'MedLagos WhatsApp Bot',
+      stage: 'Phase 2: Full-Stack Implementation',
+      progress: 60,
+      appName: 'MedLagos Telehealth',
+      score: 98,
+      weekNumber: '03'
+    };
+
+    const html = window.emailEngine.renderTemplate(templateId, sampleData);
+    previewContainer.srcdoc = html;
+  }
+
+  async handleSendTestEmail(e) {
+    e.preventDefault();
+    const templateId = document.getElementById('testEmailTemplateSelect').value;
+    const recipient = document.getElementById('testEmailRecipient').value.trim();
+
+    if (window.emailEngine) {
+      await window.emailEngine.dispatchEmail(templateId, recipient, {
+        studentName: 'Amina Yusuf',
+        userEmail: recipient,
+        courseTitle: 'The Zeerocodes VibeCode Labs',
+        invoiceId: 'INV-2026-088',
+        amountNGN: '95,000',
+        grade: 'A+ (98%)',
+        certificateId: 'VIBECERT-2026-0881'
+      });
+      this.renderAdminConsole();
+    }
+  }
+
+  // =========================================================================
+  // TAB 8: BLOG CMS PUBLISHER
   // =========================================================================
   renderBlogCmsTab(blogPosts) {
     const container = document.getElementById('adminBlogContent');
@@ -1040,128 +1337,53 @@ class AdminConsoleManager {
               <p style="color:var(--text-cyber-muted); font-size:0.82rem; margin:0; line-height:1.4;">${post.excerpt}</p>
             </div>
             <div style="display:flex; gap:0.5rem;">
-    const labSubs = window.db.getLocal('labSubmissions') || [];
-    const lab = labSubs.find(l => l.id === labId);
-    if (!lab) return;
-
-    document.getElementById('gradeLabId').value = lab.id;
-    document.getElementById('gradeLabStudentName').textContent = `${lab.userName} (${lab.userEmail})`;
-    document.getElementById('gradeLabTitle').textContent = lab.lessonTitle;
-    document.getElementById('gradeLabRepoLink').href = lab.repoUrl;
-    document.getElementById('gradeLabRepoLink').textContent = lab.repoUrl;
-    document.getElementById('gradeScoreInput').value = lab.grade || 'A+ (98%)';
-    document.getElementById('gradeFeedbackInput').value = lab.feedback || 'Great implementation of secure webhooks!';
-
-    if (window.modal) window.modal.open('modal-admin-grade-lab');
+              <button class="btn btn-outline btn-xs" onclick="window.blog?.openArticleReader('${post.id}')"><i data-lucide="eye"></i> View</button>
+              <button class="btn btn-ghost btn-xs" style="color:#F87171;" onclick="window.adminConsole.handleDeleteBlogPost('${post.id}')"><i data-lucide="trash-2"></i></button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
   }
 
-  async handleSaveLabGrade(e) {
-    e.preventDefault();
-    const labId = document.getElementById('gradeLabId').value;
-    const grade = document.getElementById('gradeScoreInput').value.trim();
-    const status = document.getElementById('gradeStatusSelect').value;
-    const feedback = document.getElementById('gradeFeedbackInput').value.trim();
-
-    await window.db.gradeLabSubmission(labId, {
-      grade,
-      status,
-      feedback,
-      reviewedBy: window.auth?.getUser()?.displayName || 'Nuel Effiong'
-    });
-
-    if (window.modal) window.modal.close('modal-admin-grade-lab');
-    if (window.toast) window.toast.success("Lab graded successfully! Student notification dispatched.");
-    this.renderAdminConsole();
-  }
-
-  async advanceProjectStage(projId) {
-    const projects = await window.db.getAllStudioProjects();
-    const proj = projects.find(p => p.id === projId);
-    if (!proj) return;
-
-    if (proj.status === 'discovery') {
-      proj.status = 'scoping';
-      proj.stage = 'Phase 2: Architecture & Blueprint';
-      proj.progress = 40;
-    } else if (proj.status === 'scoping' || proj.status === 'development') {
-      proj.status = 'qa_audit';
-      proj.stage = 'Phase 4: VibeScan Security Hardening';
-      proj.progress = 90;
-    } else if (proj.status === 'qa_audit') {
-      proj.status = 'delivered';
-      proj.stage = 'Phase 5: Live Production Handover';
-      proj.progress = 100;
-    }
-
-    await window.db.saveStudioProject(proj);
-    if (window.toast) window.toast.success(`Project ${proj.title} advanced to ${proj.status.toUpperCase()}!`);
-    this.renderAdminConsole();
-  }
-
-  openNewPostModal() {
+  openBlogEditorModal() {
     document.getElementById('adminPostId').value = '';
-    document.getElementById('adminPostTitle').value = '';
-    document.getElementById('adminPostSlug').value = '';
-    document.getElementById('adminPostCategory').value = 'Automations';
-    document.getElementById('adminPostExcerpt').value = '';
-    document.getElementById('adminPostContent').value = '';
-    document.getElementById('adminPostTags').value = 'AI, Automation, Lagos';
-    if (window.modal) window.modal.open('modal-admin-blog-editor');
-  }
-
-  async openEditPostModal(postId) {
-    const post = await window.db.getBlogPostBySlug(postId);
-    if (!post) return;
-
-    document.getElementById('adminPostId').value = post.id;
-    document.getElementById('adminPostTitle').value = post.title;
-    document.getElementById('adminPostSlug').value = post.slug;
-    document.getElementById('adminPostCategory').value = post.category;
-    document.getElementById('adminPostExcerpt').value = post.excerpt;
-    document.getElementById('adminPostContent').value = post.content;
-    document.getElementById('adminPostTags').value = (post.tags || []).join(', ');
+    document.getElementById('adminBlogPostForm').reset();
     if (window.modal) window.modal.open('modal-admin-blog-editor');
   }
 
   async handleSaveBlogPost(e) {
     e.preventDefault();
-    const id = document.getElementById('adminPostId').value || ('post_' + Date.now());
+    const id = document.getElementById('adminPostId').value || ('blog_' + Date.now());
     const title = document.getElementById('adminPostTitle').value.trim();
-    let slug = document.getElementById('adminPostSlug').value.trim();
-    if (!slug) slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
+    const slug = document.getElementById('adminPostSlug').value.trim() || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     const category = document.getElementById('adminPostCategory').value;
+    const tags = document.getElementById('adminPostTags').value.split(',').map(t => t.trim()).filter(Boolean);
     const excerpt = document.getElementById('adminPostExcerpt').value.trim();
     const content = document.getElementById('adminPostContent').value.trim();
-    const tags = document.getElementById('adminPostTags').value.split(',').map(t => t.trim()).filter(Boolean);
 
     const post = {
       id,
-      title,
       slug,
+      title,
       category,
-      categoryBadge: category === 'AI Security' ? 'badge-danger' : category === 'Automations' ? 'badge-success' : 'badge-teal',
-      author: window.auth?.getUser()?.displayName || 'Nuel Effiong',
-      authorRole: 'Principal AI Systems Architect',
-      date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-      readTime: '6 min read',
-      featuredImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop',
-      excerpt,
       tags,
+      excerpt,
       content,
-      status: 'published'
+      author: 'Nuel Effiong',
+      authorRole: 'Founder & Principal AI Systems Architect',
+      date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      readTime: '5 min read',
+      views: 120,
+      claps: 24,
+      heroImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1200&auto=format&fit=crop'
     };
 
     await window.db.saveBlogPost(post);
-    if (window.modal) window.modal.close('modal-admin-blog-editor');
-    if (window.toast) window.toast.success("Blog article published and indexed with Schema JSON-LD!");
-    this.renderAdminConsole();
-    if (window.blog) window.blog.renderBlogView();
-  }
-
     window.toast?.success(`Article "${title}" published to live blog!`);
     if (window.modal) window.modal.closeAll();
     this.renderAdminConsole();
+    if (window.blog) window.blog.renderBlogView();
   }
 
   async handleDeleteBlogPost(postId) {
