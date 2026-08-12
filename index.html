@@ -2016,14 +2016,16 @@ const isValid = crypto.timingSafeEqual(
             </div>
           </div>
 
-          <!-- Admin Tabs Bar -->
+          <!-- Admin Tabs Bar (8 Operations Hubs) -->
           <div class="admin-tabs-bar">
             <button class="admin-tab-btn active" data-tab="adminTabOverview"><i data-lucide="layout-dashboard"></i> Overview</button>
-            <button class="admin-tab-btn" data-tab="adminTabAcademy"><i data-lucide="graduation-cap"></i> LMS & Student Grading</button>
-            <button class="admin-tab-btn" data-tab="adminTabStudio"><i data-lucide="workflow"></i> Studio Projects Pipeline</button>
-            <button class="admin-tab-btn" data-tab="adminTabVibescan"><i data-lucide="shield-check"></i> VibeScan Audits</button>
+            <button class="admin-tab-btn" data-tab="adminTabLmsEditor"><i data-lucide="book-open"></i> LMS Curriculum & Videos</button>
+            <button class="admin-tab-btn" data-tab="adminTabStudents"><i data-lucide="graduation-cap"></i> Student Admissions</button>
+            <button class="admin-tab-btn" data-tab="adminTabFinancials"><i data-lucide="wallet"></i> Sales, Invoices & Profits</button>
+            <button class="admin-tab-btn" data-tab="adminTabStudio"><i data-lucide="workflow"></i> Studio Projects</button>
+            <button class="admin-tab-btn" data-tab="adminTabVibescan"><i data-lucide="shield-check"></i> VibeScan Engine</button>
             <button class="admin-tab-btn" data-tab="adminTabBlog"><i data-lucide="newspaper"></i> Blog CMS</button>
-            <button class="admin-tab-btn" data-tab="adminTabWebhooks"><i data-lucide="activity"></i> Webhook & Security Logs</button>
+            <button class="admin-tab-btn" data-tab="adminTabWebhooks"><i data-lucide="activity"></i> Webhook & Logs</button>
           </div>
 
           <!-- Tab Panels -->
@@ -2033,8 +2035,20 @@ const isValid = crypto.timingSafeEqual(
             </div>
           </div>
 
-          <div id="adminTabAcademy" class="admin-tab-panel">
-            <div id="adminLmsContent">
+          <div id="adminTabLmsEditor" class="admin-tab-panel">
+            <div id="adminLmsEditorContent">
+              <!-- Rendered dynamically by admin.js -->
+            </div>
+          </div>
+
+          <div id="adminTabStudents" class="admin-tab-panel">
+            <div id="adminStudentsContent">
+              <!-- Rendered dynamically by admin.js -->
+            </div>
+          </div>
+
+          <div id="adminTabFinancials" class="admin-tab-panel">
+            <div id="adminFinancialsContent">
               <!-- Rendered dynamically by admin.js -->
             </div>
           </div>
@@ -2710,6 +2724,261 @@ const isValid = crypto.timingSafeEqual(
 
           <button type="submit" class="btn btn-primary btn-block">
             <i data-lucide="send"></i> Publish Article to Blog
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN EDIT/ADD LMS LESSON MODAL -->
+  <div id="modal-admin-edit-lesson" class="modal-backdrop">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <h3 id="adminEditLessonModalHeading">Edit Curriculum Lesson & Video Stream</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="adminEditLessonForm">
+          <input type="hidden" id="editLessonLevelIndex">
+          <input type="hidden" id="editLessonModuleIndex">
+          <input type="hidden" id="editLessonIndex">
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap:1rem; margin-bottom:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="editLessonTitleInput">Lesson Title</label>
+              <input type="text" id="editLessonTitleInput" class="form-input" placeholder="e.g. 1.1 What Vibe Coding Is (and Isn't)" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="editLessonDurationInput">Estimated Duration</label>
+              <input type="text" id="editLessonDurationInput" class="form-input" placeholder="18 mins" value="18 mins">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="editLessonVideoUrl">Video Embed / Stream URL (YouTube Embed / Vimeo / MP4)</label>
+            <input type="url" id="editLessonVideoUrl" class="form-input" placeholder="https://www.youtube-nocookie.com/embed/..." value="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="editLessonAlertInput">Security & Engineering Alert Callout</label>
+            <textarea id="editLessonAlertInput" class="form-textarea" rows="2" placeholder="Security Non-Negotiable: Always validate incoming webhook payloads using crypto.timingSafeEqual before processing."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="editLessonPromptInput">AI Studio / Antigravity Prompt Blueprint</label>
+            <textarea id="editLessonPromptInput" class="form-textarea" rows="4" style="font-family:var(--font-mono); font-size:0.82rem; background:#04070D; color:var(--emerald-light);" placeholder="Prompt template for students..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">
+            <i data-lucide="save"></i> Save Lesson Changes to Live LMS
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN ADMIT STUDENT MODAL -->
+  <div id="modal-admin-admit-student" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Admit Candidate to The VibeCode Labs</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="adminAdmitStudentForm">
+          <div class="form-group">
+            <label class="form-label" for="admitStudentName">Student Full Name</label>
+            <input type="text" id="admitStudentName" class="form-input" placeholder="e.g. Babatunde Alabi" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="admitStudentEmail">Student Email Address</label>
+            <input type="email" id="admitStudentEmail" class="form-input" placeholder="babatunde@gmail.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="admitStudentPhone">WhatsApp Number</label>
+            <input type="tel" id="admitStudentPhone" class="form-input" placeholder="+234 813 000 0000" required>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="admitStudentCohort">Assigned Cohort</label>
+              <select id="admitStudentCohort" class="form-select">
+                <option value="Cohort 04 (October 15, 2026)">Cohort 04 (Oct 15)</option>
+                <option value="Cohort 05 (January 10, 2027)">Cohort 05 (Jan 10)</option>
+                <option value="Self-Paced VIP Builder">Self-Paced VIP Builder</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="admitStudentPayment">Payment Status</label>
+              <select id="admitStudentPayment" class="form-select">
+                <option value="Paystack (Online)">Paystack (Verified)</option>
+                <option value="Direct Bank Transfer">Direct Bank Transfer</option>
+                <option value="Full Scholarship / Sponsored">Sponsored Grant</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="admitStudentAmount">Amount Enrolled (NGN)</label>
+            <input type="number" id="admitStudentAmount" class="form-input" value="95000">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            <i data-lucide="user-check"></i> Complete Admission & Issue Credentials
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN NEW INVOICE MODAL -->
+  <div id="modal-admin-new-invoice" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Generate Verified Client Invoice</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="adminNewInvoiceForm">
+          <div class="form-group">
+            <label class="form-label" for="newInvId">Invoice Reference ID</label>
+            <input type="text" id="newInvId" class="form-input" readonly style="background:#04070D; font-family:var(--font-mono);">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="newInvClientName">Client / Company Name</label>
+            <input type="text" id="newInvClientName" class="form-input" placeholder="e.g. Apex Health Systems" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="newInvClientEmail">Client Billing Email</label>
+            <input type="email" id="newInvClientEmail" class="form-input" placeholder="finance@apexhealth.ng" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="newInvProjectTitle">Scope Description / Project</label>
+            <input type="text" id="newInvProjectTitle" class="form-input" placeholder="e.g. Phase 2 WhatsApp Invoicing Bot" required>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="newInvAmountNGN">Amount (NGN)</label>
+              <input type="number" id="newInvAmountNGN" class="form-input" placeholder="1850000" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="newInvDueDate">Payment Due Date</label>
+              <input type="date" id="newInvDueDate" class="form-input" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            <i data-lucide="receipt"></i> Issue Invoice & Generate Paystack Link
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN ADD EXPENSE MODAL -->
+  <div id="modal-admin-add-expense" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Log Operating / Infrastructure Cost</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="adminAddExpenseForm">
+          <div class="form-group">
+            <label class="form-label" for="newExpCategory">Expense Category</label>
+            <select id="newExpCategory" class="form-select">
+              <option value="Cloud Infrastructure">Cloud Infrastructure (Vercel, Supabase, OpenAI, Anthropic)</option>
+              <option value="WhatsApp & Messaging">WhatsApp & SMS Gateway API (Twilio, Meta)</option>
+              <option value="Engineering Payroll">Engineering & Mentorship Payroll</option>
+              <option value="Domain & Tooling">Domain, SSL & Security Tooling</option>
+              <option value="Office & Operations">Operations & Power / Internet</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="newExpDesc">Cost Description</label>
+            <input type="text" id="newExpDesc" class="form-input" placeholder="e.g. Anthropic Claude 3.5 Sonnet API Tokens" required>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="newExpAmountNGN">Amount (NGN)</label>
+              <input type="number" id="newExpAmountNGN" class="form-input" placeholder="125000" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="newExpDate">Date Logged</label>
+              <input type="date" id="newExpDate" class="form-input">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            <i data-lucide="minus-circle"></i> Log Expense to Financial Ledger
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN RUN CUSTOM SCAN MODAL -->
+  <div id="modal-admin-custom-scan" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Run On-Demand AST Security Scan</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="adminCustomScanForm">
+          <div class="form-group">
+            <label class="form-label" for="customScanTargetName">Project / Company Name</label>
+            <input type="text" id="customScanTargetName" class="form-input" placeholder="e.g. LagosFintech Portal" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="customScanRepoUrl">GitHub Repository or Live API URL</label>
+            <input type="url" id="customScanRepoUrl" class="form-input" placeholder="https://github.com/org/repo" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="customScanProfile">Security Audit Profile</label>
+            <select id="customScanProfile" class="form-select">
+              <option value="Full OWASP LLM Top 10 + Webhook HMAC">Full OWASP LLM Top 10 + Webhook HMAC Audit</option>
+              <option value="PostgreSQL RLS & API Key Leak Inspector">PostgreSQL RLS & API Key Leak Inspector</option>
+              <option value="Prompt Injection & SSRF Penetration Audit">Prompt Injection & SSRF Penetration Audit</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            <i data-lucide="shield-check"></i> Execute AST Scanner & Generate VibeCert
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN EDIT PROJECT MODAL -->
+  <div id="modal-admin-edit-project" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Manage Studio Client Project & Sprints</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="adminEditProjectForm">
+          <input type="hidden" id="editProjId">
+          <div class="form-group">
+            <label class="form-label" for="editProjTitle">Project Name</label>
+            <input type="text" id="editProjTitle" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editProjClientName">Client Full Name</label>
+            <input type="text" id="editProjClientName" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editProjStage">Current Sprint / Delivery Stage</label>
+            <input type="text" id="editProjStage" class="form-input" placeholder="Phase 2: Full-Stack UI & Database" required>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="editProjProgress">Progress (%)</label>
+              <input type="number" id="editProjProgress" class="form-input" min="0" max="100" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="editProjBudget">Budget (NGN)</label>
+              <input type="number" id="editProjBudget" class="form-input" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            <i data-lucide="save"></i> Update Project Details
           </button>
         </form>
       </div>

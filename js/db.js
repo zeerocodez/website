@@ -907,6 +907,272 @@ class DatabaseLayer {
     return null;
   }
 
+  // --- Lesson & Curriculum Management ---
+  async getCourse(courseId = 'course-vibecode-labs') {
+    const courses = await this.getCourses();
+    return courses.find(c => c.id === courseId) || courses[0];
+  }
+
+  async saveCourse(updatedCourse) {
+    const courses = await this.getCourses();
+    const idx = courses.findIndex(c => c.id === updatedCourse.id);
+    if (idx >= 0) {
+      courses[idx] = updatedCourse;
+    } else {
+      courses.push(updatedCourse);
+    }
+    this.setLocal('courses', courses);
+    return updatedCourse;
+  }
+
+  async updateLessonData(courseId, levelIndex, moduleIndex, lessonIndex, updatedTitle) {
+    const course = await this.getCourse(courseId);
+    if (course && course.levels[levelIndex]?.modules[moduleIndex]?.lessons[lessonIndex] !== undefined) {
+      course.levels[levelIndex].modules[moduleIndex].lessons[lessonIndex] = updatedTitle;
+      await this.saveCourse(course);
+      return true;
+    }
+    return false;
+  }
+
+  async addLessonToModule(courseId, levelIndex, moduleIndex, newLessonTitle) {
+    const course = await this.getCourse(courseId);
+    if (course && course.levels[levelIndex]?.modules[moduleIndex]) {
+      course.levels[levelIndex].modules[moduleIndex].lessons.push(newLessonTitle);
+      course.levels[levelIndex].lessonCount = (course.levels[levelIndex].lessonCount || 0) + 1;
+      await this.saveCourse(course);
+      return true;
+    }
+    return false;
+  }
+
+  async deleteLessonFromModule(courseId, levelIndex, moduleIndex, lessonIndex) {
+    const course = await this.getCourse(courseId);
+    if (course && course.levels[levelIndex]?.modules[moduleIndex]) {
+      course.levels[levelIndex].modules[moduleIndex].lessons.splice(lessonIndex, 1);
+      course.levels[levelIndex].lessonCount = Math.max(0, (course.levels[levelIndex].lessonCount || 1) - 1);
+      await this.saveCourse(course);
+      return true;
+    }
+    return false;
+  }
+
+  // --- Student Admissions & Removal ---
+  async admitStudent({ name, email, phone, cohort = 'October 15, 2026', paymentMethod = 'Paystack Direct', amountNGN = 95000 }) {
+    const users = (await this.getAllUsers()) || [];
+    let existingUser = users.find(u => u.email === email);
+
+    if (!existingUser) {
+      const uid = 'usr_' + Date.now();
+      existingUser = {
+        uid,
+        email,
+        displayName: name,
+        phone: phone || '+234 800 000 0000',
+        role: 'student',
+        createdAt: new Date().toISOString(),
+        cohort
+      };
+      users.push(existingUser);
+      this.setLocal('users', users);
+    }
+
+    const enrollments = (await this.getAllEnrollments()) || [];
+    const existingEnroll = enrollments.find(e => e.userId === existingUser.uid || e.userEmail === email);
+
+    if (!existingEnroll) {
+      const newEnroll = {
+        id: 'enroll_' + Date.now(),
+        userId: existingUser.uid,
+        userEmail: email,
+        studentName: name,
+        studentPhone: phone || '+234 800 000 0000',
+        courseId: 'course-vibecode-labs',
+        courseTitle: 'The Zeerocodes VibeCode Labs',
+        cohort,
+        status: 'active',
+        enrolledAt: new Date().toISOString(),
+        paymentStatus: 'paid',
+        paymentMethod,
+        amountNGN,
+        progress: 0,
+        completedLessons: ['lesson_1_1']
+      };
+      enrollments.unshift(newEnroll);
+      this.setLocal('enrollments', enrollments);
+
+      // Log payment event
+      await this.logPaymentEvent({
+        id: 'evt_adm_' + Date.now(),
+        provider: paymentMethod.toLowerCase().includes('offline') ? 'Manual Admin' : 'Paystack',
+        reference: 'ADM-' + Math.random().toString(36).substring(2, 9).toUpperCase(),
+        amountNGN,
+        currency: 'NGN',
+        status: 'success',
+        customerEmail: email,
+        item: 'The Zeerocodes VibeCode Labs Admission',
+        verifiedAt: new Date().toISOString()
+      });
+
+      return newEnroll;
+    }
+    return existingEnroll;
+  }
+
+  async removeStudent(enrollmentId, userEmail) {
+    const enrollments = (await this.getAllEnrollments()) || [];
+    const filtered = enrollments.filter(e => e.id !== enrollmentId && e.userEmail !== userEmail);
+    this.setLocal('enrollments', filtered);
+    return true;
+  }
+
+  // --- Invoicing & Billing Ledger ---
+  async getInvoices() {
+    const defaultInvoices = [
+      {
+        id: 'INV-2026-001',
+        clientName: 'PayQuick Africa',
+        clientEmail: 'tunde@payquick.africa',
+        projectTitle: 'WhatsApp Paystack Invoicing Engine',
+        amountNGN: 2500000,
+        amountUSD: 1650,
+        status: 'paid',
+        issueDate: '2026-08-01',
+        dueDate: '2026-08-15',
+        paidAt: '2026-08-03',
+        items: [
+          { desc: 'n8n Webhook Architecture & Paystack HMAC Verification', qty: 1, rate: 1500000, amount: 1500000 },
+          { desc: 'WhatsApp Cloud API 90-Second Bot Integration', qty: 1, rate: 1000000, amount: 1000000 }
+        ]
+      },
+      {
+        id: 'INV-2026-002',
+        clientName: 'MedLagos Telehealth',
+        clientEmail: 'dr.folake@medlagos.ng',
+        projectTitle: 'Clinical Telehealth Platform & Patient Portal',
+        amountNGN: 4800000,
+        amountUSD: 3200,
+        status: 'paid',
+        issueDate: '2026-08-05',
+        dueDate: '2026-08-20',
+        paidAt: '2026-08-07',
+        items: [
+          { desc: 'Next.js 15 Full-Stack Patient Consultation Portal', qty: 1, rate: 3000000, amount: 3000000 },
+          { desc: 'Supabase RLS & Webhook Payment Automated Reminders', qty: 1, rate: 1800000, amount: 1800000 }
+        ]
+      },
+      {
+        id: 'INV-2026-003',
+        clientName: 'SwiftShip Logistics',
+        clientEmail: 'ops@swiftship.africa',
+        projectTitle: 'Real-time Driver Dispatch & Automated SMS Tracking',
+        amountNGN: 1850000,
+        amountUSD: 1250,
+        status: 'pending',
+        issueDate: '2026-08-10',
+        dueDate: '2026-08-25',
+        items: [
+          { desc: 'Autonomous Fleet Tracking & Waybill Dispatch Bot', qty: 1, rate: 1850000, amount: 1850000 }
+        ]
+      }
+    ];
+
+    const invoices = this.getLocal('invoices');
+    if (invoices && invoices.length > 0) return invoices;
+    this.setLocal('invoices', defaultInvoices);
+    return defaultInvoices;
+  }
+
+  async saveInvoice(invoice) {
+    const invoices = await this.getInvoices();
+    const idx = invoices.findIndex(i => i.id === invoice.id);
+    if (idx >= 0) {
+      invoices[idx] = { ...invoices[idx], ...invoice };
+    } else {
+      invoices.unshift(invoice);
+    }
+    this.setLocal('invoices', invoices);
+    return invoice;
+  }
+
+  async deleteInvoice(invoiceId) {
+    const invoices = await this.getInvoices();
+    const filtered = invoices.filter(i => i.id !== invoiceId);
+    this.setLocal('invoices', filtered);
+    return true;
+  }
+
+  // --- Operating Expenses & Profit Analytics ---
+  async getExpenses() {
+    const defaultExpenses = [
+      { id: 'exp-01', category: 'Infrastructure', desc: 'Vercel Pro & Global Edge Network', amountNGN: 45000, date: '2026-08-01' },
+      { id: 'exp-02', category: 'Database & Auth', desc: 'Firebase Blaze & Supabase Pro Tier', amountNGN: 60000, date: '2026-08-02' },
+      { id: 'exp-03', category: 'AI Inference', desc: 'Claude 3.7 Sonnet & OpenAI API Tokens', amountNGN: 120000, date: '2026-08-04' },
+      { id: 'exp-04', category: 'Messaging', desc: 'WhatsApp Cloud API Meta Inbound/Outbound', amountNGN: 35000, date: '2026-08-06' },
+      { id: 'exp-05', category: 'Operations & QA', desc: 'Security Audit QA Specialist Payout', amountNGN: 250000, date: '2026-08-08' }
+    ];
+
+    const expenses = this.getLocal('expenses');
+    if (expenses && expenses.length > 0) return expenses;
+    this.setLocal('expenses', defaultExpenses);
+    return defaultExpenses;
+  }
+
+  async saveExpense(expense) {
+    const expenses = await this.getExpenses();
+    const idx = expenses.findIndex(e => e.id === expense.id);
+    if (idx >= 0) {
+      expenses[idx] = { ...expenses[idx], ...expense };
+    } else {
+      expenses.unshift(expense);
+    }
+    this.setLocal('expenses', expenses);
+    return expense;
+  }
+
+  async deleteExpense(expenseId) {
+    const expenses = await this.getExpenses();
+    const filtered = expenses.filter(e => e.id !== expenseId);
+    this.setLocal('expenses', filtered);
+    return true;
+  }
+
+  // --- Custom VibeScan Security Audits ---
+  async getCustomAudits() {
+    const defaultCustom = [
+      {
+        id: 'c-audit-01',
+        repoUrl: 'https://github.com/swiftship/fleet-tracking-api.git',
+        targetName: 'SwiftShip Fleet API',
+        profile: 'Full OWASP LLM Top 10 + Webhook HMAC',
+        score: 98,
+        status: 'certified',
+        scannedAt: '2026-08-11T14:30:00Z',
+        vulnerabilitiesCount: 0,
+        certificationId: 'VIBECERT-2026-0042'
+      }
+    ];
+
+    const audits = this.getLocal('customAudits');
+    if (audits && audits.length > 0) return audits;
+    this.setLocal('customAudits', defaultCustom);
+    return defaultCustom;
+  }
+
+  async saveCustomAudit(audit) {
+    const audits = await this.getCustomAudits();
+    audits.unshift(audit);
+    this.setLocal('customAudits', audits);
+    return audit;
+  }
+
+  async deleteStudioProject(projectId) {
+    const projects = this.getLocal('studioProjects') || [];
+    const filtered = projects.filter(p => p.id !== projectId);
+    this.setLocal('studioProjects', filtered);
+    return true;
+  }
+
   // --- Studio Projects ---
   async getStudioProjectsForUser(userId) {
     const projects = this.getLocal('studioProjects') || [];
