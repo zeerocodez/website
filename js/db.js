@@ -813,6 +813,129 @@ const DEFAULT_BLOG_POSTS = [
         <li><strong>Security & Monetization:</strong> Validating apps with VibeScan audits and pitching value-based retainer contracts.</li>
       </ul>
     `
+  },
+  {
+    id: 'post-swiftship-logistics-automation',
+    title: 'How We Automated Fleet Dispatch for SwiftShip Lagos Reclaiming 850+ Daily Chats',
+    slug: 'autonomous-logistics-fleet-dispatch-whatsapp-google-maps',
+    category: 'Case Studies',
+    categoryBadge: 'badge-success',
+    author: 'Nuel Effiong',
+    authorRole: 'Principal AI Systems Architect',
+    date: 'August 11, 2026',
+    readTime: '7 min read',
+    featuredImage: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1000&auto=format&fit=crop',
+    excerpt: 'How Zeerocodes Studio engineered an on-demand logistics dispatch portal with Google Maps routing and automated WhatsApp rider bots, enabling SwiftShip to handle 3.8x delivery volume without extra hires.',
+    tags: ['Logistics', 'WhatsApp Cloud API', 'Google Maps API', 'Automated Dispatch', 'Lagos'],
+    status: 'published',
+    content: `
+      <h2>The Bottleneck: 850+ Daily WhatsApp Chats Asking "Where Is My Rider?"</h2>
+      <p>SwiftShip Logistics operates an on-demand delivery fleet across Ikeja, Victoria Island, Lekki, and Yaba. As order volume tripled, their customer service and dispatch teams were completely overwhelmed.</p>
+      
+      <p>Dispatchers spent all day manually answering customer chats, calling riders on cellular lines to check locations, and updating chaotic Google Sheets. Delivery lag increased to over 45 minutes just to assign a single parcel.</p>
+
+      <h2>The Autonomous Solution: Intelligent Map Routing & WhatsApp Bot</h2>
+      <p>Zeerocodes Studio designed and deployed an end-to-end autonomous dispatch system in 18 business days:</p>
+
+      <ol>
+        <li><strong>Customer Booking Webhook:</strong> When a customer places a delivery request on SwiftShip's web portal, pickup and dropoff coordinates are geo-encoded via Google Maps API.</li>
+        <li><strong>Proximity Rider Matching:</strong> Our algorithm queries active rider GPS beacons to calculate real-time transit distance and battery status.</li>
+        <li><strong>WhatsApp Dispatch Push:</strong> The nearest rider receives an interactive WhatsApp message with one-tap <em>"Accept Delivery"</em> or <em>"Decline"</em> buttons.</li>
+        <li><strong>Live Customer Tracking Link:</strong> Upon acceptance, the customer receives an instant WhatsApp link showing the rider moving on a live map in real time.</li>
+      </ol>
+
+      <h2>The Outcome: 4-Minute Dispatch & 3.8x Volume Scale</h2>
+      <p>Average dispatch assignment dropped from <strong>45 minutes to under 4 minutes</strong>. Customer support inquiries dropped by <strong>74%</strong>, and SwiftShip handled <strong>3.8x more deliveries</strong> with zero additional dispatch staff.</p>
+
+      <div class="article-cta-box" style="background:#080D16; border:1px solid var(--emerald-primary); padding:1.5rem; border-radius:var(--radius-sm); margin:2rem 0;">
+        <h4 style="color:#FFF; margin-bottom:0.4rem;">Need custom logistics or workflow software?</h4>
+        <p style="color:var(--text-cyber-muted); font-size:0.9rem; margin-bottom:1rem;">Zeerocodes Studio designs, builds, and deploys production systems in 14-28 days.</p>
+        <button class="btn btn-primary btn-sm trigger-calendly-booking" data-service="Custom Logistics Dispatch System">
+          Book a Free 30-Min Discovery Call
+        </button>
+      </div>
+    `
+  },
+  {
+    id: 'post-supabase-rls-hardening',
+    title: 'The Complete Guide to Supabase PostgreSQL Row-Level Security (RLS) for African SaaS Founders',
+    slug: 'supabase-postgresql-row-level-security-rls-guide-saas',
+    category: 'AI Security',
+    categoryBadge: 'badge-danger',
+    author: 'Nuel Effiong',
+    authorRole: 'Principal AI Systems Architect',
+    date: 'August 12, 2026',
+    readTime: '9 min read',
+    featuredImage: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1000&auto=format&fit=crop',
+    excerpt: 'Why default Supabase tables leave your customer records open to public theft, and how to write uncrackable PostgreSQL RLS policies that pass enterprise security audits.',
+    tags: ['Supabase', 'PostgreSQL', 'Row-Level Security', 'Cybersecurity', 'Database Hardening'],
+    status: 'published',
+    content: `
+      <h2>The #1 Vulnerability in Modern AI-Generated Backends</h2>
+      <p>When founders vibe-code a Next.js or React application using Supabase, AI tools generate database tables that lack <strong>Row-Level Security (RLS)</strong> by default. Even if you don't expose your server key, your public anon key allows anyone with basic curl knowledge to dump your entire customer database.</p>
+
+      <h2>How Attackers Exploit Missing RLS</h2>
+      <p>Consider a standard table named <code>customer_invoices</code>. Without RLS, an attacker simply executes:</p>
+      
+      <pre><code>fetch('https://your-project.supabase.co/rest/v1/customer_invoices?select=*', {
+  headers: { 'apikey': 'your-public-anon-key' }
+});</code></pre>
+
+      <p>This query bypasses frontend UI screens and returns every invoice, customer bank account, phone number, and transaction amount in your database.</p>
+
+      <h2>The Non-Negotiable Fix: 3-Step Hardening</h2>
+      <ol>
+        <li><strong>Always Enable RLS Explicitly:</strong>
+          <pre><code>ALTER TABLE customer_invoices ENABLE ROW LEVEL SECURITY;</code></pre>
+        </li>
+        <li><strong>Enforce Tenant Ownership on SELECT:</strong>
+          <pre><code>CREATE POLICY "Users can only select own invoices"
+  ON customer_invoices FOR SELECT
+  USING (auth.uid() = user_id);</code></pre>
+        </li>
+        <li><strong>Block Client-Side Role Elevation on UPDATE:</strong>
+          <pre><code>CREATE POLICY "Users cannot modify their own role"
+  ON auth_profiles FOR UPDATE
+  USING (auth.uid() = id)
+  WITH CHECK (role = (SELECT role FROM auth_profiles WHERE id = auth.uid()));</code></pre>
+        </li>
+      </ol>
+
+      <p>By enforcing these rules, your database cryptographically guarantees tenant isolation at the PostgreSQL kernel level.</p>
+    `
+  },
+  {
+    id: 'post-antigravity-ai-studio-mvp',
+    title: 'Mastering Google Antigravity & AI Studio: How African Founders Ship Production MVPs in 72 Hours',
+    slug: 'mastering-google-antigravity-ai-studio-72-hour-mvp',
+    category: 'Engineering',
+    categoryBadge: 'badge-teal',
+    author: 'Nuel Effiong',
+    authorRole: 'Principal AI Systems Architect',
+    date: 'August 12, 2026',
+    readTime: '8 min read',
+    featuredImage: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=1000&auto=format&fit=crop',
+    excerpt: 'A comprehensive methodology for writing airtight engineering specifications, generating full-stack Next.js applications, and passing AST security audits in 72 hours.',
+    tags: ['Google Antigravity', 'AI Studio', 'Vibe Coding', 'MVP Engineering', 'The VibeCode Labs'],
+    status: 'published',
+    content: `
+      <h2>The Shift from Syntax Typing to Architectural Specification</h2>
+      <p>The biggest mistake first-time AI builders make is writing vague prompts like <em>"Build me a billing system"</em>. AI models will hallucinate database schemas, invent non-existent packages, and introduce critical security gaps.</p>
+
+      <h2>The 4-Step Zeerocodes 72-Hour Build Formula</h2>
+      
+      <h3>Step 1: Entity-Relationship & Security Specification (Day 1)</h3>
+      <p>Before asking the AI to write a single component, define your database entities, foreign keys, and security rules (RLS, HMAC, rate limiting) in markdown specifications.</p>
+
+      <h3>Step 2: Component Scaffolding in Google Stitch & AI Studio (Day 2)</h3>
+      <p>Generate high-conversion UI layouts with strict design tokens, responsive typography, and mobile-first touch targets tailored for Nigerian mobile data speeds.</p>
+
+      <h3>Step 3: Business Logic & Autonomous Integrations (Day 3)</h3>
+      <p>Wire real payment webhooks (Paystack / Flutterwave), event triggers, and WhatsApp notifications using constant-time cryptographic verification.</p>
+
+      <h3>Step 4: VibeScan AST Static Audit & Hardening</h3>
+      <p>Run your repository through VibeScan to seal backdoors, verify OWASP LLM compliance, and generate the cryptographic <strong>VibeCert™ Seal</strong>.</p>
+    `
   }
 ];
 
