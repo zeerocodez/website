@@ -8,6 +8,7 @@
 const AUTH_USER_KEY = 'zeerocodes_current_user';
 
 const MASTER_ADMIN_EMAILS = [
+  'ukemeobonguduak@gmail.com',
   'zeerocodes@gmail.com',
   'admin@zeerocodes.com',
   'nuel@zeerocodes.com',
@@ -17,7 +18,7 @@ const MASTER_ADMIN_EMAILS = [
 function isMasterAdminEmail(email) {
   if (!email) return false;
   const clean = String(email).toLowerCase().trim();
-  return MASTER_ADMIN_EMAILS.includes(clean) || clean.includes('admin@zeerocodes') || clean.includes('nuel@zeerocodes');
+  return MASTER_ADMIN_EMAILS.includes(clean) || clean.includes('admin@zeerocodes') || clean.includes('nuel@zeerocodes') || clean.includes('ukemeobonguduak');
 }
 
 class AuthService {

@@ -486,6 +486,18 @@ const DEFAULT_COURSES = [
 
 const DEFAULT_USERS = [
   {
+    uid: 'user-admin-ukeme',
+    displayName: 'Ukemeobong Uduak',
+    email: 'ukemeobonguduak@gmail.com',
+    role: 'admin',
+    photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop',
+    title: 'Lead Administrator & Executive Architect',
+    phone: '+234 812 000 0000',
+    referralSource: 'direct',
+    joinedAt: '2026-01-01T08:00:00Z',
+    emailVerified: true
+  },
+  {
     uid: 'user-admin-01',
     displayName: 'Nuel Effiong',
     email: 'admin@zeerocodes.com',

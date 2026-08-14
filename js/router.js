@@ -49,9 +49,44 @@ class Router {
         desc: 'Transparent pricing for VibeScan AI code audits: Starter Scan, Comprehensive Audit, and Enterprise Retainer with VibeCert™ badge.',
         public: true
       },
+      '#vibescanSandboxSection': {
+        viewId: 'view-vibescan',
+        scrollToId: 'vibescanSandboxSection',
+        title: 'Test Live AST Security Scanner Sandbox | Zeerocodes VibeScan',
+        desc: 'Interactive AST threat analyzer for vibe-coded applications. Detect API key leaks, open PostgreSQL RLS, and webhook exploits in real-time.',
+        public: true
+      },
+      '#studio-services': {
+        viewId: 'view-studio',
+        scrollToId: 'studio-services-section',
+        title: 'Custom Web Apps & SaaS Engineering | Zeerocodes Studio',
+        desc: 'We build production web apps, client portals, and SaaS platforms delivered in 14-28 days with zero tech debt.',
+        public: true
+      },
+      '#studio-websites': {
+        viewId: 'view-studio',
+        scrollToId: 'studio-websites-section',
+        title: 'High-Converting Websites & Portals | Zeerocodes Studio',
+        desc: 'Sub-second mobile-first websites with integrated Paystack checkout and automated CRM lead capture.',
+        public: true
+      },
+      '#studio-automations': {
+        viewId: 'view-studio',
+        scrollToId: 'studio-automations-section',
+        title: 'Autonomous Business Automations | Zeerocodes Studio',
+        desc: 'WhatsApp bots, 90-second payment reconciliation, and automated operational pipelines.',
+        public: true
+      },
+      '#studio-sla': {
+        viewId: 'view-studio',
+        scrollToId: 'studio-sla-section',
+        title: 'Managed Operations & 24/7 SLA | Zeerocodes Studio',
+        desc: '24/7 continuous health checks, 99.99% webhook uptime guarantee, and dedicated engineer hotline.',
+        public: true
+      },
       '#roiCalculatorSection': {
         viewId: 'view-studio',
-        scrollToId: 'roiCalculatorSection',
+        scrollToId: 'roi-calculator',
         title: 'Automation ROI & Hours Reclaimed Calculator | Zeerocodes Studio',
         desc: 'Calculate how many hours and millions in manual payroll your business can reclaim with autonomous event-driven automations.',
         public: true

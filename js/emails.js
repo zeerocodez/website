@@ -61,6 +61,41 @@ class TransactionalEmailEngine {
         category: 'Academy (Teach)',
         defaultSubject: '⚡ Weekly Builder Sprint: {{courseTitle}} Week {{weekNumber}}',
         render: (data) => this.templateCohortReminder(data)
+      },
+      admin_new_discovery_booking: {
+        id: 'admin_new_discovery_booking',
+        name: 'Admin Alert: New Discovery Call Booked',
+        category: 'Admin Notifications',
+        defaultSubject: '🚨 [Admin Alert] New Discovery Call Booked: {{clientName}} ({{scheduledDate}} @ {{scheduledSlot}})',
+        render: (data) => this.templateAdminDiscoveryBooking(data)
+      },
+      admin_new_course_enrollment: {
+        id: 'admin_new_course_enrollment',
+        name: 'Admin Alert: New Course Enrollment',
+        category: 'Admin Notifications',
+        defaultSubject: '🎓 [Admin Alert] New Student Enrolled: {{studentName}} ({{courseTitle}})',
+        render: (data) => this.templateAdminCourseEnrollment(data)
+      },
+      admin_new_client_inquiry: {
+        id: 'admin_new_client_inquiry',
+        name: 'Admin Alert: New Client Scoping Inquiry',
+        category: 'Admin Notifications',
+        defaultSubject: '📬 [Admin Alert] New Studio Inquiry: {{clientName}} ({{topic}})',
+        render: (data) => this.templateAdminClientInquiry(data)
+      },
+      discovery_confirmed: {
+        id: 'discovery_confirmed',
+        name: 'Client Discovery Call Confirmation',
+        category: 'Studio (Build)',
+        defaultSubject: '📅 Your Zeerocodes Discovery Call is Confirmed ({{scheduledDate}} at {{scheduledSlot}})',
+        render: (data) => this.templateDiscoveryConfirmed(data)
+      },
+      inquiry_received: {
+        id: 'inquiry_received',
+        name: 'Client Project Inquiry Receipt',
+        category: 'Studio (Build)',
+        defaultSubject: '⚡ We received your inquiry — Zeerocodes Engineering Team',
+        render: (data) => this.templateInquiryReceived(data)
       }
     };
   }
@@ -391,6 +426,193 @@ class TransactionalEmailEngine {
     `;
 
     return this.wrapEmail(`Week ${week} Sprint in ${course}`, `Your weekly builder roadmap for ${course}.`, body);
+  }
+
+  // =========================================================================
+  // 8. ADMIN ALERT: NEW DISCOVERY CALL BOOKED
+  // =========================================================================
+  templateAdminDiscoveryBooking(data) {
+    const client = data.clientName || 'Prospective Client';
+    const email = data.clientEmail || data.userEmail || 'client@example.com';
+    const phone = data.clientPhone || 'Not provided';
+    const service = data.service || 'Custom Automation / Web App';
+    const budget = data.budget || '₦500k - ₦1.5M';
+    const date = data.scheduledDate || 'Tomorrow';
+    const slot = data.scheduledSlot || '10:00 AM (WAT)';
+    const notes = data.summary || data.notes || 'No special notes provided';
+
+    const body = `
+      <div style="margin-bottom:16px;">
+        <span class="badge badge-success">🚨 HIGH PRIORITY LEAD</span>
+      </div>
+      <h2>New Discovery Call Booked</h2>
+      <p>A prospective client has scheduled a 30-minute discovery session within WAT office hours.</p>
+
+      <div class="card-box">
+        <table class="table-data">
+          <tbody>
+            <tr><td style="color:#6B7280; width:35%;">Client Name:</td><td><strong>${client}</strong></td></tr>
+            <tr><td style="color:#6B7280;">Work Email:</td><td><a href="mailto:${email}" style="color:#85C79A;">${email}</a></td></tr>
+            <tr><td style="color:#6B7280;">Phone / WhatsApp:</td><td>${phone}</td></tr>
+            <tr><td style="color:#6B7280;">Target Service:</td><td><span class="badge badge-teal">${service}</span></td></tr>
+            <tr><td style="color:#6B7280;">Estimated Budget:</td><td><strong style="color:#85C79A;">${budget}</strong></td></tr>
+            <tr><td style="color:#6B7280;">Scheduled Slot:</td><td><strong style="color:#FFF;">${date} at ${slot}</strong></td></tr>
+          </tbody>
+        </table>
+        <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); font-size:13px; color:#E4EEE7; line-height:1.5;">
+          <strong>Project Bottlenecks & Notes:</strong><br>
+          "${notes}"
+        </div>
+      </div>
+
+      <div style="text-align:center; margin:28px 0;">
+        <a href="https://zeerocodes.com/#admin" class="btn-primary">View in Admin Command Center &rarr;</a>
+      </div>
+    `;
+
+    return this.wrapEmail(`Admin Alert: Discovery Call from ${client}`, `New Discovery Call Booked: ${client} for ${date} at ${slot}`, body);
+  }
+
+  // =========================================================================
+  // 9. ADMIN ALERT: NEW COURSE ENROLLMENT
+  // =========================================================================
+  templateAdminCourseEnrollment(data) {
+    const student = data.studentName || data.userEmail || 'New Student';
+    const email = data.userEmail || 'student@example.com';
+    const course = data.courseTitle || 'The Zeerocodes VibeCode Labs';
+    const amountNGN = (parseInt(data.amountNGN) || 95000).toLocaleString();
+    const ref = data.paymentRef || data.reference || 'ZC_TXN_' + Date.now().toString(36);
+
+    const body = `
+      <div style="margin-bottom:16px;">
+        <span class="badge badge-success">🎓 REVENUE RECORDED (200 OK)</span>
+      </div>
+      <h2>New Student Enrollment Confirmed</h2>
+      <p>A new builder has completed tuition settlement and is admitted to the cohort.</p>
+
+      <div class="card-box">
+        <table class="table-data">
+          <tbody>
+            <tr><td style="color:#6B7280; width:35%;">Student Name:</td><td><strong>${student}</strong></td></tr>
+            <tr><td style="color:#6B7280;">Student Email:</td><td><a href="mailto:${email}" style="color:#85C79A;">${email}</a></td></tr>
+            <tr><td style="color:#6B7280;">Course Track:</td><td><strong>${course}</strong></td></tr>
+            <tr><td style="color:#6B7280;">Tuition Paid:</td><td><strong style="color:#85C79A; font-size:15px;">₦${amountNGN}</strong></td></tr>
+            <tr><td style="color:#6B7280;">Payment Gateway:</td><td>Paystack / Flutterwave Verified (Ref: ${ref})</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="text-align:center; margin:28px 0;">
+        <a href="https://zeerocodes.com/#admin" class="btn-primary">Open Student Directory &rarr;</a>
+      </div>
+    `;
+
+    return this.wrapEmail(`New Student Enrollment: ${student}`, `New enrollment for ${course}: ${student} (₦${amountNGN})`, body);
+  }
+
+  // =========================================================================
+  // 10. ADMIN ALERT: NEW CLIENT INQUIRY / REQUEST
+  // =========================================================================
+  templateAdminClientInquiry(data) {
+    const client = data.name || data.clientName || 'Inquirer';
+    const email = data.email || data.clientEmail || 'client@example.com';
+    const topic = data.topic || 'General Inquiry';
+    const message = data.message || 'No details provided';
+    const ref = data.inquiryRef || ('INQ-' + Date.now().toString(36).toUpperCase());
+
+    const body = `
+      <div style="margin-bottom:16px;">
+        <span class="badge badge-teal">📬 NEW INCOMING INQUIRY</span>
+      </div>
+      <h2>New Client Request Submitted</h2>
+      <p>A prospective client has submitted an inquiry form on Zeerocodes.</p>
+
+      <div class="card-box">
+        <table class="table-data">
+          <tbody>
+            <tr><td style="color:#6B7280; width:35%;">Inquiry Ref:</td><td><strong style="font-family:monospace; color:#85C79A;">${ref}</strong></td></tr>
+            <tr><td style="color:#6B7280;">From:</td><td><strong>${client}</strong> (<a href="mailto:${email}" style="color:#85C79A;">${email}</a>)</td></tr>
+            <tr><td style="color:#6B7280;">Topic:</td><td><span class="badge badge-teal">${topic}</span></td></tr>
+          </tbody>
+        </table>
+        <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); font-size:13px; color:#E4EEE7; line-height:1.5; margin-top:8px;">
+          <strong>Message / Scope Details:</strong><br>
+          "${message}"
+        </div>
+      </div>
+
+      <div style="text-align:center; margin:28px 0;">
+        <a href="https://zeerocodes.com/#admin" class="btn-primary">Respond in Admin Dashboard &rarr;</a>
+      </div>
+    `;
+
+    return this.wrapEmail(`New Inquiry: ${client} (${topic})`, `New inquiry from ${client} regarding ${topic}`, body);
+  }
+
+  // =========================================================================
+  // 11. CLIENT CONFIRMATION: DISCOVERY SESSION
+  // =========================================================================
+  templateDiscoveryConfirmed(data) {
+    const client = data.clientName || 'Partner';
+    const service = data.service || 'Custom Automation / Web App';
+    const date = data.scheduledDate || 'Tomorrow';
+    const slot = data.scheduledSlot || '10:00 AM (WAT)';
+    const gcalUrl = data.gcalUrl || 'https://calendar.google.com';
+    const waUrl = data.waUrl || 'https://wa.me/2348120000000';
+
+    const body = `
+      <div style="margin-bottom:16px;">
+        <span class="badge badge-success">CALENDAR APPOINTMENT CONFIRMED</span>
+      </div>
+      <h2>Your Discovery Session is Confirmed, ${client}!</h2>
+      <p>We are excited to learn about your business and map out an autonomous software architecture that saves your team time and eliminates manual headaches.</p>
+
+      <div class="card-box">
+        <div style="font-size:12px; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">SESSION DETAILS</div>
+        <div style="font-size:18px; font-weight:800; color:#FFF; margin-bottom:10px;">${service}</div>
+        <div style="font-size:14px; color:#85C79A; margin-bottom:6px;"><strong>Date:</strong> ${date}</div>
+        <div style="font-size:14px; color:#85C79A; margin-bottom:14px;"><strong>Time:</strong> ${slot} (West Africa Time / Lagos GMT+1)</div>
+        <div style="font-size:13px; color:#9CA3AF;">Lead Architect: Nuel Effiong (Principal AI Systems Architect)</div>
+      </div>
+
+      <div style="display:flex; gap:12px; justify-content:center; margin:28px 0; flex-wrap:wrap;">
+        <a href="${gcalUrl}" class="btn-primary" target="_blank">Add to Google Calendar &rarr;</a>
+        <a href="${waUrl}" style="background:#25D366; color:#FFF; text-decoration:none; padding:14px 24px; border-radius:8px; font-weight:700; font-size:14px;" target="_blank">Chat on WhatsApp</a>
+      </div>
+
+      <p style="font-size:12px; color:#6B7280; text-align:center;">Need to reschedule? Reply directly to this email or send a message to +234 812 000 0000.</p>
+    `;
+
+    return this.wrapEmail(`Discovery Call Confirmed: ${date} @ ${slot}`, `Your Zeerocodes discovery session for ${service} is scheduled for ${date} at ${slot}.`, body);
+  }
+
+  // =========================================================================
+  // 12. CLIENT INQUIRY RECEIPT
+  // =========================================================================
+  templateInquiryReceived(data) {
+    const client = data.name || data.clientName || 'Partner';
+    const topic = data.topic || 'General Inquiry';
+    const ref = data.inquiryRef || ('INQ-' + Date.now().toString(36).toUpperCase());
+
+    const body = `
+      <div style="margin-bottom:16px;">
+        <span class="badge badge-teal">INQUIRY RECEIVED</span>
+      </div>
+      <h2>Thank You for Reaching Out, ${client}!</h2>
+      <p>We have safely received your project details regarding <strong>${topic}</strong>. A lead systems architect from our Lagos engineering office is reviewing your inquiry.</p>
+
+      <div class="card-box">
+        <div style="font-size:12px; color:#6B7280; margin-bottom:4px;">INQUIRY REFERENCE</div>
+        <div style="font-family:monospace; font-size:16px; color:#85C79A; font-weight:700; margin-bottom:12px;">${ref}</div>
+        <p style="font-size:13px; color:#E4EEE7; margin:0;"><strong>Guaranteed Response Time:</strong> Within 24 business hours. If your project is urgent, you may also book an instant 30-minute discovery call on our calendar.</p>
+      </div>
+
+      <div style="text-align:center; margin:28px 0;">
+        <a href="https://zeerocodes.com/#studio" class="btn-primary">Explore Studio Services & Case Studies &rarr;</a>
+      </div>
+    `;
+
+    return this.wrapEmail(`Inquiry Received: ${topic}`, `We have received your Zeerocodes inquiry (${ref}). We will respond within 24 hours.`, body);
   }
 
   // --- Render Template with Variable Interpolation ---

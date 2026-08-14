@@ -3292,3 +3292,565 @@ img, svg, video {
     display: none !important;
   }
 }
+
+/* ==========================================================================
+   TIME SLOTS & ANTI-OVERBOOKING STYLES (WAT OFFICE HOURS)
+   ========================================================================== */
+.time-slot-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #D1D5DB;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-xs);
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.time-slot-btn:hover:not(:disabled) {
+  border-color: var(--emerald-light);
+  color: #FFF;
+  background: rgba(0, 245, 212, 0.08);
+}
+
+.time-slot-btn.selected {
+  background: linear-gradient(135deg, var(--emerald-primary), #009688);
+  border-color: var(--emerald-light);
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 0 14px rgba(0, 245, 212, 0.35);
+}
+
+.time-slot-btn:disabled,
+.time-slot-btn.slot-booked {
+  background: rgba(239, 68, 68, 0.06) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: #F87171 !important;
+  text-decoration: line-through;
+  cursor: not-allowed !important;
+  opacity: 0.65;
+}
+
+/* ==========================================================================
+   SAMPLE AUTOMATIONS INTERACTIVE HOVER & WORKFLOW SIMULATOR
+   ========================================================================== */
+.sample-auto-card.interactive-wf-trigger {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.sample-auto-card.interactive-wf-trigger:hover {
+  transform: translateY(-4px);
+  border-color: var(--emerald-light);
+  box-shadow: 0 12px 30px rgba(0, 245, 212, 0.15);
+}
+
+.sim-node-item {
+  position: relative;
+}
+
+.sim-node-item::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: transparent;
+  transition: background 0.3s ease;
+}
+
+.sim-node-item.active-pulse {
+  border-color: #00F5D4 !important;
+  box-shadow: 0 0 20px rgba(0, 245, 212, 0.25);
+}
+
+/* ==========================================================================
+   FUTURISTIC TABLET DASHBOARD DESIGN SYSTEM (INSPIRED BY REFERENCE UI)
+   ========================================================================== */
+.modern-dash-shell {
+  background: radial-gradient(circle at 20% 0%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(0, 245, 212, 0.06) 0%, transparent 40%),
+              #070A10;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 1.5rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  position: relative;
+  overflow: hidden;
+}
+
+.modern-dash-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .modern-dash-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 1. Sleek Sidebar with Glowing Active Pill */
+.modern-dash-sidebar {
+  background: rgba(12, 16, 25, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  padding: 1.25rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dash-brand-header {
+  padding: 0.5rem 0.75rem 1rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.dash-brand-badge {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+  background: linear-gradient(135deg, #FFFFFF, #CBD5E1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.modern-dash-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.modern-dash-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #94A3B8;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+}
+
+.modern-dash-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #FFFFFF;
+}
+
+.modern-dash-nav-btn.active {
+  background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%) !important;
+  color: #FFFFFF !important;
+  font-weight: 700;
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4), 0 0 1px #FFF inset;
+}
+
+.modern-dash-nav-btn i {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* 2. Top Header & Key Stat Cards Grid */
+.modern-dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.modern-dash-title-group h2 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.modern-stat-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.ref-stat-card {
+  background: rgba(12, 17, 26, 0.8);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ref-stat-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(139, 92, 246, 0.35);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4), 0 0 20px rgba(139, 92, 246, 0.1);
+}
+
+.ref-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.6), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.ref-stat-card:hover::before {
+  opacity: 1;
+}
+
+.ref-stat-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.ref-stat-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ref-stat-val-group {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+}
+
+.ref-stat-number {
+  font-size: 2.1rem;
+  font-weight: 900;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.trend-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.trend-pill.positive {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.trend-pill.purple {
+  background: rgba(168, 85, 247, 0.15);
+  color: #C084FC;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.trend-pill.cyan {
+  background: rgba(34, 211, 238, 0.15);
+  color: #38BDF8;
+  border: 1px solid rgba(34, 211, 238, 0.3);
+}
+
+.ref-sparkline-wrap {
+  width: 100%;
+  height: 38px;
+  margin-top: 0.25rem;
+}
+
+.ref-sparkline-wrap svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* 3. Interactive Glowing Area Wave Chart */
+.wave-chart-card {
+  background: rgba(12, 17, 26, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 1.5rem;
+  position: relative;
+}
+
+.wave-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.wave-period-group {
+  display: flex;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 2px;
+}
+
+.period-pill-btn {
+  background: transparent;
+  border: none;
+  color: #94A3B8;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.period-pill-btn:hover {
+  color: #FFF;
+}
+
+.period-pill-btn.active {
+  background: linear-gradient(135deg, #8B5CF6, #6366F1);
+  color: #FFF;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+}
+
+.wave-canvas-wrap {
+  width: 100%;
+  height: 220px;
+  position: relative;
+}
+
+.wave-canvas-wrap svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* 4. Circular Multi-Ring Donut Breakdown Card */
+.ref-donut-card {
+  background: rgba(12, 17, 26, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ref-donut-container {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0.5rem auto 1rem auto;
+}
+
+.ref-donut-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.donut-center-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.donut-center-number {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  line-height: 1;
+}
+
+.donut-center-sub {
+  font-size: 0.68rem;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 3px;
+}
+
+.donut-legend-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.donut-legend-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #D1D5DB;
+}
+
+.donut-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+/* 5. Floating "Amara — AI Systems Ops Manager" Card */
+.floating-ai-card {
+  background: rgba(15, 21, 33, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  border-radius: 18px;
+  padding: 1.15rem 1.35rem;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 24px rgba(139, 92, 246, 0.15);
+  position: relative;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ai-profile-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ai-avatar-wrap {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+}
+
+.ai-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #8B5CF6;
+  box-shadow: 0 0 14px rgba(139, 92, 246, 0.4);
+}
+
+.ai-pulse-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #10B981;
+  border: 2px solid #070A10;
+  box-shadow: 0 0 8px #10B981;
+  animation: pulseAiGlow 2s infinite ease-in-out;
+}
+
+@keyframes pulseAiGlow {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+.ai-info-meta h4 {
+  font-size: 0.98rem;
+  color: #FFF;
+  margin: 0 0 0.2rem 0;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.ai-info-meta p {
+  font-size: 0.82rem;
+  color: #94A3B8;
+  margin: 0;
+  line-height: 1.4;
+  max-width: 560px;
+}
+
+/* 6. Live Service Integrations & Operations Feed */
+.ref-integration-card {
+  background: rgba(12, 17, 26, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 1.5rem;
+}
+
+.ref-integration-row {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+  transition: all 0.2s ease;
+}
+
+.ref-integration-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(139, 92, 246, 0.25);
+  transform: translateX(3px);
+}
+
+.integration-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+

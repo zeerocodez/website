@@ -159,103 +159,399 @@ class AdminConsoleManager {
   }
 
   // =========================================================================
-  // TAB 1: OVERVIEW & MISSION CONTROL
+  // TAB 1: OVERVIEW & MISSION CONTROL (REFERENCE UI UPGRADE)
   // =========================================================================
   renderOverviewTab(projects, vibescanSubs, enrollments, labSubs, paymentEvents, netProfitNGN, profitMargin, totalRevNGN, emailLogs) {
     const container = document.getElementById('adminOverviewContent');
     if (!container) return;
 
     const pendingLabsCount = labSubs.filter(l => l.status === 'pending').length;
+    const discoveryProjects = (projects || []).filter(p => p.status === 'discovery_booked' || p.scheduledSlot);
+    const contactInquiries = (window.db ? window.db.getLocal('contactInquiries') : []) || [];
+    const allLeads = [
+      ...discoveryProjects.map(d => ({ type: 'discovery', title: d.title, name: d.clientName, email: d.userEmail, phone: d.clientPhone, date: d.scheduledDate, slot: d.scheduledSlot, notes: d.summary, budget: d.budget, raw: d })),
+      ...contactInquiries.map(c => ({ type: 'inquiry', title: c.topic, name: c.name, email: c.email, phone: 'Via Web Form', date: c.submittedAt?.split('T')[0], slot: '24h SLA', notes: c.message, budget: 'Pending Scope', raw: c }))
+    ];
 
     container.innerHTML = `
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap:1.5rem; margin-bottom:2rem;">
-        <!-- Financial Quick Snapshot -->
-        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.5rem;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-            <h4 style="color:#FFF; font-size:1.05rem; margin:0; display:flex; align-items:center; gap:0.5rem;">
-              <i data-lucide="wallet" style="color:var(--emerald-light);"></i> Net Profit & Margins
-            </h4>
-            <span class="badge badge-success">${profitMargin}% Margin</span>
-          </div>
-          <div style="font-size:2rem; font-weight:900; color:var(--emerald-light); margin-bottom:0.4rem;">
-            ₦${(netProfitNGN / 1000000).toFixed(2)}M
-          </div>
-          <div style="font-size:0.8rem; color:var(--text-cyber-muted); margin-bottom:1.25rem;">
-            Gross Pipeline: <strong>₦${(totalRevNGN / 1000000).toFixed(2)}M</strong>
-          </div>
-          <button class="btn btn-outline btn-xs" onclick="document.querySelector('[data-tab=adminTabFinancials]').click()">
-            <i data-lucide="receipt"></i> View Invoices & Profit Breakdown &rarr;
+      <!-- Top Title & Quick Actions -->
+      <div class="modern-dash-header">
+        <div class="modern-dash-title-group">
+          <h2>
+            <i data-lucide="shield-alert" style="color:#A855F7;"></i> Command Hub Telemetry
+          </h2>
+          <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0.25rem 0 0 0;">
+            Live operations, client build pipelines, student admissions & financial margins
+          </p>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <span class="badge badge-success" style="font-size:0.75rem;">${profitMargin}% Margin</span>
+          <button class="btn btn-outline btn-xs" onclick="window.app?.runAmaraAiDiagnostic()">
+            <i data-lucide="activity"></i> System Audit
           </button>
         </div>
+      </div>
 
-        <!-- Action Items Callout -->
-        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.5rem;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-            <h4 style="color:#FFF; font-size:1.05rem; margin:0; display:flex; align-items:center; gap:0.5rem;">
-              <i data-lucide="bell" style="color:var(--cyan-accent);"></i> Operational Queue
-            </h4>
-            <span class="badge badge-teal">${pendingLabsCount + vibescanSubs.length} Pending</span>
+      <!-- 4 Key Stat Cards (Inspired by Reference UI Top Row) -->
+      <div class="modern-stat-cards-grid">
+        <!-- Stat 1: Gross Pipeline -->
+        <div class="ref-stat-card">
+          <div class="ref-stat-top">
+            <span class="ref-stat-label">GROSS PIPELINE</span>
+            <span class="trend-pill positive"><i data-lucide="trending-up"></i> +59%</span>
           </div>
-          <div style="display:flex; flex-direction:column; gap:0.75rem;">
-            <div style="background:rgba(255,255,255,0.02); padding:0.65rem 0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
-              <div>
-                <strong style="color:#FFF; font-size:0.85rem;">Student Code Labs</strong>
-                <div style="font-size:0.75rem; color:var(--text-cyber-muted);">${pendingLabsCount} labs awaiting inspection</div>
-              </div>
-              <button class="btn btn-primary btn-xs" onclick="document.querySelector('[data-tab=adminTabStudents]').click()">Grade</button>
-            </div>
-            <div style="background:rgba(255,255,255,0.02); padding:0.65rem 0.85rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
-              <div>
-                <strong style="color:#FFF; font-size:0.85rem;">Transactional Email Engine</strong>
-                <div style="font-size:0.75rem; color:var(--text-cyber-muted);">${emailLogs.length} automated messages logged</div>
-              </div>
-              <button class="btn btn-outline btn-xs" onclick="document.querySelector('[data-tab=adminTabEmails]').click()">Emails</button>
-            </div>
+          <div class="ref-stat-val-group">
+            <span class="ref-stat-number">₦${(totalRevNGN / 1000000).toFixed(1)}M</span>
+            <span style="font-size:0.8rem; color:var(--emerald-light); font-weight:700;">₦${(netProfitNGN / 1000000).toFixed(1)}M Net</span>
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-cyber-muted);">${profitMargin}% Profit Margin Reached</div>
+          <div class="ref-sparkline-wrap">
+            <svg viewBox="0 0 160 38" fill="none">
+              <path d="M0 30 Q 20 28, 40 20 T 80 15 T 120 22 T 160 5" stroke="#A855F7" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <path d="M0 30 Q 20 28, 40 20 T 80 15 T 120 22 T 160 5 L 160 38 L 0 38 Z" fill="url(#sparkAdmin1)" opacity="0.3"/>
+              <defs>
+                <linearGradient id="sparkAdmin1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#A855F7"/>
+                  <stop offset="100%" stop-color="transparent"/>
+                </linearGradient>
+              </defs>
+            </svg>
           </div>
         </div>
 
-        <!-- Quick Admin Shortcuts -->
-        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.5rem;">
-          <h4 style="color:#FFF; font-size:1.05rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
-            <i data-lucide="zap" style="color:var(--emerald-light);"></i> Rapid Actions
-          </h4>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
-            <button class="btn btn-outline btn-xs" onclick="window.adminConsole.openCreateCourseModal()"><i data-lucide="book-plus"></i> New Course</button>
-            <button class="btn btn-outline btn-xs" onclick="window.adminConsole.openAdmitStudentModal()"><i data-lucide="user-plus"></i> Admit Student</button>
-            <button class="btn btn-outline btn-xs" onclick="window.adminConsole.openNewProjectModal()"><i data-lucide="folder-plus"></i> New Project</button>
-            <button class="btn btn-outline btn-xs" onclick="window.adminConsole.openNewInvoiceModal()"><i data-lucide="receipt"></i> New Invoice</button>
-            <button class="btn btn-outline btn-xs" onclick="window.adminConsole.openCustomScanModal()"><i data-lucide="shield-check"></i> Custom Scan</button>
-            <button class="btn btn-outline btn-xs" onclick="window.adminConsole.openBlogEditorModal()"><i data-lucide="edit-3"></i> New Article</button>
+        <!-- Stat 2: Active Builds -->
+        <div class="ref-stat-card">
+          <div class="ref-stat-top">
+            <span class="ref-stat-label">ACTIVE BUILDS</span>
+            <span class="trend-pill positive"><i data-lucide="trending-up"></i> +1.5%</span>
+          </div>
+          <div class="ref-stat-val-group">
+            <span class="ref-stat-number">${projects.length}</span>
+            <span class="trend-pill cyan">3 Sprints</span>
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-cyber-muted);">Next.js SaaS & WhatsApp Bots</div>
+          <div class="ref-sparkline-wrap">
+            <svg viewBox="0 0 160 38" fill="none">
+              <path d="M0 32 Q 25 15, 50 25 T 100 10 T 130 18 T 160 4" stroke="#00F5D4" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <path d="M0 32 Q 25 15, 50 25 T 100 10 T 130 18 T 160 4 L 160 38 L 0 38 Z" fill="url(#sparkAdmin2)" opacity="0.3"/>
+              <defs>
+                <linearGradient id="sparkAdmin2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#00F5D4"/>
+                  <stop offset="100%" stop-color="transparent"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Stat 3: Inbound Leads & Calls -->
+        <div class="ref-stat-card">
+          <div class="ref-stat-top">
+            <span class="ref-stat-label">DISCOVERY QUEUE</span>
+            <span class="trend-pill positive">WAT Active</span>
+          </div>
+          <div class="ref-stat-val-group">
+            <span class="ref-stat-number">${allLeads.length}</span>
+            <span style="font-size:0.8rem; color:var(--cyan-accent); font-weight:700;">In Queue</span>
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-cyber-muted);">10 AM - 6 PM WAT Office Hours</div>
+          <div class="ref-sparkline-wrap">
+            <svg viewBox="0 0 160 38" fill="none">
+              <path d="M0 28 Q 30 32, 60 18 T 110 24 T 160 8" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <path d="M0 28 Q 30 32, 60 18 T 110 24 T 160 8 L 160 38 L 0 38 Z" fill="url(#sparkAdmin3)" opacity="0.3"/>
+              <defs>
+                <linearGradient id="sparkAdmin3" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#38BDF8"/>
+                  <stop offset="100%" stop-color="transparent"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Stat 4: Builders & Labs -->
+        <div class="ref-stat-card">
+          <div class="ref-stat-top">
+            <span class="ref-stat-label">BUILDERS TRAINED</span>
+            <span class="trend-pill purple">COHORT 4</span>
+          </div>
+          <div class="ref-stat-val-group">
+            <span class="ref-stat-number">1,450</span>
+            <span style="font-size:0.8rem; color:#A855F7; font-weight:700;">+24%</span>
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-cyber-muted);">${pendingLabsCount} Labs Awaiting Inspection</div>
+          <div class="ref-sparkline-wrap">
+            <svg viewBox="0 0 160 38" fill="none">
+              <path d="M0 25 Q 35 10, 70 20 T 120 8 T 160 2" stroke="#EC4899" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <path d="M0 25 Q 35 10, 70 20 T 120 8 T 160 2 L 160 38 L 0 38 Z" fill="url(#sparkAdmin4)" opacity="0.3"/>
+              <defs>
+                <linearGradient id="sparkAdmin4" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#EC4899"/>
+                  <stop offset="100%" stop-color="transparent"/>
+                </linearGradient>
+              </defs>
+            </svg>
           </div>
         </div>
       </div>
 
+      <!-- Floating AI Ops Manager Card (Reference UI) -->
+      <div class="floating-ai-card">
+        <div class="ai-profile-left">
+          <div class="ai-avatar-wrap">
+            <img class="ai-avatar-img" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop" alt="Amara AI Ops Manager">
+            <span class="ai-pulse-dot" title="Amara AI Ops Engine is Active"></span>
+          </div>
+          <div class="ai-info-meta">
+            <h4>
+              <span>Amara</span> <span class="badge badge-teal" style="font-size:0.65rem;">System Ops Commander</span>
+            </h4>
+            <p>Admin Operations Overview: ${allLeads.length} inbound leads & discovery appointments queued. All Paystack webhook listeners and PostgreSQL RLS security barriers are healthy with 0 critical breaches.</p>
+          </div>
+        </div>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <button class="btn btn-outline btn-xs" onclick="window.adminConsole.openNewInvoiceModal()"><i data-lucide="receipt"></i> Issue Invoice</button>
+          <button class="btn btn-primary btn-xs" onclick="window.app?.runAmaraAiDiagnostic()"><i data-lucide="shield-check"></i> Run Health Audit</button>
+        </div>
+      </div>
+
+      <!-- Main Visualizers Grid (Interactive Wave Chart + Donut Breakdown) -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap:1.25rem; margin-bottom:1.5rem;">
+        
+        <!-- Left: Revenue & Webhook Velocity Wave Chart -->
+        <div class="wave-chart-card">
+          <div class="wave-chart-header">
+            <div>
+              <span class="badge badge-teal" style="font-size:0.65rem; margin-bottom:0.25rem;">FINANCIAL VELOCITY</span>
+              <h4 style="color:#FFF; font-size:1.1rem; margin:0;">Gross Pipeline Growth</h4>
+            </div>
+            <div class="wave-period-group">
+              <button class="period-pill-btn" onclick="window.adminConsole.updateAdminWaveChart('1D', this)">1D</button>
+              <button class="period-pill-btn active" onclick="window.adminConsole.updateAdminWaveChart('7D', this)">7D</button>
+              <button class="period-pill-btn" onclick="window.adminConsole.updateAdminWaveChart('30D', this)">30D</button>
+              <button class="period-pill-btn" onclick="window.adminConsole.updateAdminWaveChart('1Y', this)">1Y</button>
+            </div>
+          </div>
+
+          <div class="wave-canvas-wrap" id="adminWaveChartSvgWrap">
+            <!-- Rendered by updateAdminWaveChart -->
+          </div>
+        </div>
+
+        <!-- Right: Revenue Stream Multi-Ring Donut Breakdown -->
+        <div class="ref-donut-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <div>
+              <span class="badge badge-cyber" style="font-size:0.65rem; margin-bottom:0.25rem;">REVENUE SPLIT</span>
+              <h4 style="color:#FFF; font-size:1.1rem; margin:0;">3 Enterprise Pillars</h4>
+            </div>
+            <span class="badge badge-success" style="font-size:0.68rem;">₦${(totalRevNGN / 1000000).toFixed(1)}M Total</span>
+          </div>
+
+          <div class="ref-donut-container">
+            <svg class="ref-donut-svg" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="48" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
+              <!-- Studio Builds (Cyan) 50% -> 150px -->
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#00F5D4" stroke-width="12"
+                stroke-dasharray="301.59" stroke-dashoffset="150" stroke-linecap="round"/>
+              <!-- Academy Cohorts (Purple) 35% -> 105px -->
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#8B5CF6" stroke-width="12"
+                stroke-dasharray="301.59" stroke-dashoffset="210" stroke-linecap="round"/>
+              <!-- VibeScan Audits (Pink) 15% -> 45px -->
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#EC4899" stroke-width="12"
+                stroke-dasharray="301.59" stroke-dashoffset="270" stroke-linecap="round"/>
+            </svg>
+            <div class="donut-center-text">
+              <div class="donut-center-number">${profitMargin}%</div>
+              <div class="donut-center-sub">Margin</div>
+            </div>
+          </div>
+
+          <div class="donut-legend-grid">
+            <div class="donut-legend-item">
+              <span><span class="donut-dot" style="background:#00F5D4; box-shadow:0 0 6px #00F5D4;"></span>Studio Software & n8n Retainers</span>
+              <strong style="color:#FFF;">50.0%</strong>
+            </div>
+            <div class="donut-legend-item">
+              <span><span class="donut-dot" style="background:#8B5CF6; box-shadow:0 0 6px #8B5CF6;"></span>Academy Cohort Admissions</span>
+              <strong style="color:#FFF;">35.0%</strong>
+            </div>
+            <div class="donut-legend-item">
+              <span><span class="donut-dot" style="background:#EC4899; box-shadow:0 0 6px #EC4899;"></span>VibeScan AST Security Seals</span>
+              <strong style="color:#FFF;">15.0%</strong>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Inquiries & Discovery Calls Live Inbox -->
+      <div style="background:rgba(12, 17, 26, 0.85); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:1.5rem; margin-bottom:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+          <h4 style="color:#FFF; font-size:1.1rem; margin:0; display:flex; align-items:center; gap:0.5rem;">
+            <i data-lucide="calendar-check" style="color:var(--emerald-light);"></i> Discovery Calls & Client Inquiries Queue (${allLeads.length})
+          </h4>
+          <span class="badge badge-success">WAT Office Hours Active (10 AM - 6 PM)</span>
+        </div>
+
+        ${(() => {
+          if (!allLeads.length) {
+            return `<p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0;">No pending discovery calls or inquiries. System is fully caught up!</p>`;
+          }
+
+          return `
+            <div style="display:flex; flex-direction:column; gap:0.75rem;">
+              ${allLeads.slice(0, 6).map(lead => `
+                <div style="background:rgba(255,255,255,0.02); padding:0.85rem 1.1rem; border-radius:12px; border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+                  <div>
+                    <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                      <span class="badge ${lead.type === 'discovery' ? 'badge-success' : 'badge-teal'}">${lead.type === 'discovery' ? 'DISCOVERY BOOKED' : 'INQUIRY'}</span>
+                      <strong style="color:#FFF; font-size:0.92rem;">${lead.name}</strong>
+                      <span style="color:var(--text-cyber-muted); font-size:0.8rem;">(${lead.email})</span>
+                    </div>
+                    <div style="font-size:0.82rem; color:var(--emerald-light); font-weight:600;">
+                      ${lead.title} • <span style="color:#FFF;">${lead.date} @ ${lead.slot}</span> • Budget: ${lead.budget}
+                    </div>
+                    <div style="font-size:0.78rem; color:var(--text-cyber-muted); margin-top:0.2rem;">
+                      "${(lead.notes || '').substring(0, 90)}..."
+                    </div>
+                  </div>
+                  <div style="display:flex; gap:0.5rem;">
+                    <a href="mailto:${lead.email}?subject=Zeerocodes%20Discovery%20Session" class="btn btn-outline btn-xs" style="color:var(--cyan-accent);"><i data-lucide="mail"></i> Email Client</a>
+                    <button class="btn btn-primary btn-xs" onclick="window.toast?.success('Client session confirmed in calendar!');"><i data-lucide="check"></i> Confirm</button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        })()}
+      </div>
+
       <!-- Live Payment Activity Feed -->
-      <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.5rem;">
+      <div style="background:rgba(12, 17, 26, 0.85); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:1.5rem;">
         <h4 style="color:#FFF; font-size:1.1rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
           <i data-lucide="activity" style="color:var(--cyan-accent);"></i> Verified Webhook Payment Feed
         </h4>
         <div style="display:flex; flex-direction:column; gap:0.6rem;">
           ${paymentEvents.slice(0, 5).map(p => `
-            <div style="background:rgba(255,255,255,0.02); padding:0.75rem 1rem; border-radius:var(--radius-xs); border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+            <div style="background:rgba(255,255,255,0.02); padding:0.75rem 1rem; border-radius:12px; border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
               <div>
                 <div style="display:flex; align-items:center; gap:0.5rem;">
-                  <strong style="color:#FFF; font-size:0.88rem;">${p.customerEmail}</strong>
+                  <strong style="color:#FFF; font-size:0.88rem;">${p.customerEmail || p.userEmail}</strong>
                   <span class="badge badge-success">PAID</span>
                 </div>
                 <div style="font-size:0.75rem; color:var(--text-cyber-muted); font-family:var(--font-mono); margin-top:0.2rem;">
-                  Item: ${p.item} • Ref: ${p.reference} • Gateway: ${p.provider}
+                  Item: ${p.item || p.itemTitle} • Ref: ${p.reference || p.id} • Gateway: ${p.provider}
                 </div>
               </div>
               <div style="text-align:right;">
-                <strong style="color:var(--emerald-light); font-size:1rem;">₦${(p.amountNGN).toLocaleString()}</strong>
-                <div style="font-size:0.72rem; color:var(--text-cyber-muted);">${new Date(p.verifiedAt).toLocaleDateString()}</div>
+                <strong style="color:var(--emerald-light); font-size:1rem;">₦${((p.amountNGN) || 95000).toLocaleString()}</strong>
+                <div style="font-size:0.72rem; color:var(--text-cyber-muted);">${new Date(p.verifiedAt || p.initiatedAt || Date.now()).toLocaleDateString()}</div>
               </div>
             </div>
           `).join('')}
         </div>
       </div>
     `;
+
+    // Render initial 7D admin wave chart
+    this.updateAdminWaveChart('7D');
+  }
+
+  updateAdminWaveChart(period = '7D', btn = null) {
+    const wrap = document.getElementById('adminWaveChartSvgWrap');
+    if (!wrap) return;
+
+    if (btn) {
+      document.querySelectorAll('#adminOverviewContent .wave-period-group .period-pill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    const datasets = {
+      '1D': {
+        labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '23:59'],
+        points: [2500000, 4800000, 9500000, 14200000, 11800000, 18500000, 22000000]
+      },
+      '7D': {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        points: [18000000, 24000000, 21500000, 38000000, 45000000, 58000000, 68500000]
+      },
+      '30D': {
+        labels: ['W1', 'W2', 'W3', 'W4', 'W5'],
+        points: [42000000, 78000000, 115000000, 148000000, 180500000]
+      },
+      '1Y': {
+        labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+        points: [120000000, 240000000, 390000000, 520000000]
+      }
+    };
+
+    const data = datasets[period] || datasets['7D'];
+    const maxVal = Math.max(...data.points);
+    const minVal = Math.min(...data.points);
+
+    const width = 600;
+    const height = 180;
+    const stepX = width / (data.points.length - 1);
+
+    const coords = data.points.map((val, idx) => {
+      const x = idx * stepX;
+      const y = height - ((val - minVal) / (maxVal - minVal || 1)) * (height - 40) - 20;
+      return { x, y, val };
+    });
+
+    let pathD = `M ${coords[0].x} ${coords[0].y}`;
+    for (let i = 0; i < coords.length - 1; i++) {
+      const p0 = coords[i];
+      const p1 = coords[i + 1];
+      const cp1x = p0.x + (p1.x - p0.x) / 2;
+      const cp1y = p0.y;
+      const cp2x = p0.x + (p1.x - p0.x) / 2;
+      const cp2y = p1.y;
+      pathD += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p1.x} ${p1.y}`;
+    }
+
+    const areaD = `${pathD} L ${width} ${height} L 0 ${height} Z`;
+
+    wrap.innerHTML = `
+      <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" style="width:100%; height:100%;">
+        <defs>
+          <linearGradient id="adminWaveGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#00F5D4" stop-opacity="0.45"/>
+            <stop offset="60%" stop-color="#8B5CF6" stop-opacity="0.12"/>
+            <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="adminWaveLineGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#00F5D4"/>
+            <stop offset="50%" stop-color="#38BDF8"/>
+            <stop offset="100%" stop-color="#A855F7"/>
+          </linearGradient>
+          <filter id="adminGlowEffect" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+        </defs>
+
+        <line x1="0" y1="40" x2="${width}" y2="40" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4"/>
+        <line x1="0" y1="90" x2="${width}" y2="90" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4"/>
+        <line x1="0" y1="140" x2="${width}" y2="140" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4"/>
+
+        <path d="${areaD}" fill="url(#adminWaveGrad)"/>
+        <path d="${pathD}" fill="none" stroke="url(#adminWaveLineGrad)" stroke-width="3.5" stroke-linecap="round" filter="url(#adminGlowEffect)"/>
+
+        ${coords.map(c => `
+          <g>
+            <circle cx="${c.x}" cy="${c.y}" r="5" fill="#070A10" stroke="#A855F7" stroke-width="2.5"/>
+            <circle cx="${c.x}" cy="${c.y}" r="2" fill="#FFFFFF"/>
+          </g>
+        `).join('')}
+      </svg>
+      <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-cyber-muted); margin-top:0.4rem; padding:0 0.5rem; font-family:var(--font-mono);">
+        ${data.labels.map(l => `<span>${l}</span>`).join('')}
+      </div>
+    `;
+
+    if (window.lucide) window.lucide.createIcons();
   }
 
   // =========================================================================

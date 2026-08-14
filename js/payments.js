@@ -254,8 +254,12 @@ class PaymentManager {
         // Trigger Transactional Email & WhatsApp hook
         if (window.notifications) {
           window.notifications.dispatch('enrollment_confirmed', {
+            studentName: (txn.user && txn.user.displayName) ? txn.user.displayName : txn.userEmail.split('@')[0],
             userEmail: txn.userEmail,
             courseTitle: txn.itemTitle,
+            amountNGN: txn.amountNGN,
+            paymentRef: txn.id,
+            invoiceId: 'INV-' + (txn.id.length > 8 ? txn.id.substring(3, 11) : txn.id),
             enrollmentId: enrollment.id
           });
         }
