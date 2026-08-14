@@ -624,7 +624,7 @@ class TransactionalEmailEngine {
     return tmpl.render(data);
   }
 
-  // --- Dispatch Transactional Email (Simulated & Persisted to DB Logs) ---
+  // --- Dispatch Transactional Email (Persisted to DB Logs & Dispatched via Resend API) ---
   async dispatchEmail(templateId, recipientEmail, data = {}) {
     const tmpl = this.templates[templateId];
     if (!tmpl) return;
@@ -636,16 +636,41 @@ class TransactionalEmailEngine {
 
     const htmlContent = tmpl.render(data);
 
-    // Save into database logs
+    // 1. Save into local / Firestore database logs
     if (window.db) {
       await window.db.saveEmailLog({
         template: templateId,
         subject,
         to: recipientEmail,
         recipientName: data.studentName || data.clientName || recipientEmail,
-        status: 'DELIVERED',
+        status: 'DISPATCHED',
         sentAt: new Date().toISOString()
       });
+    }
+
+    // 2. Dispatch to live serverless Resend API endpoint
+    try {
+      fetch('/api/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: recipientEmail,
+          subject: subject,
+          html: htmlContent,
+          templateId: templateId
+        })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result && result.id) {
+          console.log(`🚀 [Resend Live Delivery] Email ID: ${result.id} successfully sent to ${recipientEmail}`);
+        }
+      })
+      .catch(err => {
+        console.warn('ℹ️ Background email API notice (local/offline environment):', err.message);
+      });
+    } catch (fetchErr) {
+      console.warn('ℹ️ Email dispatch background trigger notice:', fetchErr.message);
     }
 
     console.log(`📨 [Transactional Email Engine] Dispatched "${subject}" to ${recipientEmail}`);

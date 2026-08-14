@@ -293,7 +293,67 @@ app.post('/api/contact', (req, res) => {
 
 /**
  * =========================================================================
- * 6. HEALTH CHECK & SYSTEM TELEMETRY
+ * 6. TRANSACTIONAL EMAIL DISPATCHER (Resend REST API)
+ * =========================================================================
+ */
+app.post('/api/email/send', async (req, res) => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn('⚠️ RESEND_API_KEY is not configured on server.');
+    return res.status(503).json({ error: 'Resend API key not configured on server.', delivered: false });
+  }
+
+  try {
+    const { to, subject, html, text, from, replyTo } = req.body || {};
+
+    if (!to || !subject || (!html && !text)) {
+      return res.status(400).json({ error: 'Missing required email fields (to, subject, html/text).' });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const recipients = Array.isArray(to) ? to : [to];
+    for (const r of recipients) {
+      if (!emailRegex.test(r)) {
+        return res.status(400).json({ error: `Invalid recipient email format: ${r}` });
+      }
+    }
+
+    const payload = {
+      from: from || process.env.RESEND_FROM || 'Zeerocodes <onboarding@resend.dev>',
+      to: recipients,
+      subject: String(subject).slice(0, 200),
+      html: html || undefined,
+      text: text || undefined,
+      reply_to: replyTo || 'admin@zeerocodes.com'
+    };
+
+    const resendRes = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await resendRes.json();
+
+    if (!resendRes.ok) {
+      console.error('❌ Resend Error in server.js:', data);
+      return res.status(resendRes.status).json({ error: data.message || 'Resend delivery failed', details: data });
+    }
+
+    console.log(`✅ [Resend] Email "${subject}" sent to ${recipients.join(', ')} (ID: ${data.id})`);
+    return res.status(200).json({ success: true, id: data.id, recipients, sentAt: new Date().toISOString() });
+  } catch (err) {
+    console.error('Email send server error:', err);
+    return res.status(500).json({ error: 'Internal server error while sending email.' });
+  }
+});
+
+/**
+ * =========================================================================
+ * 7. HEALTH CHECK & SYSTEM TELEMETRY
  * =========================================================================
  */
 app.get('/api/health', (req, res) => {
@@ -305,6 +365,7 @@ app.get('/api/health', (req, res) => {
     environment: process.env.NODE_ENV || 'production',
     gateways: {
       paystack: !!process.env.PAYSTACK_SECRET_KEY,
+      resend: !!process.env.RESEND_API_KEY,
       flutterwave: !!process.env.FLUTTERWAVE_SECRET_KEY,
       supabase: !!SUPABASE_URL,
       vibescanBackend: VIBESCAN_API_URL
