@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Zeerocodes - Customer Avatars, Marketing Framework & Messaging Suite</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap');
+
+    @page {
+      size: A4;
+      margin: 15mm 15mm 15mm 15mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #0F172A;
+      background: #FFFFFF;
+      line-height: 1.55;
+      font-size: 9.5pt;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4, h5 {
+      font-family: 'Outfit', sans-serif;
+      color: #061826;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    h1 {
+      font-size: 20pt;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    h2 {
+      font-size: 13pt;
+      border-bottom: 2px solid #00F5D4;
+      padding-bottom: 4px;
+      margin-top: 18px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #014D40;
+    }
+
+    h3 {
+      font-size: 11pt;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      color: #0F172A;
+    }
+
+    p {
+      margin-bottom: 8px;
+      color: #334155;
+    }
+
+    strong {
+      color: #0F172A;
+      font-weight: 700;
+    }
+
+    code {
+      font-family: 'Fira Code', monospace;
+      font-size: 8.5pt;
+      background: #F1F5F9;
+      padding: 2px 5px;
+      border-radius: 4px;
+      color: #0F766E;
+    }
+
+    /* Page Breaks */
+    .page-break {
+      page-break-after: always;
+      break-after: page;
+    }
+
+    .avoid-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Header & Cover Banner */
+    .doc-header {
+      background: linear-gradient(135deg, #040914 0%, #081B24 50%, #013B36 100%);
+      color: #FFFFFF;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      position: relative;
+    }
+
+    .doc-badge {
+      display: inline-block;
+      background: rgba(0, 245, 212, 0.15);
+      color: #00F5D4;
+      border: 1px solid rgba(0, 245, 212, 0.3);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .doc-subtitle {
+      font-size: 10pt;
+      color: #94A3B8;
+      margin-top: 4px;
+      margin-bottom: 0;
+    }
+
+    .doc-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 8pt;
+    }
+
+    .doc-meta-item span {
+      display: block;
+      color: #64748B;
+      font-size: 7pt;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .doc-meta-item strong {
+      color: #F8FAFC;
+      font-size: 8.5pt;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0 14px 0;
+      font-size: 8.5pt;
+    }
+
+    th, td {
+      padding: 7px 10px;
+      text-align: left;
+      vertical-align: top;
+      border: 1px solid #E2E8F0;
+    }
+
+    th {
+      background: #F8FAFC;
+      color: #0F172A;
+      font-weight: 700;
+      font-family: 'Outfit', sans-serif;
+      font-size: 8.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 2px solid #CBD5E1;
+    }
+
+    tr:nth-child(even) {
+      background: #FAFCFE;
+    }
+
+    /* Avatar Cards */
+    .avatar-card {
+      border: 1px solid #CBD5E1;
+      border-left: 4px solid #016B61;
+      border-radius: 8px;
+      padding: 12px 14px;
+      background: #FFFFFF;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    }
+
+    .avatar-card.studio {
+      border-left-color: #0D9488;
+    }
+
+    .avatar-card.academy {
+      border-left-color: #8B5CF6;
+    }
+
+    .avatar-card.vibescan {
+      border-left-color: #EC4899;
+    }
+
+    .avatar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      border-bottom: 1px solid #F1F5F9;
+      padding-bottom: 4px;
+    }
+
+    .avatar-title {
+      font-size: 11pt;
+      font-weight: 800;
+      color: #0F172A;
+    }
+
+    .avatar-tag {
+      font-size: 7.5pt;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+    }
+
+    .tag-studio { background: #CCFBF1; color: #0F766E; }
+    .tag-academy { background: #EDE9FE; color: #6D28D9; }
+    .tag-vibescan { background: #FCE7F3; color: #BE185D; }
+
+    /* Message Script Boxes */
+    .msg-box {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin: 8px 0;
+      font-size: 8.5pt;
+    }
+
+    .msg-box.hook {
+      background: #FFFBEB;
+      border-color: #FDE68A;
+      color: #92400E;
+    }
+
+    .msg-box.value {
+      background: #F0FDF4;
+      border-color: #BBF7D0;
+      color: #166534;
+    }
+
+    .msg-box.script {
+      background: #0B132B;
+      color: #E2E8F0;
+      border-color: #1E293B;
+      font-family: 'Fira Code', monospace;
+      font-size: 8pt;
+      white-space: pre-wrap;
+    }
+
+    .msg-box.objection {
+      background: #FEF2F2;
+      border-color: #FECACA;
+      color: #991B1B;
+    }
+
+    /* Flywheel Diagram */
+    .flywheel-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .flywheel-node {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .flywheel-node.teach { border-top: 3px solid #8B5CF6; }
+    .flywheel-node.build { border-top: 3px solid #00F5D4; }
+    .flywheel-node.protect { border-top: 3px solid #EC4899; }
+
+    .flywheel-node h4 {
+      font-size: 9pt;
+      margin-bottom: 3px;
+    }
+
+    .flywheel-node p {
+      font-size: 7.5pt;
+      color: #64748B;
+      margin-bottom: 0;
+    }
+
+    /* Footer */
+    .doc-footer {
+      margin-top: 20px;
+      padding-top: 10px;
+      border-top: 1px solid #E2E8F0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 7.5pt;
+      color: #94A3B8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= PAGE 1 ================= -->
+  <div class="doc-header">
+    <div class="doc-badge">Proprietary GTM Blueprint • 2026 Edition</div>
+    <h1>ZEEROCODES AUTOMATION & SECURITY</h1>
+    <p class="doc-subtitle">Master Customer Avatars, Communication Style, Marketing Framework & High-Converting Messaging Suite</p>
+    
+    <div class="doc-meta-grid">
+      <div class="doc-meta-item">
+        <span>Prepared For</span>
+        <strong>Zeerocodes Labs</strong>
+      </div>
+      <div class="doc-meta-item">
+        <span>Lead Architect</span>
+        <strong>Nuel Effiong</strong>
+      </div>
+      <div class="doc-meta-item">
+        <span>Target Markets</span>
+        <strong>Nigeria / Pan-Africa / Global</strong>
+      </div>
+      <div class="doc-meta-item">
+        <span>Core Flywheel</span>
+        <strong>Teach • Build • Protect</strong>
+      </div>
+    </div>
+  </div>
+
+  <h2>1. Strategic Flywheel Architecture</h2>
+  <p>
+    Zeerocodes operates a self-reinforcing enterprise flywheel. Customer acquisition flows from high-volume educational awareness (Teach), into high-ticket custom automation retainers (Build), and matures into recurring compliance and certification seals (Protect).
+  </p>
+
+  <div class="flywheel-grid avoid-break">
+    <div class="flywheel-node teach">
+      <h4>1. TEACH (Academy)</h4>
+      <p><strong>The Entry Gate:</strong> Trains creators, freelancers & engineers on full-stack AI development.</p>
+    </div>
+    <div class="flywheel-node build">
+      <h4>2. BUILD (Studio)</h4>
+      <p><strong>The Cash Engine:</strong> Custom Next.js SaaS, n8n automations & 90-sec WhatsApp billing bots.</p>
+    </div>
+    <div class="flywheel-node protect">
+      <h4>3. PROTECT (VibeScan)</h4>
+      <p><strong>The Enterprise Moat:</strong> AST static security scanning & tamper-proof VibeCert™ certification.</p>
+    </div>
+  </div>
+
+  <h2>2. Master Customer Avatars</h2>
+
+  <!-- AVATAR 1 -->
+  <div class="avatar-card studio avoid-break">
+    <div class="avatar-header">
+      <div class="avatar-title">Avatar 1: "The Scale-Hungry SME Operator" (Studio / Build)</div>
+      <span class="avatar-tag tag-studio">High-Ticket Studio Retainer</span>
+    </div>
+    <table>
+      <tr>
+        <th style="width:25%;">Profile Dimension</th>
+        <th>Characteristics & Behavioral Insights</th>
+      </tr>
+      <tr>
+        <td><strong>Persona Identity</strong></td>
+        <td><strong>Tunde Balogun (41, Lagos / Abuja / Remote)</strong> — Managing Director / COO of a ₦50M–₦500M/yr enterprise (E-commerce, Micro-lending, Logistics, Real Estate, or Healthcare).</td>
+      </tr>
+      <tr>
+        <td><strong>Psychographics</strong></td>
+        <td>Pragmatic, impatient with buzzwords, hyper-protective of cash flow. Burned by past freelance developers who took 6 months to deliver buggy WordPress plugins.</td>
+      </tr>
+      <tr>
+        <td><strong>Current Bottleneck</strong></td>
+        <td>Staff spends 5+ hours daily copying bank alerts, manually issuing PDF invoices on WhatsApp, and reconciling Excel sheets. Orders are lost after office hours.</td>
+      </tr>
+      <tr>
+        <td><strong>Trigger Event</strong></td>
+        <td>Missed a ₦3M order over a weekend; customer complaints peaked during a promo campaign; payroll grew without revenue increasing.</td>
+      </tr>
+      <tr>
+        <td><strong>Core Desire</strong></td>
+        <td>A 24/7 automated business engine that confirms Paystack/Moniepoint payments in 90 seconds, issues instant receipts, and updates stock without hiring 4 more staff.</td>
+      </tr>
+      <tr>
+        <td><strong>Primary Objection</strong></td>
+        <td><em>"₦1.5M is too expensive for an automation system."</em> &rarr; <strong>Resolution:</strong> Reframe as paying for itself in 72 days by eliminating ₦400k/mo in headcount leakages and human error.</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- AVATAR 2 -->
+  <div class="avatar-card academy avoid-break">
+    <div class="avatar-header">
+      <div class="avatar-title">Avatar 2: "The Ambitious Builder / Tech Upgrader" (Academy / Teach)</div>
+      <span class="avatar-tag tag-academy">Cohort Admissions & LMS</span>
+    </div>
+    <table>
+      <tr>
+        <th style="width:25%;">Profile Dimension</th>
+        <th>Characteristics & Behavioral Insights</th>
+      </tr>
+      <tr>
+        <td><strong>Persona Identity</strong></td>
+        <td><strong>Amina Yusuf (24, Yaba / Port Harcourt / Accra)</strong> — Freelance designer, junior engineer, or university graduate aiming for remote high-income tech careers.</td>
+      </tr>
+      <tr>
+        <td><strong>Psychographics</strong></td>
+        <td>Hungry for financial independence; exhausted by 40-hour theoretical tutorials; wants to build production-grade web apps using Antigravity, Cursor, n8n, and Next.js.</td>
+      </tr>
+      <tr>
+        <td><strong>Current Bottleneck</strong></td>
+        <td>Understands prompt writing, but cannot connect Supabase authentication, secure Paystack webhooks, or deploy hardened client portals.</td>
+      </tr>
+      <tr>
+        <td><strong>Trigger Event</strong></td>
+        <td>Sent 50+ resumes with zero response; saw peers earning $2,500/project building AI systems; needs verified proof of competency.</td>
+      </tr>
+      <tr>
+        <td><strong>Core Desire</strong></td>
+        <td>Achieve official <strong>VibeCert™ Certified Builder</strong> status, build production applications in 48 hours, and command ₦250k–₦1.5M per client build.</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ================= PAGE 2 ================= -->
+
+  <!-- AVATAR 3 -->
+  <div class="avatar-card vibescan avoid-break">
+    <div class="avatar-header">
+      <div class="avatar-title">Avatar 3: "The High-Velocity Vibe Founder / CTO" (Protect / VibeScan)</div>
+      <span class="avatar-tag tag-vibescan">Security Audits & Certifications</span>
+    </div>
+    <table>
+      <tr>
+        <th style="width:25%;">Profile Dimension</th>
+        <th>Characteristics & Behavioral Insights</th>
+      </tr>
+      <tr>
+        <td><strong>Persona Identity</strong></td>
+        <td><strong>Kelechi Okonjo (32, Remote / Diaspora / Techstars Alum)</strong> — Technical Founder or Solo Builder who launched an MVP in 2 weeks using AI tools.</td>
+      </tr>
+      <tr>
+        <td><strong>Psychographics</strong></td>
+        <td>Obsessed with shipping speed; harbors quiet anxiety that their AI-generated codebase has leaked OpenAI API keys or open PostgreSQL database tables.</td>
+      </tr>
+      <tr>
+        <td><strong>Current Bottleneck</strong></td>
+        <td>500+ active users, but database Row Level Security (RLS) is disabled, API keys are exposed in client JavaScript, and no rate limits exist.</td>
+      </tr>
+      <tr>
+        <td><strong>Trigger Event</strong></td>
+        <td>An institutional angel investor requested a security audit report; preparing for a major public product launch on Product Hunt or TechCabal.</td>
+      </tr>
+      <tr>
+        <td><strong>Core Desire</strong></td>
+        <td>Instant AST automated security scan with line-by-line remediation diffs and a tamper-proof <strong>VibeCert™ Seal</strong> to prove security to enterprise clients.</td>
+      </tr>
+    </table>
+  </div>
+
+  <h2>3. High-Converting Communication Style</h2>
+
+  <div class="avoid-break">
+    <p><strong>The Zeerocodes Brand Voice:</strong> <em>"The Gritty, Authoritative Systems Architect."</em> We speak with the rigor of a senior security engineer and the commercial empathy of a battle-tested African business founder.</p>
+
+    <table>
+      <tr>
+        <th style="width:30%;">Principle</th>
+        <th style="width:35%;">❌ What We NEVER Say (Fluff)</th>
+        <th style="width:35%;">✅ What We ALWAYS Say (Outcomes)</th>
+      </tr>
+      <tr>
+        <td><strong>No Corporate Jargon</strong></td>
+        <td>"We leverage synergistic AI paradigms to transform your digital strategy."</td>
+        <td>"We replace 4 hours of manual invoice typing with a 90-second automated WhatsApp webhook."</td>
+      </tr>
+      <tr>
+        <td><strong>African Market Mastery</strong></td>
+        <td>"Our cloud software operates with standard web protocols."</td>
+        <td>"Built for Lagos: Handles network drops, Paystack/Moniepoint retries, and instant WhatsApp receipts."</td>
+      </tr>
+      <tr>
+        <td><strong>Security as a Guardrail</strong></td>
+        <td>"Security compliance is recommended for modern web developers."</td>
+        <td>"Shipping vibe-coded code without RLS is like building a penthouse on wet sand. We harden it."</td>
+      </tr>
+    </table>
+  </div>
+
+  <h2>4. Custom High-Converting Messaging Suite</h2>
+
+  <!-- STUDIO MESSAGING -->
+  <div class="avoid-break" style="margin-bottom:12px;">
+    <h3>A. Automation Studio Messaging (For SME Founders & Operators)</h3>
+    <div class="msg-box hook">
+      <strong>🪝 Cold Ad Hook:</strong> "If your business stops making money the minute your office manager turns off their phone at 6 PM, you don't have a business—you have a bottleneck."
+    </div>
+    <div class="msg-box value">
+      <strong>💎 Core Value Proposition:</strong> "We build custom AI automation engines and WhatsApp invoicing bots that save your company 120+ operational hours every month and close customer sales in under 90 seconds."
+    </div>
+    <div class="msg-box script"><strong>💬 High-Converting WhatsApp Sales Script:</strong>
+"Hey [Name], noticed your team handles customer inquiries and payment receipts manually in WhatsApp DMs.
+
+We just deployed an automated Paystack-linked engine for an e-commerce brand in Lekki that validates alerts, generates PDF receipts, and updates the inventory database in 45 seconds—zero human typing.
+
+Here is a 45-second demo screen recording: [Demo Link]
+
+Would you be open to a 15-minute diagnostic call this Thursday at 2 PM WAT to calculate your exact monthly payroll savings?"</div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ================= PAGE 3 ================= -->
+
+  <!-- ACADEMY MESSAGING -->
+  <div class="avoid-break" style="margin-bottom:12px;">
+    <h3>B. AI Income Academy Messaging (For Career Builders & Freelancers)</h3>
+    <div class="msg-box hook">
+      <strong>🪝 Cold Ad Hook:</strong> "Syntax isn’t what gets you paid in 2026. Knowing how to architect, ship, and cryptographically secure full AI workflows that businesses pay millions for is."
+    </div>
+    <div class="msg-box value">
+      <strong>💎 Core Value Proposition:</strong> "Go from basic prompt writing to deploying enterprise-grade Next.js web applications, n8n automations, and cryptographic security systems with official VibeCert™ certification."
+    </div>
+    <div class="msg-box objection">
+      <strong>🛡️ Objection Handler ("I don't have a CS degree"):</strong> "You don't need 4 years of theoretical algorithms. We teach visual logic, AI-assisted development tools (Cursor/Antigravity), and exact deployment architectures. If you understand how data moves between a customer and a database, you can build production apps."
+    </div>
+  </div>
+
+  <!-- VIBESCAN MESSAGING -->
+  <div class="avoid-break" style="margin-bottom:14px;">
+    <h3>C. VibeScan AST Security Messaging (For Founders & Dev Teams)</h3>
+    <div class="msg-box hook">
+      <strong>🪝 Cold Ad Hook:</strong> "You shipped your app in 5 days with AI. But did you leave your database RLS open to the entire internet?"
+    </div>
+    <div class="msg-box value">
+      <strong>💎 Core Value Proposition:</strong> "The premier AST static security engine built specifically for vibe-coded applications. Detect leaked API keys, bypass-prone authentication routes, and unauthenticated database queries before your users or hackers do."
+    </div>
+    <div class="msg-box objection">
+      <strong>🛡️ Objection Handler ("Our app is too small for security"):</strong> "Automated bots don't wait for your startup to reach Series A. Scanners crawl GitHub and public endpoints looking for exposed Supabase keys within 15 minutes of deployment. Fixing a vulnerability takes 2 hours today; recovering from a leaked user database takes years."
+    </div>
+  </div>
+
+  <h2>5. GTM Execution Matrix & Channel Allocation</h2>
+
+  <table class="avoid-break">
+    <thead>
+      <tr>
+        <th>Channel</th>
+        <th>Target Avatar</th>
+        <th>Lead Magnet / Core Offer</th>
+        <th>Primary Conversion KPI</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>WhatsApp Direct & SME Communities</strong></td>
+        <td>Avatar 1 (SME Operators)</td>
+        <td>45-Second Video Teardown of manual bottlenecks + ROI Calculator</td>
+        <td>Book Free 30-Min Discovery Session</td>
+      </tr>
+      <tr>
+        <td><strong>YouTube & LinkedIn / X Deconstructions</strong></td>
+        <td>Avatar 2 (Career Builders)</td>
+        <td>"Building & Securing a Full SaaS in 3 Hours with Antigravity Stack"</td>
+        <td>Enroll in VibeCode Labs Cohort (₦95,000)</td>
+      </tr>
+      <tr>
+        <td><strong>Tech Twitter, GitHub & Founder Groups</strong></td>
+        <td>Avatar 3 (Vibe Founders)</td>
+        <td>Live AST Scanner Sandbox + "Top 10 Vibe-Coding Vulnerabilities"</td>
+        <td>Order VibeScan Audit & VibeCert™ Seal</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="avoid-break" style="background:#040914; color:#FFFFFF; padding:12px 16px; border-radius:8px; margin-top:14px;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <h4 style="color:#00F5D4; font-size:9.5pt; margin-bottom:2px;">ZEEROCODES AUTOMATION LIMITED</h4>
+        <p style="color:#94A3B8; font-size:7.5pt; margin:0;">Enterprise Systems • Anti-Overbooking Guardrails • VibeCert™ Security Seals</p>
+      </div>
+      <div style="text-align:right;">
+        <span style="font-family:'Fira Code', monospace; font-size:7.5pt; color:#A855F7;">WAT Office Hours: 10 AM - 6 PM</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span>© 2026 Zeerocodes Automation Limited. All rights reserved.</span>
+    <span>Confidential GTM Strategic Document</span>
+    <span>Page 3 of 3</span>
+  </div>
+
+</body>
+</html>

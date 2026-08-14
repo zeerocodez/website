@@ -3853,4 +3853,90 @@ img, svg, video {
   flex-shrink: 0;
 }
 
+/* ==========================================================================
+   MARKETING PLAYBOOK & AVATAR GTM COMPONENT STYLES
+   ========================================================================== */
+.agony-callout-card {
+  background: radial-gradient(circle at 10% 0%, rgba(239, 68, 68, 0.12) 0%, transparent 60%),
+              rgba(12, 17, 26, 0.9);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.agony-callout-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #EF4444, #F59E0B);
+}
+
+.leakage-matrix-wrap {
+  overflow-x: auto;
+  margin: 2rem 0;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #080D16;
+}
+
+.leakage-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 600px;
+}
+
+.leakage-table th {
+  background: rgba(255, 255, 255, 0.03);
+  color: #FFF;
+  font-family: var(--font-heading);
+  padding: 1rem 1.25rem;
+  text-align: left;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.leakage-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+}
+
+.leakage-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.vibecert-seal-showcase {
+  background: radial-gradient(circle at 50% 0%, rgba(0, 245, 212, 0.12) 0%, transparent 70%),
+              radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 60%),
+              #070A10;
+  border: 1px solid rgba(0, 245, 212, 0.25);
+  border-radius: 24px;
+  padding: 2.5rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 245, 212, 0.08);
+}
+
+.msg-quote-pill {
+  display: inline-block;
+  background: rgba(0, 245, 212, 0.08);
+  border: 1px solid rgba(0, 245, 212, 0.2);
+  color: #00F5D4;
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+
 
