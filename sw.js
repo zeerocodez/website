@@ -3,22 +3,31 @@
  * Offline lesson and blueprint cache for low-bandwidth environments.
  */
 
-const CACHE_NAME = 'zeerocodes-cache-v1';
+const CACHE_NAME = 'zeerocodes-cache-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/styles.css',
   '/logo.png',
+  '/favicon.png',
+  '/manifest.json',
   '/js/toast.js',
+  '/js/firebase-config.js',
   '/js/db.js',
   '/js/auth.js',
   '/js/emails.js',
   '/js/notifications.js',
   '/js/payments.js',
   '/js/lms.js',
+  '/js/vibescanReview.js',
+  '/js/vibescanLiveEngine.js',
+  '/js/roiCalculator.js',
+  '/js/encryptionVisualizer.js',
+  '/js/knowledgeBase.js',
   '/js/blog.js',
   '/js/admin.js',
   '/js/studio.js',
+  '/js/bookingModal.js',
   '/js/router.js',
   '/js/app.js'
 ];

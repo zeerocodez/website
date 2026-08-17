@@ -26,6 +26,11 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Missing x-paystack-signature header' });
     }
 
+    if (!process.env.PAYSTACK_SECRET_KEY && process.env.NODE_ENV === 'production') {
+      console.error('❌ PAYSTACK_SECRET_KEY is not configured on server.');
+      return res.status(500).json({ error: 'Server payment configuration error' });
+    }
+
     const payload = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {});
     const hash = crypto.createHmac('sha512', secretKey)
       .update(payload)
@@ -36,7 +41,7 @@ module.exports = async (req, res) => {
 
     const isValid = sigBuffer.length === hashBuffer.length && crypto.timingSafeEqual(sigBuffer, hashBuffer);
 
-    if (!isValid && process.env.NODE_ENV === 'production') {
+    if (!isValid) {
       console.error('❌ Paystack webhook signature verification failed.');
       return res.status(401).json({ error: 'Invalid webhook signature' });
     }

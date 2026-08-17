@@ -41,8 +41,8 @@ module.exports = async (req, res) => {
       from: from || process.env.RESEND_FROM || 'Zeerocodes <onboarding@resend.dev>',
       to: recipients,
       subject: String(subject).slice(0, 200),
-      html: html || undefined,
-      text: text || undefined,
+      html: html ? String(html).slice(0, 100000) : undefined,
+      text: text ? String(text).slice(0, 20000) : undefined,
       reply_to: replyTo || process.env.RESEND_REPLY_TO || 'admin@zeerocodes.com'
     };
 
@@ -58,10 +58,9 @@ module.exports = async (req, res) => {
     const data = await resendResponse.json();
 
     if (!resendResponse.ok) {
-      console.error('❌ Resend API Error:', data);
+      console.error('❌ Resend API Error:', data?.message || 'Delivery error');
       return res.status(resendResponse.status).json({
-        error: data.message || 'Resend delivery failed',
-        details: data
+        error: data.message || 'Resend delivery failed'
       });
     }
 
@@ -75,7 +74,7 @@ module.exports = async (req, res) => {
     });
 
   } catch (err) {
-    console.error('Email dispatcher serverless error:', err);
+    console.error('Email dispatcher serverless error:', err.message);
     return res.status(500).json({ error: 'Internal server error while dispatching email.' });
   }
 };

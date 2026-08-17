@@ -14,11 +14,29 @@ class PaymentManager {
     this.activeTransaction = null;
     this.pollingInterval = null;
     this.activeCurrency = 'NGN';
+    this.paystackPublicKey = window.PAYSTACK_PUBLIC_KEY || localStorage.getItem('zeerocodes_paystack_pub') || '';
     this.exchangeRates = {
       NGN: 1,
       USD: 1 / 1500,
       GBP: 1 / 1900
     };
+    this.fetchServerConfig();
+  }
+
+  async fetchServerConfig() {
+    try {
+      const res = await fetch('/api/config');
+      if (res.ok) {
+        const cfg = await res.json();
+        if (cfg.paystackPublicKey) {
+          this.paystackPublicKey = cfg.paystackPublicKey;
+          window.PAYSTACK_PUBLIC_KEY = cfg.paystackPublicKey;
+          localStorage.setItem('zeerocodes_paystack_pub', cfg.paystackPublicKey);
+        }
+      }
+    } catch (e) {
+      // Offline / standalone mode: relies on runtime window/cached config
+    }
   }
 
   /**
@@ -184,10 +202,14 @@ class PaymentManager {
     }
 
     // Real Paystack Inline Checkout Integration
-    if (provider === 'paystack' && typeof window.PaystackPop !== 'undefined') {
-      try {
+        const pubKey = this.paystackPublicKey || window.PAYSTACK_PUBLIC_KEY || '';
+        if (!pubKey) {
+          console.log("ℹ️ No client Paystack public key configured, proceeding in sandbox verification mode.");
+          throw new Error("Paystack public key unconfigured on client.");
+        }
+
         const handler = window.PaystackPop.setup({
-          key: window.PAYSTACK_PUBLIC_KEY || 'pk_live_fcd549597192eafcf4c212803bd73879c0c4a473',
+          key: pubKey,
           email: txn.userEmail,
           amount: Math.round(txn.amountNGN * 100), // Paystack expects amount in Kobo
           currency: 'NGN',

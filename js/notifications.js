@@ -11,8 +11,7 @@
  */
 
 const WHATSAPP_CONFIG = {
-  apiUrl: "https://graph.facebook.com/v18.0/YOUR_PHONE_NUMBER_ID/messages",
-  bearerToken: "YOUR_WHATSAPP_CLOUD_API_TOKEN", // Set in server environment
+  apiUrl: "https://graph.facebook.com/v18.0",
   senderPhone: "+2348120000000"
 };
 

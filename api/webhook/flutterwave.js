@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
 
     const isValid = sigBuffer.length === secretBuffer.length && crypto.timingSafeEqual(sigBuffer, secretBuffer);
 
-    if (!isValid && process.env.NODE_ENV === 'production') {
+    if (!isValid) {
       console.error('❌ Flutterwave webhook signature mismatch.');
       return res.status(401).json({ error: 'Invalid verification hash' });
     }

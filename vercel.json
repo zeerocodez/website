@@ -1,15 +1,20 @@
 {
+  "version": 2,
   "cleanUrls": true,
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
         { "key": "X-XSS-Protection", "value": "1; mode=block" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains; preload" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; img-src 'self' https: data: blob:; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; script-src 'self' https://unpkg.com https://www.gstatic.com https://js.paystack.co 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https: wss:; frame-src 'self' https://checkout.paystack.com https://js.paystack.co https://*.firebaseapp.com;"
+        }
       ]
     }
   ]
