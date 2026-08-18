@@ -152,59 +152,68 @@ class AdminConsoleManager {
     const adminView = document.getElementById('view-admin');
     if (!adminView || !window.db) return;
 
-    // Fetch all collections
-    const allCourses = await window.db.getCourses();
-    const currentCourse = await window.db.getCourse(this.selectedCourseId) || allCourses[0];
-    this.selectedCourseId = currentCourse.id;
+    try {
+      // Fetch all collections
+      const allCourses = (await window.db.getCourses()) || [];
+      let currentCourse = null;
+      try {
+        currentCourse = (await window.db.getCourse(this.selectedCourseId)) || allCourses[0];
+      } catch (e) {
+        currentCourse = allCourses[0] || { id: 'course-vibecode-labs', title: 'The VibeCode Labs' };
+      }
+      this.selectedCourseId = currentCourse ? currentCourse.id : 'course-vibecode-labs';
 
-    const projects = await window.db.getAllStudioProjects();
-    const vibescanSubs = await window.db.getAllPendingSubmissions();
-    const enrollments = await window.db.getAllEnrollments();
-    const users = await window.db.getAllUsers();
-    const labSubs = await window.db.getAllLabSubmissions();
-    const blogPosts = await window.db.getBlogPosts();
-    const paymentEvents = await window.db.getPaymentEvents();
-    const invoices = await window.db.getInvoices();
-    const expenses = await window.db.getExpenses();
-    const customAudits = await window.db.getCustomAudits();
-    const emailLogs = await window.db.getEmailLogs();
+      const projects = (await window.db.getAllStudioProjects()) || [];
+      const vibescanSubs = (await window.db.getAllPendingSubmissions()) || [];
+      const enrollments = (await window.db.getAllEnrollments()) || [];
+      const users = (await window.db.getAllUsers()) || [];
+      const labSubs = (await window.db.getAllLabSubmissions()) || [];
+      const blogPosts = (await window.db.getBlogPosts()) || [];
+      const paymentEvents = (await window.db.getPaymentEvents()) || [];
+      const invoices = (await window.db.getInvoices()) || [];
+      const expenses = (await window.db.getExpenses()) || [];
+      const customAudits = (await window.db.getCustomAudits()) || [];
+      const emailLogs = (await window.db.getEmailLogs()) || [];
 
-    // 1. Calculate Telemetry & Financials
-    const academyRevNGN = enrollments.reduce((acc, e) => acc + (e.amountNGN || 95000), 0);
-    const studioRevNGN = projects.reduce((acc, p) => acc + (p.budgetNGN || 0), 0);
-    const vibescanRevNGN = 1850000;
-    const totalRevNGN = academyRevNGN + studioRevNGN + vibescanRevNGN;
-    const totalExpensesNGN = expenses.reduce((acc, exp) => acc + (exp.amountNGN || 0), 0);
-    const netProfitNGN = totalRevNGN - totalExpensesNGN;
-    const profitMargin = totalRevNGN > 0 ? ((netProfitNGN / totalRevNGN) * 100).toFixed(1) : 0;
+      // 1. Calculate Telemetry & Financials
+      const academyRevNGN = enrollments.reduce((acc, e) => acc + (e.amountNGN || 95000), 0);
+      const studioRevNGN = projects.reduce((acc, p) => acc + (p.budgetNGN || 0), 0);
+      const vibescanRevNGN = 1850000;
+      const totalRevNGN = academyRevNGN + studioRevNGN + vibescanRevNGN;
+      const totalExpensesNGN = expenses.reduce((acc, exp) => acc + (exp.amountNGN || 0), 0);
+      const netProfitNGN = totalRevNGN - totalExpensesNGN;
+      const profitMargin = totalRevNGN > 0 ? ((netProfitNGN / totalRevNGN) * 100).toFixed(1) : 0;
 
-    const activeProjectsCount = projects.filter(p => p.status !== 'delivered').length;
-    const pendingAuditsCount = vibescanSubs.filter(s => s.status !== 'certified').length;
-    const totalStudentsCount = enrollments.length;
+      const activeProjectsCount = projects.filter(p => p.status !== 'delivered').length;
+      const pendingAuditsCount = vibescanSubs.filter(s => s.status !== 'certified').length;
+      const totalStudentsCount = enrollments.length;
 
-    // Update Telemetry Header
-    const revEl = document.getElementById('adminStatRevenue');
-    const projEl = document.getElementById('adminStatProjects');
-    const audEl = document.getElementById('adminStatAudits');
-    const stuEl = document.getElementById('adminStatStudents');
+      // Update Telemetry Header
+      const revEl = document.getElementById('adminStatRevenue');
+      const projEl = document.getElementById('adminStatProjects');
+      const audEl = document.getElementById('adminStatAudits');
+      const stuEl = document.getElementById('adminStatStudents');
 
-    if (revEl) revEl.textContent = `₦${(totalRevNGN / 1000000).toFixed(2)}M`;
-    if (projEl) projEl.textContent = `${activeProjectsCount} Active`;
-    if (audEl) audEl.textContent = `${pendingAuditsCount} In Queue`;
-    if (stuEl) stuEl.textContent = `${totalStudentsCount.toLocaleString()} Students`;
+      if (revEl) revEl.textContent = `₦${(totalRevNGN / 1000000).toFixed(2)}M`;
+      if (projEl) projEl.textContent = `${activeProjectsCount} Active`;
+      if (audEl) audEl.textContent = `${pendingAuditsCount} In Queue`;
+      if (stuEl) stuEl.textContent = `${totalStudentsCount.toLocaleString()} Students`;
 
-    // 2. Render Specialized Tabs
-    this.renderOverviewTab(projects, vibescanSubs, enrollments, labSubs, paymentEvents, netProfitNGN, profitMargin, totalRevNGN, emailLogs);
-    this.renderLmsEditorTab(currentCourse, allCourses);
-    this.renderStudentsTab(enrollments, labSubs, users);
-    this.renderFinancialsTab(totalRevNGN, totalExpensesNGN, netProfitNGN, profitMargin, academyRevNGN, studioRevNGN, vibescanRevNGN, invoices, expenses);
-    this.renderStudioTab(projects);
-    this.renderVibescanTab(vibescanSubs, customAudits);
-    this.renderEmailHubTab(emailLogs);
-    this.renderBlogCmsTab(blogPosts);
-    this.renderWebhookTab(paymentEvents);
+      // 2. Render Specialized Tabs with individual try/catch guards
+      try { this.renderOverviewTab(projects, vibescanSubs, enrollments, labSubs, paymentEvents, netProfitNGN, profitMargin, totalRevNGN, emailLogs); } catch(e) { console.error("renderOverviewTab error:", e); }
+      try { this.renderLmsEditorTab(currentCourse, allCourses); } catch(e) { console.error("renderLmsEditorTab error:", e); }
+      try { this.renderStudentsTab(enrollments, labSubs, users); } catch(e) { console.error("renderStudentsTab error:", e); }
+      try { this.renderFinancialsTab(totalRevNGN, totalExpensesNGN, netProfitNGN, profitMargin, academyRevNGN, studioRevNGN, vibescanRevNGN, invoices, expenses); } catch(e) { console.error("renderFinancialsTab error:", e); }
+      try { this.renderStudioTab(projects); } catch(e) { console.error("renderStudioTab error:", e); }
+      try { this.renderVibescanTab(vibescanSubs, customAudits); } catch(e) { console.error("renderVibescanTab error:", e); }
+      try { this.renderEmailHubTab(emailLogs); } catch(e) { console.error("renderEmailHubTab error:", e); }
+      try { this.renderBlogCmsTab(blogPosts); } catch(e) { console.error("renderBlogCmsTab error:", e); }
+      try { this.renderWebhookTab(paymentEvents); } catch(e) { console.error("renderWebhookTab error:", e); }
 
-    if (window.lucide) window.lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
+    } catch (err) {
+      console.error("Critical error in renderAdminConsole:", err);
+    }
   }
 
   // =========================================================================
