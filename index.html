@@ -149,20 +149,20 @@
       <!-- Desktop Nav Menu -->
       <ul class="nav-menu">
         <li><a href="#home" class="nav-link active">Overview</a></li>
-        <li><a href="#studio" class="nav-link">Studio (We Build For You)</a></li>
-        <li><a href="#academy" class="nav-link">Academy (Learn to Build)</a></li>
-        <li><a href="#vibescan" class="nav-link">Security (VibeScan)</a></li>
-        <li><a href="#verify" class="nav-link"><i data-lucide="award" style="width:14px; height:14px; display:inline;"></i> Verify Cert</a></li>
+        <li><a href="#studio" class="nav-link">Studio</a></li>
+        <li><a href="#academy" class="nav-link">Academy</a></li>
+        <li><a href="#vibescan" class="nav-link">Security</a></li>
+        <li><a href="#verify" class="nav-link"><i data-lucide="award" style="width:13px; height:13px; display:inline;"></i> Verify</a></li>
         <li><a href="#blog" class="nav-link">Blog</a></li>
         <li><a href="#about" class="nav-link">About</a></li>
         <li><a href="#contact" class="nav-link">Contact</a></li>
-        <li class="nav-admin-link d-none"><a href="#admin" class="nav-link" style="color:var(--emerald-light); font-weight:700;"><i data-lucide="shield-alert" style="width:15px; height:15px; display:inline;"></i> Admin</a></li>
+        <li class="nav-admin-link d-none"><a href="#admin" class="nav-link" style="color:var(--emerald-light); font-weight:700;"><i data-lucide="shield-alert" style="width:14px; height:14px; display:inline;"></i> Admin</a></li>
       </ul>
 
       <!-- Nav Actions -->
       <div class="nav-actions">
         <!-- Global Multi-Currency Switcher -->
-        <select id="globalCurrencySelector" class="form-select" style="padding:0.35rem 0.65rem; font-size:0.8rem; font-weight:700; width:auto; background:#04070D; color:var(--emerald-light); border-color:rgba(16,185,129,0.3); border-radius:var(--radius-xs);" onchange="window.app?.setGlobalCurrency(this.value)" title="Change Currency">
+        <select id="globalCurrencySelector" class="form-select nav-currency-select" onchange="window.app?.setGlobalCurrency(this.value)" title="Change Currency">
           <option value="NGN">₦ NGN</option>
           <option value="USD">$ USD</option>
           <option value="GBP">£ GBP</option>
@@ -177,21 +177,21 @@
 
         <!-- Unauthenticated -->
         <div class="nav-unauthenticated">
-          <button class="btn btn-ghost btn-sm" onclick="window.modal.openAuth('login')" title="Sign In to Your Account">
-            <i data-lucide="log-in"></i> Sign In
+          <button class="btn btn-ghost btn-sm nav-btn-signin" onclick="window.modal.openAuth('login')" title="Sign In to Your Account">
+            <i data-lucide="log-in"></i> <span>Sign In</span>
           </button>
-          <button class="btn btn-outline btn-sm" onclick="window.modal.openAuth('signup')" style="border-color:rgba(16,185,129,0.4); color:var(--emerald-light);" title="Create Free Account">
-            <i data-lucide="user-plus"></i> Sign Up
+          <button class="btn btn-outline btn-sm nav-btn-signup" onclick="window.modal.openAuth('signup')" title="Create Free Account">
+            <i data-lucide="user-plus"></i> <span>Sign Up</span>
           </button>
-          <button class="btn btn-primary btn-sm trigger-calendly-booking">
-            <i data-lucide="calendar"></i> Book Free Call
+          <button class="btn btn-primary btn-sm nav-btn-cta trigger-calendly-booking">
+            <i data-lucide="calendar"></i> <span>Book Call</span>
           </button>
         </div>
 
         <!-- Authenticated -->
         <div class="nav-authenticated d-none">
           <a href="#dashboard" class="btn btn-outline btn-sm">
-            <i data-lucide="layout-dashboard"></i> Dashboard
+            <i data-lucide="layout-dashboard"></i> <span>Dashboard</span>
           </a>
           <span class="user-role-badge badge badge-teal">USER</span>
           <button class="btn btn-ghost btn-xs btn-sign-out" title="Sign Out">
