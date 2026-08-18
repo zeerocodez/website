@@ -2575,6 +2575,32 @@ img, svg, video {
   font-weight: 700;
 }
 
+/* Blog PDF Resource Download Card */
+.blog-pdf-download-card {
+  transition: var(--transition-smooth);
+}
+
+.blog-pdf-download-card:hover {
+  border-color: var(--emerald-primary) !important;
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* PDF Upload Dropzone in Admin CMS */
+.pdf-upload-dropzone {
+  background: #04070D;
+  border: 2px dashed rgba(16, 185, 129, 0.3);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.pdf-upload-dropzone:hover,
+.pdf-upload-dropzone.drag-over {
+  background: rgba(16, 185, 129, 0.05);
+  border-color: var(--emerald-primary);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+}
+
 /* ==========================================================================
    ADMIN CONSOLE STYLES
    ========================================================================== */

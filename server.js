@@ -18,6 +18,8 @@ try {
 
 const express = require('express');
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 8080;
 
@@ -101,15 +103,15 @@ setInterval(() => {
   }
 }, 5 * 60 * 1000);
 
-// Capture raw body for webhook HMAC validation
+// Capture raw body for webhook HMAC validation & allow PDF base64 payloads
 app.use(express.json({
-  limit: '2mb',
+  limit: '25mb',
   verify: (req, res, buf) => {
     req.rawBody = buf;
   }
 }));
 
-app.use(express.urlencoded({ extended: true, limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
 // Apply rate limiting to all /api/* routes
 app.use('/api', apiRateLimiter);
@@ -468,6 +470,90 @@ app.get('/api/auth/security-diagnostic', (req, res) => {
       owaspCompliance: "10/10 LLM security categories monitored"
     }
   });
+});
+
+/**
+ * =========================================================================
+ * 10. PDF ASSET UPLOAD & DOWNLOAD DISPATCH (Blog Resources & Blueprints)
+ * =========================================================================
+ */
+const UPLOADS_DIR = path.join(__dirname, 'uploads', 'pdf');
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+
+app.post('/api/upload/pdf', apiRateLimiter, (req, res) => {
+  try {
+    const { filename, fileData, title } = req.body || {};
+
+    if (!fileData) {
+      return res.status(400).json({ error: 'Missing file data in request payload.' });
+    }
+
+    // Extract base64 payload
+    let base64Content = fileData;
+    if (fileData.includes(',')) {
+      base64Content = fileData.split(',')[1];
+    }
+
+    const buffer = Buffer.from(base64Content, 'base64');
+
+    // Max 20MB limit check
+    const MAX_SIZE = 20 * 1024 * 1024;
+    if (buffer.length > MAX_SIZE) {
+      return res.status(400).json({ error: 'PDF file exceeds maximum allowed limit of 20MB.' });
+    }
+
+    // Strict Magic Number / Header Verification (%PDF- in ASCII: 0x25 0x50 0x44 0x46 0x2D)
+    const header = buffer.slice(0, 5).toString('ascii');
+    if (!header.startsWith('%PDF-')) {
+      return res.status(400).json({ error: 'Invalid file format. Uploaded file is not a valid PDF document.' });
+    }
+
+    // Sanitize filename & prevent path traversal
+    const rawName = (filename || 'document.pdf').replace(/[^a-zA-Z0-9._-]/g, '_');
+    const safeBaseName = path.basename(rawName, path.extname(rawName)).slice(0, 80) || 'document';
+    const timestamp = Date.now();
+    const finalFilename = `${safeBaseName}-${timestamp}.pdf`;
+    const targetPath = path.join(UPLOADS_DIR, finalFilename);
+
+    // Save file to disk
+    fs.writeFileSync(targetPath, buffer);
+
+    const sizeFormatted = buffer.length > 1024 * 1024
+      ? `${(buffer.length / (1024 * 1024)).toFixed(2)} MB`
+      : `${Math.round(buffer.length / 1024)} KB`;
+
+    console.log(`📄 Stored PDF resource: ${finalFilename} (${sizeFormatted})`);
+
+    return res.status(200).json({
+      success: true,
+      url: `/uploads/pdf/${finalFilename}`,
+      filename: finalFilename,
+      originalName: filename || finalFilename,
+      title: title || safeBaseName.replace(/[-_]/g, ' '),
+      size: buffer.length,
+      sizeFormatted,
+      uploadedAt: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error('PDF upload error:', err);
+    return res.status(500).json({ error: 'Failed to process and store PDF document.' });
+  }
+});
+
+// Explicit secure download / view endpoint for uploads
+app.get('/uploads/pdf/:file', (req, res) => {
+  const safeFilename = path.basename(req.params.file);
+  const filePath = path.join(UPLOADS_DIR, safeFilename);
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'Requested PDF document not found.' });
+  }
+
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `inline; filename="${safeFilename}"`);
+  return res.sendFile(filePath);
 });
 
 app.listen(PORT, () => {

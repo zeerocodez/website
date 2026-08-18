@@ -1988,9 +1988,13 @@ const isValid = crypto.timingSafeEqual(
             <button class="blog-cat-btn active" data-category="All">All Stories</button>
             <button class="blog-cat-btn" data-category="Automations">Automations</button>
             <button class="blog-cat-btn" data-category="AI Security">AI Security</button>
-            <button class="blog-cat-btn" data-category="Career & Training">Career & Training</button>
             <button class="blog-cat-btn" data-category="Custom Apps">Custom Apps</button>
+            <button class="blog-cat-btn" data-category="Career & Training">Career & Training</button>
+            <button class="blog-cat-btn" data-category="Case Studies">Case Studies</button>
           </div>
+
+          <!-- Featured Hero Article -->
+          <div id="blogFeaturedHero" style="display:none; margin-bottom:2.5rem;"></div>
 
           <!-- Blog Grid -->
           <div class="blog-grid" id="blogPostsGrid">
@@ -3150,6 +3154,7 @@ const isValid = crypto.timingSafeEqual(
               <select id="adminPostCategory" class="form-select">
                 <option value="Automations">Automations</option>
                 <option value="AI Security">AI Security</option>
+                <option value="Custom Apps">Custom Apps</option>
                 <option value="Career & Training">Career & Training</option>
                 <option value="Case Studies">Case Studies</option>
               </select>
@@ -3163,6 +3168,76 @@ const isValid = crypto.timingSafeEqual(
           <div class="form-group">
             <label class="form-label" for="adminPostExcerpt">Excerpt / Summary (Meta Description)</label>
             <textarea id="adminPostExcerpt" class="form-textarea" rows="2" placeholder="Brief 1-2 sentence overview for SEO..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="adminPostImage">Featured Banner Image URL (Optional)</label>
+            <input type="url" id="adminPostImage" class="form-input" placeholder="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000">
+          </div>
+
+          <!-- DOWNLOADABLE PDF RESOURCE ATTACHMENT -->
+          <div class="form-group" style="margin-bottom:1.25rem;">
+            <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+              <span><i data-lucide="file-text" style="width:14px; height:14px; display:inline; color:var(--emerald-light);"></i> Downloadable PDF Resource (Optional)</span>
+              <span style="font-size:0.75rem; color:var(--text-cyber-muted);">Whitepaper, Playbook, Cheat Sheet</span>
+            </label>
+            
+            <!-- Hidden file input & metadata fields -->
+            <input type="file" id="adminPostPdfFile" accept=".pdf,application/pdf" style="display:none;">
+            <input type="hidden" id="adminPostPdfData">
+            <input type="hidden" id="adminPostPdfUrl">
+            <input type="hidden" id="adminPostPdfSize">
+            <input type="hidden" id="adminPostPdfSizeFormatted">
+            <input type="hidden" id="adminPostPdfDownloads">
+
+            <!-- Upload Dropzone -->
+            <div id="adminPdfDropzone" class="pdf-upload-dropzone" onclick="document.getElementById('adminPostPdfFile').click()">
+              <div style="text-align:center; padding:1.25rem 1rem;">
+                <div style="width:40px; height:40px; border-radius:50%; background:rgba(16,185,129,0.1); border:1px dashed var(--emerald-primary); display:flex; align-items:center; justify-content:center; margin:0 auto 0.5rem auto; color:var(--emerald-light);">
+                  <i data-lucide="upload-cloud" style="width:20px; height:20px;"></i>
+                </div>
+                <div style="font-size:0.88rem; color:#FFF; font-weight:600; margin-bottom:0.2rem;">
+                  Click to upload PDF or drag & drop here
+                </div>
+                <div style="font-size:0.75rem; color:var(--text-cyber-muted);">
+                  Accepts PDF documents up to 20MB
+                </div>
+              </div>
+            </div>
+
+            <!-- Attached PDF Preview Card -->
+            <div id="adminPdfAttachedPreview" style="display:none; background:#04070D; border:1px solid rgba(16,185,129,0.4); border-radius:var(--radius-xs); padding:1rem; margin-top:0.75rem;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap;">
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                  <div style="width:38px; height:38px; border-radius:var(--radius-xs); background:rgba(16,185,129,0.15); display:flex; align-items:center; justify-content:center; color:var(--emerald-light);">
+                    <i data-lucide="file-check" style="width:20px; height:20px;"></i>
+                  </div>
+                  <div>
+                    <div id="adminPdfPreviewName" style="color:#FFF; font-weight:700; font-size:0.9rem; word-break:break-all;">document.pdf</div>
+                    <div id="adminPdfPreviewSize" style="color:var(--text-cyber-muted); font-size:0.75rem;">475 KB • PDF Attached</div>
+                  </div>
+                </div>
+                <div style="display:flex; gap:0.5rem;">
+                  <button type="button" class="btn btn-outline btn-xs" id="btnAdminPdfChange" onclick="document.getElementById('adminPostPdfFile').click()">
+                    Change PDF
+                  </button>
+                  <button type="button" class="btn btn-ghost btn-xs" id="btnAdminPdfRemove" style="color:#F87171;" onclick="window.adminConsole.removeAttachedPdf()">
+                    <i data-lucide="trash-2"></i> Remove
+                  </button>
+                </div>
+              </div>
+
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap:0.75rem; margin-top:0.75rem; border-top:1px solid rgba(255,255,255,0.06); padding-top:0.75rem;">
+                <div>
+                  <label class="form-label" style="font-size:0.75rem;">Resource Title for Readers</label>
+                  <input type="text" id="adminPostPdfTitle" class="form-input" style="padding:0.4rem 0.65rem; font-size:0.82rem;" placeholder="e.g., Marketing Playbook (PDF)">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size:0.75rem;">Resource Description (Optional)</label>
+                  <input type="text" id="adminPostPdfDesc" class="form-input" style="padding:0.4rem 0.65rem; font-size:0.82rem;" placeholder="e.g., Complete ICP persona sheets and scripts">
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="form-group">

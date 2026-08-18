@@ -19,7 +19,8 @@ try {
         ".png"  = "image/png";
         ".jpg"  = "image/jpeg";
         ".svg"  = "image/svg+xml";
-        ".json" = "application/json"
+        ".json" = "application/json";
+        ".pdf"  = "application/pdf"
     }
 
     while ($listener.IsListening) {

@@ -97,6 +97,33 @@ class AdminConsoleManager {
     if (testEmailForm) {
       testEmailForm.addEventListener('submit', (e) => this.handleSendTestEmail(e));
     }
+
+    // PDF Attachment Upload & Drag-and-Drop
+    const pdfFileInput = document.getElementById('adminPostPdfFile');
+    if (pdfFileInput) {
+      pdfFileInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) this.handlePdfFileSelected(file);
+      });
+    }
+
+    const pdfDropzone = document.getElementById('adminPdfDropzone');
+    if (pdfDropzone) {
+      pdfDropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        pdfDropzone.classList.add('drag-over');
+      });
+      pdfDropzone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        pdfDropzone.classList.remove('drag-over');
+      });
+      pdfDropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        pdfDropzone.classList.remove('drag-over');
+        const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file) this.handlePdfFileSelected(file);
+      });
+    }
   }
 
   async renderAdminConsole() {
@@ -1604,6 +1631,9 @@ class AdminConsoleManager {
   // =========================================================================
   // TAB 8: BLOG CMS PUBLISHER
   // =========================================================================
+  // =========================================================================
+  // TAB 8: BLOG CMS PUBLISHER & PDF RESOURCE MANAGER
+  // =========================================================================
   renderBlogCmsTab(blogPosts) {
     const container = document.getElementById('adminBlogContent');
     if (!container) return;
@@ -1611,9 +1641,9 @@ class AdminConsoleManager {
     container.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
         <div>
-          <h3 style="color:#FFF; font-size:1.25rem; margin:0;">Engineering Blog CMS</h3>
+          <h3 style="color:#FFF; font-size:1.25rem; margin:0;">Engineering Blog CMS & PDF Library</h3>
           <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0.2rem 0 0 0;">
-            Publish technical tutorials, case studies, and engineering benchmarks to attract organic client and student inbound.
+            Publish technical tutorials, case studies, and downloadable PDF blueprints to capture leads and drive student enrollment.
           </p>
         </div>
         <button class="btn btn-primary btn-sm" onclick="window.adminConsole.openBlogEditorModal()">
@@ -1622,30 +1652,185 @@ class AdminConsoleManager {
       </div>
 
       <div style="display:flex; flex-direction:column; gap:1rem;">
-        ${blogPosts.map(post => `
-          <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.25rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
-            <div style="flex:1; min-width:280px;">
-              <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
-                <span class="badge badge-teal">${post.category}</span>
-                <span style="font-size:0.75rem; color:var(--text-cyber-muted);">${post.readTime || '6 min read'} • ${post.date || 'August 2026'}</span>
+        ${blogPosts.map(post => {
+          const pdfBadge = post.pdfAttachment ? `
+            <span class="badge badge-cyber" style="display:inline-flex; align-items:center; gap:0.3rem; font-size:0.7rem;">
+              <i data-lucide="file-text" style="width:11px; height:11px;"></i> PDF (${post.pdfAttachment.sizeFormatted || 'Attached'}) • ${post.pdfAttachment.downloads || 0} dl
+            </span>
+          ` : '';
+
+          return `
+            <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.25rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+              <div style="flex:1; min-width:280px;">
+                <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.35rem; flex-wrap:wrap;">
+                  <span class="badge badge-teal">${post.category}</span>
+                  ${pdfBadge}
+                  <span style="font-size:0.75rem; color:var(--text-cyber-muted);">${post.readTime || '6 min read'} • ${post.date || 'August 2026'}</span>
+                </div>
+                <h4 style="color:#FFF; font-size:1.05rem; margin-bottom:0.35rem;">${post.title}</h4>
+                <p style="color:var(--text-cyber-muted); font-size:0.82rem; margin:0; line-height:1.4;">${post.excerpt}</p>
               </div>
-              <h4 style="color:#FFF; font-size:1.05rem; margin-bottom:0.35rem;">${post.title}</h4>
-              <p style="color:var(--text-cyber-muted); font-size:0.82rem; margin:0; line-height:1.4;">${post.excerpt}</p>
+              <div style="display:flex; gap:0.5rem; align-items:center;">
+                <button class="btn btn-primary btn-xs" onclick="window.adminConsole.openBlogEditorModal('${post.id}')" title="Edit Article">
+                  <i data-lucide="edit-3"></i> Edit
+                </button>
+                <button class="btn btn-outline btn-xs" onclick="window.blog?.openArticleReader('${post.slug || post.id}')" title="View Reader">
+                  <i data-lucide="eye"></i> View
+                </button>
+                <button class="btn btn-ghost btn-xs" style="color:#F87171;" onclick="window.adminConsole.handleDeleteBlogPost('${post.id}')" title="Delete Article">
+                  <i data-lucide="trash-2"></i>
+                </button>
+              </div>
             </div>
-            <div style="display:flex; gap:0.5rem;">
-              <button class="btn btn-outline btn-xs" onclick="window.blog?.openArticleReader('${post.id}')"><i data-lucide="eye"></i> View</button>
-              <button class="btn btn-ghost btn-xs" style="color:#F87171;" onclick="window.adminConsole.handleDeleteBlogPost('${post.id}')"><i data-lucide="trash-2"></i></button>
-            </div>
-          </div>
-        `).join('')}
+          `;
+        }).join('')}
       </div>
     `;
+    if (window.lucide) window.lucide.createIcons();
   }
 
-  openBlogEditorModal() {
+  async openBlogEditorModal(postId = null) {
+    const form = document.getElementById('adminBlogPostForm');
+    if (form) form.reset();
+
+    const dropzone = document.getElementById('adminPdfDropzone');
+    const preview = document.getElementById('adminPdfAttachedPreview');
+
+    // Reset hidden fields
     document.getElementById('adminPostId').value = '';
-    document.getElementById('adminBlogPostForm').reset();
+    document.getElementById('adminPostPdfData').value = '';
+    document.getElementById('adminPostPdfUrl').value = '';
+    document.getElementById('adminPostPdfSize').value = '';
+    document.getElementById('adminPostPdfSizeFormatted').value = '';
+    document.getElementById('adminPostPdfDownloads').value = '0';
+    if (document.getElementById('adminPostImage')) document.getElementById('adminPostImage').value = '';
+
+    if (postId) {
+      const posts = await window.db.getBlogPosts();
+      const post = posts.find(p => p.id === postId || p.slug === postId);
+      if (post) {
+        document.getElementById('adminPostId').value = post.id || '';
+        document.getElementById('adminPostTitle').value = post.title || '';
+        document.getElementById('adminPostSlug').value = post.slug || '';
+        document.getElementById('adminPostCategory').value = post.category || 'Automations';
+        document.getElementById('adminPostTags').value = (post.tags || []).join(', ');
+        document.getElementById('adminPostExcerpt').value = post.excerpt || '';
+        document.getElementById('adminPostContent').value = post.content || '';
+        if (document.getElementById('adminPostImage')) {
+          document.getElementById('adminPostImage').value = post.featuredImage || post.heroImage || '';
+        }
+
+        if (post.pdfAttachment) {
+          const pdf = post.pdfAttachment;
+          document.getElementById('adminPdfPreviewName').textContent = pdf.name || 'document.pdf';
+          document.getElementById('adminPdfPreviewSize').textContent = `${pdf.sizeFormatted || 'PDF Document'} • ${pdf.downloads || 0} downloads`;
+          document.getElementById('adminPostPdfTitle').value = pdf.title || '';
+          document.getElementById('adminPostPdfDesc').value = pdf.description || '';
+          document.getElementById('adminPostPdfUrl').value = pdf.url || '';
+          document.getElementById('adminPostPdfData').value = pdf.dataUrl || '';
+          document.getElementById('adminPostPdfSize').value = pdf.size || '';
+          document.getElementById('adminPostPdfSizeFormatted').value = pdf.sizeFormatted || '';
+          document.getElementById('adminPostPdfDownloads').value = pdf.downloads || 0;
+
+          if (dropzone) dropzone.style.display = 'none';
+          if (preview) preview.style.display = 'block';
+        } else {
+          if (dropzone) dropzone.style.display = 'block';
+          if (preview) preview.style.display = 'none';
+        }
+      }
+    } else {
+      if (dropzone) dropzone.style.display = 'block';
+      if (preview) preview.style.display = 'none';
+    }
+
     if (window.modal) window.modal.open('modal-admin-blog-editor');
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  handlePdfFileSelected(file) {
+    if (!file) return;
+
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      window.toast?.error('Invalid file format. Please select a valid .pdf document.');
+      return;
+    }
+
+    // 20MB Max Limit
+    if (file.size > 20 * 1024 * 1024) {
+      window.toast?.error('File size exceeds the 20MB limit.');
+      return;
+    }
+
+    const sizeFormatted = file.size > 1024 * 1024
+      ? `${(file.size / (1024 * 1024)).toFixed(2)} MB`
+      : `${Math.round(file.size / 1024)} KB`;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      document.getElementById('adminPostPdfData').value = dataUrl;
+      document.getElementById('adminPostPdfSize').value = file.size;
+      document.getElementById('adminPostPdfSizeFormatted').value = sizeFormatted;
+
+      document.getElementById('adminPdfPreviewName').textContent = file.name;
+      document.getElementById('adminPdfPreviewSize').textContent = `${sizeFormatted} • Ready to Publish`;
+
+      const titleInput = document.getElementById('adminPostPdfTitle');
+      if (titleInput && !titleInput.value.trim()) {
+        const cleanBase = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+        titleInput.value = cleanBase + ' (PDF)';
+      }
+
+      const dropzone = document.getElementById('adminPdfDropzone');
+      const preview = document.getElementById('adminPdfAttachedPreview');
+      if (dropzone) dropzone.style.display = 'none';
+      if (preview) preview.style.display = 'block';
+
+      // Send to server upload endpoint asynchronously if backend is active
+      fetch('/api/upload/pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          filename: file.name,
+          fileData: dataUrl,
+          title: titleInput ? titleInput.value : file.name
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.url) {
+          document.getElementById('adminPostPdfUrl').value = data.url;
+        }
+      })
+      .catch(() => {});
+
+      window.toast?.success(`PDF "${file.name}" attached successfully!`);
+      if (window.lucide) window.lucide.createIcons();
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  removeAttachedPdf() {
+    const fileInput = document.getElementById('adminPostPdfFile');
+    if (fileInput) fileInput.value = '';
+
+    document.getElementById('adminPostPdfData').value = '';
+    document.getElementById('adminPostPdfUrl').value = '';
+    document.getElementById('adminPostPdfSize').value = '';
+    document.getElementById('adminPostPdfSizeFormatted').value = '';
+    document.getElementById('adminPostPdfDownloads').value = '0';
+    document.getElementById('adminPostPdfTitle').value = '';
+    document.getElementById('adminPostPdfDesc').value = '';
+
+    const dropzone = document.getElementById('adminPdfDropzone');
+    const preview = document.getElementById('adminPdfAttachedPreview');
+    if (dropzone) dropzone.style.display = 'block';
+    if (preview) preview.style.display = 'none';
+
+    window.toast?.info('PDF attachment removed.');
+    if (window.lucide) window.lucide.createIcons();
   }
 
   async handleSaveBlogPost(e) {
@@ -1657,6 +1842,31 @@ class AdminConsoleManager {
     const tags = document.getElementById('adminPostTags').value.split(',').map(t => t.trim()).filter(Boolean);
     const excerpt = document.getElementById('adminPostExcerpt').value.trim();
     const content = document.getElementById('adminPostContent').value.trim();
+    const customImg = document.getElementById('adminPostImage')?.value.trim();
+
+    // Check for PDF attachment
+    const pdfData = document.getElementById('adminPostPdfData').value;
+    const pdfUrl = document.getElementById('adminPostPdfUrl').value;
+    const pdfTitle = document.getElementById('adminPostPdfTitle').value.trim();
+    const pdfDesc = document.getElementById('adminPostPdfDesc').value.trim();
+    const pdfName = document.getElementById('adminPdfPreviewName').textContent || 'resource.pdf';
+    const pdfSize = parseInt(document.getElementById('adminPostPdfSize').value) || 0;
+    const pdfSizeFormatted = document.getElementById('adminPostPdfSizeFormatted').value || (pdfSize ? `${Math.round(pdfSize/1024)} KB` : 'PDF Resource');
+    const pdfDownloads = parseInt(document.getElementById('adminPostPdfDownloads').value) || 0;
+
+    let pdfAttachment = null;
+    if (pdfData || pdfUrl || (pdfTitle && pdfName !== 'document.pdf')) {
+      pdfAttachment = {
+        name: pdfName,
+        url: pdfUrl || pdfData,
+        dataUrl: pdfData,
+        title: pdfTitle || pdfName,
+        description: pdfDesc,
+        size: pdfSize,
+        sizeFormatted: pdfSizeFormatted,
+        downloads: pdfDownloads
+      };
+    }
 
     const post = {
       id,
@@ -1666,17 +1876,19 @@ class AdminConsoleManager {
       tags,
       excerpt,
       content,
+      featuredImage: customImg || 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1200&auto=format&fit=crop',
+      heroImage: customImg || 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1200&auto=format&fit=crop',
       author: 'Nuel Effiong',
       authorRole: 'Founder & Principal AI Systems Architect',
       date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-      readTime: '5 min read',
+      readTime: `${Math.max(3, Math.ceil(content.split(/\s+/).length / 200))} min read`,
       views: 120,
       claps: 24,
-      heroImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1200&auto=format&fit=crop'
+      pdfAttachment: pdfAttachment || undefined
     };
 
     await window.db.saveBlogPost(post);
-    window.toast?.success(`Article "${title}" published to live blog!`);
+    window.toast?.success(`Article "${title}" published with ${pdfAttachment ? 'PDF attachment' : 'live blog updates'}!`);
     if (window.modal) window.modal.closeAll();
     this.renderAdminConsole();
     if (window.blog) window.blog.renderBlogView();
@@ -1687,6 +1899,7 @@ class AdminConsoleManager {
       await window.db.deleteBlogPost(postId);
       window.toast?.info('Blog article deleted.');
       this.renderAdminConsole();
+      if (window.blog) window.blog.renderBlogView();
     }
   }
 

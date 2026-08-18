@@ -734,6 +734,15 @@ const DEFAULT_BLOG_POSTS = [
     excerpt: 'Step-by-step breakdown of how Zeerocodes replaced 28 hours of manual bank reconciliation per week with a 90-second event-driven n8n & WhatsApp Cloud API bot for PayQuick Africa.',
     tags: ['WhatsApp Business API', 'Paystack', 'n8n', 'FinTech Automation', 'Lagos Business'],
     status: 'published',
+    pdfAttachment: {
+      name: 'Zeerocodes_Customer_Avatars_and_Marketing_Playbook.pdf',
+      url: 'Zeerocodes_Customer_Avatars_and_Marketing_Playbook.pdf',
+      title: 'Zeerocodes Customer Avatars & Marketing Playbook (PDF Blueprint)',
+      size: 487155,
+      sizeFormatted: '475 KB',
+      description: 'Download the battle-tested ICP persona guides, cold pitch frameworks, and autonomous WhatsApp funnel blueprints.',
+      downloads: 142
+    },
     content: `
       <h2>The Real Pain: 4 Accountants Matching Bank SMS Alerts by Hand</h2>
       <p>PayQuick Africa processes hundreds of customer deposits every day across Nigeria. Before partnering with Zeerocodes Studio, their finance team spent 28 hours every week manually opening bank transfer receipts, checking SMS notifications, and replying to customer WhatsApp messages with PDF invoices.</p>
@@ -920,7 +929,7 @@ const DEFAULT_BLOG_POSTS = [
     id: 'post-antigravity-ai-studio-mvp',
     title: 'Mastering Google Antigravity & AI Studio: How African Founders Ship Production MVPs in 72 Hours',
     slug: 'mastering-google-antigravity-ai-studio-72-hour-mvp',
-    category: 'Engineering',
+    category: 'Custom Apps',
     categoryBadge: 'badge-teal',
     author: 'Nuel Effiong',
     authorRole: 'Principal AI Systems Architect',
@@ -928,7 +937,7 @@ const DEFAULT_BLOG_POSTS = [
     readTime: '8 min read',
     featuredImage: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=1000&auto=format&fit=crop',
     excerpt: 'A comprehensive methodology for writing airtight engineering specifications, generating full-stack Next.js applications, and passing AST security audits in 72 hours.',
-    tags: ['Google Antigravity', 'AI Studio', 'Vibe Coding', 'MVP Engineering', 'The VibeCode Labs'],
+    tags: ['Google Antigravity', 'AI Studio', 'Vibe Coding', 'MVP Engineering', 'Custom Apps'],
     status: 'published',
     content: `
       <h2>The Shift from Syntax Typing to Architectural Specification</h2>
@@ -947,6 +956,83 @@ const DEFAULT_BLOG_POSTS = [
 
       <h3>Step 4: VibeScan AST Static Audit & Hardening</h3>
       <p>Run your repository through VibeScan to seal backdoors, verify OWASP LLM compliance, and generate the cryptographic <strong>VibeCert™ Seal</strong>.</p>
+    `
+  },
+  {
+    id: 'post-multi-branch-retail-inventory',
+    title: 'Autonomous Multi-Branch Inventory Sync: Connecting WhatsApp Order Bots to Central SQL',
+    slug: 'autonomous-multi-branch-retail-inventory-whatsapp-sync',
+    category: 'Automations',
+    categoryBadge: 'badge-success',
+    author: 'Nuel Effiong',
+    authorRole: 'Principal AI Systems Architect',
+    date: 'August 14, 2026',
+    readTime: '7 min read',
+    featuredImage: 'https://images.unsplash.com/photo-1553413077-190dd305871c?q=80&w=1000&auto=format&fit=crop',
+    excerpt: 'How retail chains in Lagos prevent stockouts and overselling by bridging instant WhatsApp customer catalog orders with real-time distributed warehouse database locks.',
+    tags: ['Inventory Automation', 'WhatsApp Cloud API', 'PostgreSQL Locks', 'n8n', 'Retail Tech'],
+    status: 'published',
+    content: `
+      <h2>The Multi-Store Dilemma in Fast-Moving Retail</h2>
+      <p>When retail businesses operate 3+ physical branches in Lagos while taking customer orders via WhatsApp, stock inventory desynchronization creates immense customer friction. Two sales reps in different locations sell the exact same piece of merchandise simultaneously.</p>
+
+      <h2>The Event-Driven Atomic Reservation Protocol</h2>
+      <p>We engineered an atomic lock architecture using n8n and PostgreSQL row-level transactions:</p>
+      <ul>
+        <li><strong>Catalog Browsing:</strong> Customers view live stock availability via WhatsApp interactive product lists.</li>
+        <li><strong>Atomic Hold:</strong> When a customer starts checkout, a 15-minute distributed lock holds the item inventory in PostgreSQL.</li>
+        <li><strong>Payment Verification:</strong> Paystack webhook confirmation immediately clears the hold and marks the item sold across all branches.</li>
+        <li><strong>Automated Dispatch Alert:</strong> Nearest warehouse receives picking manifest with instant route planning.</li>
+      </ul>
+    `
+  },
+  {
+    id: 'post-high-ticket-vibe-coding-retainers',
+    title: 'How to Package & Sell High-Ticket Automation Retainers (₦1.5M - ₦5M/Month)',
+    slug: 'selling-high-ticket-automation-retainers-nigeria',
+    category: 'Career & Training',
+    categoryBadge: 'badge-teal',
+    author: 'Nuel Effiong',
+    authorRole: 'Principal AI Systems Architect',
+    date: 'August 16, 2026',
+    readTime: '9 min read',
+    featuredImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1000&auto=format&fit=crop',
+    excerpt: 'Stop charging one-off project fees. Learn how The VibeCode Labs graduates position Managed Operations SLAs to land long-term recurring revenue clients in Africa and globally.',
+    tags: ['Client Acquisition', 'High-Ticket Retainers', 'The VibeCode Labs', 'Freelancing', 'SLA Pricing'],
+    status: 'published',
+    content: `
+      <h2>Why One-Off Project Billing Keeps Builders in the Feast-and-Famine Cycle</h2>
+      <p>Most software builders deliver a client portal, get paid once, and immediately start hunting for their next client. Meanwhile, the client's automations experience third-party API changes, webhook timeouts, and server errors that nobody is monitoring.</p>
+
+      <h2>The Managed Operations SLA Model</h2>
+      <p>In The VibeCode Labs Level 4, we teach builders to pitch <strong>Value-Based Retainers</strong> structured around business continuity:</p>
+      <ul>
+        <li><strong>24/7 Webhook & Workflow Uptime Monitoring:</strong> Immediate WhatsApp alerting if a payment gateway drops.</li>
+        <li><strong>Monthly Security Re-certification:</strong> Regular VibeScan audits ensuring no newly added secrets or missing policies.</li>
+        <li><strong>Feature Iterations:</strong> 1-2 new workflow pipelines per month to continually reduce operational payroll.</li>
+      </ul>
+    `
+  },
+  {
+    id: 'post-custom-crm-fintech-portal',
+    title: 'Architecting a Zero-Tech-Debt Custom CRM for African SME Lenders in 21 Days',
+    slug: 'architecting-zero-tech-debt-custom-crm-fintech-sme',
+    category: 'Custom Apps',
+    categoryBadge: 'badge-teal',
+    author: 'Nuel Effiong',
+    authorRole: 'Principal AI Systems Architect',
+    date: 'August 17, 2026',
+    readTime: '8 min read',
+    featuredImage: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1000&auto=format&fit=crop',
+    excerpt: 'How Zeerocodes Studio architected a secure loan origination and customer KYC portal with automated credit scoring, Bank Verification Number (BVN) validation, and Paystack direct debit mandates.',
+    tags: ['Custom CRM', 'FinTech', 'Loan Origination', 'Next.js', 'Cybersecurity'],
+    status: 'published',
+    content: `
+      <h2>The Problem with Off-the-Shelf SaaS for African Lending</h2>
+      <p>Generic foreign CRM platforms like HubSpot and Salesforce do not integrate natively with Nigerian credit bureaus, Mono/Okra bank statement parsers, or Paystack automated debit mandates without expensive custom plugins.</p>
+
+      <h2>The Custom Solution Built in 21 Days</h2>
+      <p>Using our hardened Next.js and Supabase RLS architectural framework, Zeerocodes Studio delivered a tailor-made loan underwriting engine with instant document OCR verification and automated disbursement notifications.</p>
     `
   }
 ];
@@ -1723,10 +1809,27 @@ class DatabaseLayer {
 
   // --- Blog Posts ---
   async getBlogPosts() {
-    const posts = this.getLocal('blogPosts');
-    if (posts && posts.length > 0) return posts;
-    this.setLocal('blogPosts', DEFAULT_BLOG_POSTS);
-    return DEFAULT_BLOG_POSTS;
+    let posts = this.getLocal('blogPosts');
+    if (!posts || !Array.isArray(posts) || posts.length === 0) {
+      this.setLocal('blogPosts', DEFAULT_BLOG_POSTS);
+      return DEFAULT_BLOG_POSTS;
+    }
+    // Merge any missing default posts into stored posts so newly added default articles appear
+    let updated = false;
+    DEFAULT_BLOG_POSTS.forEach(defPost => {
+      const exists = posts.find(p => p.id === defPost.id || p.slug === defPost.slug);
+      if (!exists) {
+        posts.push(defPost);
+        updated = true;
+      } else if (!exists.pdfAttachment && defPost.pdfAttachment) {
+        exists.pdfAttachment = defPost.pdfAttachment;
+        updated = true;
+      }
+    });
+    if (updated) {
+      this.setLocal('blogPosts', posts);
+    }
+    return posts;
   }
 
   async getBlogPostBySlug(slug) {
@@ -1743,12 +1846,24 @@ class DatabaseLayer {
       posts.unshift(post);
     }
     this.setLocal('blogPosts', posts);
+    return post;
   }
 
   async deleteBlogPost(postId) {
     const posts = await this.getBlogPosts();
     const filtered = posts.filter(p => p.id !== postId);
     this.setLocal('blogPosts', filtered);
+  }
+
+  async incrementBlogPostPdfDownload(slugOrId) {
+    const posts = await this.getBlogPosts();
+    const post = posts.find(p => p.slug === slugOrId || p.id === slugOrId);
+    if (post && post.pdfAttachment) {
+      post.pdfAttachment.downloads = (post.pdfAttachment.downloads || 0) + 1;
+      this.setLocal('blogPosts', posts);
+      return post.pdfAttachment.downloads;
+    }
+    return 0;
   }
 
   // --- Quizzes ---
