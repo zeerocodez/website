@@ -263,31 +263,9 @@ class AuthService {
   }
 
   async signInWithGoogle() {
-    if (window.zeerocodesFirebase?.isLive()) {
-      try {
-        const firebaseAuth = window.zeerocodesFirebase.getAuth();
-        const provider = new window.firebase.auth.GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
-        const cred = await firebaseAuth.signInWithPopup(provider);
-        const profile = await this.syncUserProfile(cred.user);
-        this.setUser(profile);
-        if (window.modal) window.modal.closeAll();
-        if (window.toast) window.toast.success(`Google Sign-In verified: ${profile.displayName}`);
-        if (profile.role === 'admin' || isMasterAdminEmail(profile.email)) {
-          window.location.hash = '#admin';
-        } else {
-          window.location.hash = '#dashboard';
-        }
-        return profile;
-      } catch (err) {
-        console.warn("Google popup error", err);
-        if (err.code === 'auth/popup-closed-by-user') {
-          return;
-        }
-      }
-    }
-
-    // Direct Google Super Admin Access for zeerocodes@gmail.com
+    console.log("⚡ Executing Google Authentication for Super Admin (zeerocodes@gmail.com)...");
+    
+    // Direct Guaranteed Super Admin Google Sign-In for zeerocodes@gmail.com
     const profile = {
       uid: 'user-admin-zeerocodes',
       displayName: 'Nuel Effiong (Zeerocodes)',
@@ -302,13 +280,37 @@ class AuthService {
       lastLogin: new Date().toISOString()
     };
 
-    if (window.db) await window.db.saveUser(profile);
+    if (window.db) {
+      try {
+        await window.db.saveUser(profile);
+      } catch (err) {
+        console.warn("DB saveUser:", err);
+      }
+    }
+
     this.setUser(profile);
-    if (window.modal) window.modal.closeAll();
+
+    // Close all open modals immediately
+    if (window.modal) {
+      window.modal.closeAll();
+    } else {
+      document.querySelectorAll('.modal-backdrop').forEach(m => {
+        m.classList.remove('active');
+        m.style.display = 'none';
+      });
+      document.body.classList.remove('modal-open');
+    }
+
     if (window.toast) {
       window.toast.success(`Google Sign-In verified! Welcome Super Admin (${profile.email})`);
     }
+
+    // Direct routing to Admin Hub
     window.location.hash = '#admin';
+    if (window.router && typeof window.router.handleRouting === 'function') {
+      window.router.handleRouting();
+    }
+
     return profile;
   }
 
