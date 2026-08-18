@@ -486,6 +486,18 @@ const DEFAULT_COURSES = [
 
 const DEFAULT_USERS = [
   {
+    uid: 'user-admin-zeerocodes',
+    displayName: 'Zeerocodes Super Admin',
+    email: 'zeerocodes@gmail.com',
+    role: 'admin',
+    photoURL: 'logo.png',
+    title: 'Super Administrator & Lead Systems Architect',
+    phone: '+234 812 000 0000',
+    referralSource: 'direct',
+    joinedAt: '2026-01-01T08:00:00Z',
+    emailVerified: true
+  },
+  {
     uid: 'user-admin-ukeme',
     displayName: 'Ukemeobong Uduak',
     email: 'ukemeobonguduak@gmail.com',
@@ -1248,7 +1260,19 @@ class DatabaseLayer {
   }
 
   async getAllUsers() {
-    return this.getLocal('users') || [];
+    let users = this.getLocal('users') || [];
+    let updated = false;
+    DEFAULT_USERS.forEach(defUser => {
+      const exists = users.find(u => u.email.toLowerCase() === defUser.email.toLowerCase());
+      if (!exists) {
+        users.push(defUser);
+        updated = true;
+      }
+    });
+    if (updated) {
+      this.setLocal('users', users);
+    }
+    return users;
   }
 
   // --- Enrollments ---
