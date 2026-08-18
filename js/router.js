@@ -281,7 +281,7 @@ class Router {
       window.blog.renderBlogView();
     } else if (cleanHash === '#dashboard' && window.app) {
       window.app.renderUserDashboard();
-    } else if (cleanHash === '#admin' && window.adminConsole) {
+    } else if ((cleanHash === '#admin' || cleanHash.startsWith('#admin')) && window.adminConsole) {
       window.adminConsole.renderAdminConsole();
     } else if (cleanHash === '#verify' && window.app) {
       window.app.renderCertificateVerification();

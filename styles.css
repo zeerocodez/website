@@ -2336,6 +2336,110 @@ img, svg, video {
 }
 
 /* ==========================================================================
+   ENTERPRISE ADMIN COMMAND HUB STYLES
+   ========================================================================== */
+.admin-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.admin-metric-card {
+  background: #080D16;
+  border: 1px solid var(--obsidian-border);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: var(--transition-smooth);
+}
+
+.admin-metric-card:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.admin-metric-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-xs);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: var(--emerald-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admin-tabs-bar {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--obsidian-border);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(16, 185, 129, 0.3) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin-tabs-bar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.admin-tabs-bar::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.4);
+  border-radius: 4px;
+}
+
+.admin-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.15rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-xs);
+  color: var(--text-cyber-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition-smooth);
+}
+
+.admin-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.admin-tab-btn.active {
+  background: rgba(16, 185, 129, 0.14);
+  color: #FFFFFF;
+  border-color: var(--emerald-primary);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+}
+
+.admin-tab-panel {
+  display: none !important;
+}
+
+.admin-tab-panel.active {
+  display: block !important;
+  animation: adminFadeIn 0.2s ease forwards;
+}
+
+@keyframes adminFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
    VIBESCAN AI SECURITY SALES & PEACE OF MIND STYLES
    ========================================================================== */
 .security-traps-grid {

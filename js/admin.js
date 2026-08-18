@@ -22,6 +22,25 @@ class AdminConsoleManager {
 
   init() {
     this.bindAdminEvents();
+
+    // Auto-render on load & on hash change
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this.renderAdminConsole());
+    } else {
+      setTimeout(() => this.renderAdminConsole(), 100);
+    }
+
+    window.addEventListener('hashchange', () => {
+      if (window.location.hash.includes('admin')) {
+        this.renderAdminConsole();
+      }
+    });
+
+    window.addEventListener('zeerocodes:auth-changed', () => {
+      if (window.location.hash.includes('admin')) {
+        this.renderAdminConsole();
+      }
+    });
   }
 
   bindAdminEvents() {
@@ -39,6 +58,9 @@ class AdminConsoleManager {
           targetPanel.classList.add('active');
           this.activeTab = targetTab;
         }
+
+        // Re-render to ensure freshly populated state and icons
+        this.renderAdminConsole();
       }
     });
 
