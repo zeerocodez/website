@@ -624,8 +624,14 @@ class ZeerocodesApp {
       });
     }
 
-    // Demo Persona Fast Switchers
+    // Demo Persona Fast Switchers & Google Sign In
     document.addEventListener('click', (e) => {
+      // Google Sign In
+      if (e.target.closest('.btn-google-signin')) {
+        if (window.auth) window.auth.signInWithGoogle();
+        return;
+      }
+
       const demoBtn = e.target.closest('.btn-quick-demo-login');
       if (demoBtn) {
         const persona = demoBtn.getAttribute('data-persona') || 'admin';

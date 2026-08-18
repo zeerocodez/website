@@ -296,14 +296,14 @@ class AuthService {
     let profile;
     if (persona === 'admin') {
       profile = {
-        uid: 'user-admin-01',
-        displayName: 'Nuel Effiong',
-        email: 'admin@zeerocodes.com',
+        uid: 'user-admin-zeerocodes',
+        displayName: 'Nuel Effiong (Zeerocodes)',
+        email: 'zeerocodes@gmail.com',
         role: 'admin',
-        title: 'Principal AI Systems Architect',
-        phone: '+234 812 345 6789',
+        title: 'Super Administrator & Lead Systems Architect',
+        phone: '+234 812 000 0000',
         referralSource: 'direct',
-        photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop',
+        photoURL: 'logo.png',
         emailVerified: true,
         isLocalMock: true
       };
