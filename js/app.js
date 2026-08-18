@@ -31,6 +31,11 @@ class ZeerocodesApp {
 
     // Bind Wiz-Style 3-Pillar Hero Stage Switcher
     document.addEventListener('click', (e) => {
+      const directLink = e.target.closest('.tab-nav-direct-link');
+      if (directLink) {
+        return; // Allow router to handle direct navigation to #studio, #academy, #vibescan
+      }
+
       const stageBtn = e.target.closest('.wiz-tab-btn');
       if (stageBtn) {
         const stageId = stageBtn.getAttribute('data-stage');
