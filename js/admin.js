@@ -43,24 +43,38 @@ class AdminConsoleManager {
     });
   }
 
+  switchTab(targetTab) {
+    if (!targetTab) return;
+    this.activeTab = targetTab;
+
+    document.querySelectorAll('.admin-tab-btn').forEach(b => {
+      if (b.getAttribute('data-tab') === targetTab) {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.admin-tab-panel').forEach(p => {
+      if (p.id === targetTab) {
+        p.classList.add('active');
+        p.style.setProperty('display', 'block', 'important');
+      } else {
+        p.classList.remove('active');
+        p.style.setProperty('display', 'none', 'important');
+      }
+    });
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
   bindAdminEvents() {
     // Tab Switching
     document.addEventListener('click', (e) => {
       const tabBtn = e.target.closest('.admin-tab-btn');
       if (tabBtn) {
-        document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.remove('active'));
-
-        tabBtn.classList.add('active');
         const targetTab = tabBtn.getAttribute('data-tab');
-        const targetPanel = document.getElementById(targetTab);
-        if (targetPanel) {
-          targetPanel.classList.add('active');
-          this.activeTab = targetTab;
-        }
-
-        // Re-render to ensure freshly populated state and icons
-        this.renderAdminConsole();
+        this.switchTab(targetTab);
       }
     });
 
@@ -209,6 +223,9 @@ class AdminConsoleManager {
       try { this.renderEmailHubTab(emailLogs); } catch(e) { console.error("renderEmailHubTab error:", e); }
       try { this.renderBlogCmsTab(blogPosts); } catch(e) { console.error("renderBlogCmsTab error:", e); }
       try { this.renderWebhookTab(paymentEvents); } catch(e) { console.error("renderWebhookTab error:", e); }
+
+      // Ensure the currently active tab panel is displayed
+      this.switchTab(this.activeTab || 'adminTabOverview');
 
       if (window.lucide) window.lucide.createIcons();
     } catch (err) {

@@ -2348,15 +2348,15 @@ const isValid = crypto.timingSafeEqual(
 
           <!-- Admin Tabs Bar (9 Operations Hubs) -->
           <div class="admin-tabs-bar">
-            <button class="admin-tab-btn active" data-tab="adminTabOverview"><i data-lucide="layout-dashboard"></i> Overview</button>
-            <button class="admin-tab-btn" data-tab="adminTabLmsEditor"><i data-lucide="book-open"></i> LMS Curriculum & Videos</button>
-            <button class="admin-tab-btn" data-tab="adminTabStudents"><i data-lucide="graduation-cap"></i> Student Admissions</button>
-            <button class="admin-tab-btn" data-tab="adminTabFinancials"><i data-lucide="wallet"></i> Sales, Invoices & Profits</button>
-            <button class="admin-tab-btn" data-tab="adminTabStudio"><i data-lucide="workflow"></i> Studio Projects</button>
-            <button class="admin-tab-btn" data-tab="adminTabVibescan"><i data-lucide="shield-check"></i> VibeScan Engine</button>
-            <button class="admin-tab-btn" data-tab="adminTabEmails"><i data-lucide="mail"></i> Transactional Emails</button>
-            <button class="admin-tab-btn" data-tab="adminTabBlog"><i data-lucide="newspaper"></i> Blog CMS</button>
-            <button class="admin-tab-btn" data-tab="adminTabWebhooks"><i data-lucide="activity"></i> Webhook & Logs</button>
+            <button type="button" class="admin-tab-btn active" data-tab="adminTabOverview" onclick="window.adminConsole?.switchTab('adminTabOverview')"><i data-lucide="layout-dashboard"></i> Overview</button>
+            <button type="button" class="admin-tab-btn" data-tab="adminTabLmsEditor" onclick="window.adminConsole?.switchTab('adminTabLmsEditor')"><i data-lucide="book-open"></i> LMS Curriculum & Videos</button>
+            <button type="button" class="admin-tab-btn" data-tab="adminTabStudents" onclick="window.adminConsole?.switchTab('adminTabStudents')"><i data-lucide="graduation-cap"></i> Student Admissions</button>
+            <button type="button" class="admin-tab-btn" data-tab="adminTabFinancials" onclick="window.adminConsole?.switchTab('adminTabFinancials')"><i data-lucide="wallet"></i> Sales, Invoices & Profits</button>
+            <button type="button" class="admin-tab-btn" data-tab="adminTabStudio" onclick="window.adminConsole?.switchTab('adminTabStudio')"><i data-lucide="workflow"></i> Studio Projects</button>
+            <button type="button" class="admin-tab-btn" data-tab="adminTabVibescan" onclick="window.adminConsole?.switchTab('adminTabVibescan')"><i data-lucide="shield-check"></i> VibeScan Engine</button>
+            <button type="button" class="admin-tab-btn" data-tab="adminTabEmails" onclick="window.adminConsole?.switchTab('adminTabEmails')"><i data-lucide="mail"></i> Transactional Emails</button>
+            <button type="button" class="admin-tab-btn" data-tab="adminTabBlog" onclick="window.adminConsole?.switchTab('adminTabBlog')"><i data-lucide="newspaper"></i> Blog CMS</button>
+            <button type="button" class="admin-tab-btn" data-tab="adminTabWebhooks" onclick="window.adminConsole?.switchTab('adminTabWebhooks')"><i data-lucide="activity"></i> Webhook & Logs</button>
           </div>
 
           <!-- Tab Panels -->
