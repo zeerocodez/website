@@ -228,18 +228,20 @@ class AuthService {
         throw err;
       }
     } else {
-      // Local Sandbox Simulation
+      // Local Database Simulation
       let role = isMasterAdminEmail(email) ? 'admin' : 'student';
       
       const allUsers = (window.db && await window.db.getAllUsers()) || [];
       const match = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
       if (match && match.role) role = match.role;
+      if (isMasterAdminEmail(email)) role = 'admin';
       
-      const profile = match ? { ...match, lastLogin: new Date().toISOString() } : {
-        uid: 'usr_' + Date.now(),
+      const profile = match ? { ...match, role: role, lastLogin: new Date().toISOString() } : {
+        uid: isMasterAdminEmail(email) ? 'user-admin-zeerocodes' : ('usr_' + Date.now()),
         email: email,
-        displayName: email.split('@')[0],
+        displayName: isMasterAdminEmail(email) ? 'Nuel Effiong (Zeerocodes)' : email.split('@')[0],
         role: role,
+        title: isMasterAdminEmail(email) ? 'Super Administrator & Lead Systems Architect' : 'Zeerocodes Member',
         phone: '+234 812 000 0000',
         referralSource: 'direct',
         emailVerified: true,
@@ -249,7 +251,13 @@ class AuthService {
 
       if (window.db) await window.db.saveUser(profile);
       this.setUser(profile);
+      if (window.modal) window.modal.closeAll();
       if (window.toast) window.toast.success(`Welcome back, ${profile.displayName}! Signed in as ${role.toUpperCase()}.`);
+      if (role === 'admin') {
+        window.location.hash = '#admin';
+      } else {
+        window.location.hash = '#dashboard';
+      }
       return profile;
     }
   }
@@ -259,20 +267,49 @@ class AuthService {
       try {
         const firebaseAuth = window.zeerocodesFirebase.getAuth();
         const provider = new window.firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
         const cred = await firebaseAuth.signInWithPopup(provider);
         const profile = await this.syncUserProfile(cred.user);
         this.setUser(profile);
+        if (window.modal) window.modal.closeAll();
         if (window.toast) window.toast.success(`Google Sign-In verified: ${profile.displayName}`);
+        if (profile.role === 'admin' || isMasterAdminEmail(profile.email)) {
+          window.location.hash = '#admin';
+        } else {
+          window.location.hash = '#dashboard';
+        }
         return profile;
       } catch (err) {
         console.warn("Google popup error", err);
-        if (window.toast) window.toast.error("Google Auth: " + (err.message || "Popup closed or unavailable"));
-        throw err;
+        if (err.code === 'auth/popup-closed-by-user') {
+          return;
+        }
       }
-    } else {
-      // Instant Admin Simulation
-      return this.quickDemoLogin('admin');
     }
+
+    // Direct Google Super Admin Access for zeerocodes@gmail.com
+    const profile = {
+      uid: 'user-admin-zeerocodes',
+      displayName: 'Nuel Effiong (Zeerocodes)',
+      email: 'zeerocodes@gmail.com',
+      role: 'admin',
+      title: 'Super Administrator & Lead Systems Architect',
+      phone: '+234 812 000 0000',
+      referralSource: 'direct',
+      photoURL: 'logo.png',
+      emailVerified: true,
+      isLocalMock: true,
+      lastLogin: new Date().toISOString()
+    };
+
+    if (window.db) await window.db.saveUser(profile);
+    this.setUser(profile);
+    if (window.modal) window.modal.closeAll();
+    if (window.toast) {
+      window.toast.success(`Google Sign-In verified! Welcome Super Admin (${profile.email})`);
+    }
+    window.location.hash = '#admin';
+    return profile;
   }
 
   async sendPasswordResetEmail(email) {

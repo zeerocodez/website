@@ -84,6 +84,21 @@ class ModalController {
     }
   }
 
+  close(modalId) {
+    if (modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+      }
+    }
+    const anyActive = document.querySelector('.modal-backdrop.active');
+    if (!anyActive) {
+      document.body.classList.remove('modal-open');
+      this.activeModal = null;
+    }
+  }
+
   closeAll() {
     document.querySelectorAll('.modal-backdrop').forEach(m => {
       m.classList.remove('active');
