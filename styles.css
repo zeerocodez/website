@@ -2440,6 +2440,316 @@ img, svg, video {
 }
 
 /* ==========================================================================
+   MODERN DASHBOARD & TELEMETRY UI STYLES
+   ========================================================================== */
+.modern-dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.modern-dash-title-group h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+}
+
+.modern-stat-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.ref-stat-card {
+  background: #080D16;
+  border: 1px solid var(--obsidian-border);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition-smooth);
+}
+
+.ref-stat-card:hover {
+  border-color: rgba(0, 245, 212, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.ref-stat-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.ref-stat-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-cyber-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.trend-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.trend-pill.positive {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--emerald-light);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.trend-pill.cyan {
+  background: rgba(0, 245, 212, 0.15);
+  color: var(--cyan-accent);
+  border: 1px solid rgba(0, 245, 212, 0.3);
+}
+
+.trend-pill.purple {
+  background: rgba(168, 85, 247, 0.15);
+  color: #C084FC;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.ref-stat-val-group {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.3rem;
+}
+
+.ref-stat-number {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.ref-sparkline-wrap {
+  margin-top: 0.75rem;
+  height: 38px;
+  width: 100%;
+}
+
+.ref-sparkline-wrap svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.floating-ai-card {
+  background: radial-gradient(ellipse at top left, #0D1627, #06090E);
+  border: 1px solid rgba(0, 245, 212, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.ai-profile-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: min(100%, 300px);
+}
+
+.ai-avatar-wrap {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
+.ai-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--emerald-primary);
+}
+
+.ai-pulse-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background: #10B981;
+  border: 2px solid #06090E;
+  border-radius: 50%;
+  animation: pulseDot 2s infinite;
+}
+
+@keyframes pulseDot {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.ai-info-meta h4 {
+  color: #FFFFFF;
+  font-size: 0.98rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ai-info-meta p {
+  color: var(--text-cyber-muted);
+  font-size: 0.82rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.wave-chart-card {
+  background: #080D16;
+  border: 1px solid var(--obsidian-border);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+}
+
+.wave-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.wave-period-group {
+  display: flex;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 3px;
+  border-radius: var(--radius-xs);
+}
+
+.period-pill-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-cyber-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.period-pill-btn:hover {
+  color: #FFFFFF;
+}
+
+.period-pill-btn.active {
+  background: var(--emerald-primary);
+  color: #06090E;
+  font-weight: 800;
+}
+
+.wave-canvas-wrap {
+  width: 100%;
+  height: 200px;
+}
+
+.wave-canvas-wrap svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ref-donut-card {
+  background: #080D16;
+  border: 1px solid var(--obsidian-border);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ref-donut-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 0.5rem auto 1rem auto;
+}
+
+.ref-donut-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.donut-center-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.donut-center-number {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.donut-center-sub {
+  font-size: 0.68rem;
+  color: var(--text-cyber-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.donut-legend-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+}
+
+.donut-legend-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-cyber-muted);
+}
+
+.donut-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+/* ==========================================================================
    VIBESCAN AI SECURITY SALES & PEACE OF MIND STYLES
    ========================================================================== */
 .security-traps-grid {
