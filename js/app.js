@@ -1111,6 +1111,14 @@ class ZeerocodesApp {
     }
     const user = window.auth.getUser();
 
+    // Verification Guard: Only verified users can access the full dashboard curriculum & labs
+    const isVerified = window.auth.isUserVerified(user);
+    if (!isVerified) {
+      this.renderStudentPendingVerificationView(user);
+      if (window.lucide) window.lucide.createIcons();
+      return;
+    }
+
     // 1. Top Profile Header
     const nameEl = document.getElementById('dashUserName');
     const emailEl = document.getElementById('dashUserEmail');
@@ -1186,6 +1194,161 @@ class ZeerocodesApp {
     this.renderStudentVibescanTab(vibescanSubs);
     this.renderStudentBillingTab(userPayments, user);
     this.renderStudentSettingsTab(user);
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  // =========================================================================
+  // PENDING VERIFICATION STATE (WHEN NEW STUDENT SIGNS UP AWAITING ADMIN APPROVAL)
+  // =========================================================================
+  renderStudentPendingVerificationView(user) {
+    const nameEl = document.getElementById('dashUserName');
+    const emailEl = document.getElementById('dashUserEmail');
+    const roleBadgeEl = document.getElementById('dashUserRoleBadge');
+    if (nameEl) nameEl.textContent = user.displayName || 'Applicant';
+    if (emailEl) emailEl.textContent = user.email || '';
+    if (roleBadgeEl) {
+      roleBadgeEl.textContent = 'PENDING VERIFICATION';
+      roleBadgeEl.className = 'badge badge-warning';
+    }
+
+    const container = document.getElementById('dashOverviewContainer');
+    if (!container) return;
+
+    container.innerHTML = `
+      <div class="student-welcome-banner" style="background:linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(12, 17, 26, 0.95) 100%); border-color:rgba(245, 158, 11, 0.35);">
+        <div class="student-welcome-left">
+          <div class="student-avatar-badge" style="border-color:#F59E0B; box-shadow:0 0 15px rgba(245, 158, 11, 0.3);">
+            <img src="${user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop'}" alt="${user.displayName}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+            <span class="student-online-dot" style="background:#F59E0B; box-shadow:0 0 8px #F59E0B;" title="Application Under Review"></span>
+          </div>
+          <div>
+            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.25rem;">
+              <span class="badge badge-warning" style="font-size:0.7rem; font-weight:800;">
+                <i data-lucide="clock" style="width:12px; height:12px; display:inline;"></i> VERIFICATION IN PROGRESS
+              </span>
+              <span style="font-size:0.75rem; color:var(--text-cyber-muted);">Application ID: #APP-${(user.uid || '000000').slice(-6).toUpperCase()}</span>
+            </div>
+            <h3 style="color:#FFF; font-size:1.4rem; font-weight:800; margin:0;">
+              Welcome, <span style="color:#FBBF24;">${(user.displayName || 'APPLICANT').toUpperCase()}</span> 👋
+            </h3>
+            <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0.25rem 0 0 0;">
+              Your student registration for <strong>The VibeCode Labs Cohort 4</strong> has been submitted.
+            </p>
+          </div>
+        </div>
+        <div class="student-welcome-right" style="text-align:right;">
+          <div class="badge badge-warning" style="font-size:0.75rem; padding:0.4rem 0.8rem; margin-bottom:0.4rem;">
+            ⏳ Awaiting Admin Approval
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-cyber-muted);">Reviewer: Nuel Effiong (Lead Architect)</div>
+        </div>
+      </div>
+
+      <!-- 3-Step Verification Pipeline -->
+      <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.75rem; margin-bottom:1.5rem;">
+        <h4 style="color:#FFF; font-size:1.15rem; margin:0 0 1.25rem 0; display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="shield-check" style="color:var(--cyan-accent);"></i> Verification & Access Roadmap
+        </h4>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap:1rem;">
+          <div style="background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.3); border-radius:12px; padding:1.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <span style="font-size:1.4rem;">1️⃣</span>
+              <span class="badge badge-success">✓ COMPLETED</span>
+            </div>
+            <strong style="color:#FFF; font-size:0.95rem; display:block; margin-bottom:0.25rem;">Account Registration</strong>
+            <p style="font-size:0.78rem; color:var(--text-cyber-muted); margin:0;">
+              Identity profile and email credentials initialized in our student ledger.
+            </p>
+          </div>
+
+          <div style="background:rgba(245, 158, 11, 0.08); border:1px solid rgba(245, 158, 11, 0.4); border-radius:12px; padding:1.25rem; box-shadow:0 0 20px rgba(245, 158, 11, 0.08);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <span style="font-size:1.4rem;">2️⃣</span>
+              <span class="badge badge-warning">⏳ IN PROGRESS</span>
+            </div>
+            <strong style="color:#FBBF24; font-size:0.95rem; display:block; margin-bottom:0.25rem;">Admin Verification & Check</strong>
+            <p style="font-size:0.78rem; color:var(--text-cyber-muted); margin:0;">
+              The Lead Architect reviews your application details and assigns your cohort slot.
+            </p>
+          </div>
+
+          <div style="background:rgba(255, 255, 255, 0.02); border:1px solid rgba(255, 255, 255, 0.06); border-radius:12px; padding:1.25rem; opacity:0.6;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <span style="font-size:1.4rem;">3️⃣</span>
+              <span class="badge badge-cyber">🔒 LOCKED</span>
+            </div>
+            <strong style="color:#FFF; font-size:0.95rem; display:block; margin-bottom:0.25rem;">Dashboard & LMS Unlocked</strong>
+            <p style="font-size:0.78rem; color:var(--text-cyber-muted); margin:0;">
+              All 4 levels, 88 code labs, Saturday live clinics, and Discord VIP channels unlocked.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Direct Expedite Card -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap:1.25rem; margin-bottom:1.5rem;">
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.5rem;">
+          <h4 style="color:#FFF; font-size:1.1rem; margin:0 0 0.5rem 0; display:flex; align-items:center; gap:0.5rem;">
+            <i data-lucide="zap" style="color:#F59E0B;"></i> Expedite Your Verification
+          </h4>
+          <p style="color:var(--text-cyber-muted); font-size:0.82rem; margin-bottom:1.25rem; line-height:1.45;">
+            Need instant access for an upcoming cohort sprint? Message Nuel Effiong directly on WhatsApp with your registered email (<strong>${user.email}</strong>).
+          </p>
+          <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+            <a href="https://wa.me/2348120000000?text=Hi%20Nuel%2C%20I%20just%20registered%20for%20The%20VibeCode%20Labs%20with%20email%20${encodeURIComponent(user.email)}%20and%20App%20ID%20%23APP-${(user.uid || '').slice(-6).toUpperCase()}.%20Please%20verify%20my%20dashboard%20access." target="_blank" class="btn btn-primary btn-sm" style="background:#25D366; border-color:#25D366; color:#000; font-weight:700;">
+              <i data-lucide="message-square"></i> Chat with Admin on WhatsApp
+            </a>
+            <button class="btn btn-outline btn-sm" onclick="window.location.reload()">
+              <i data-lucide="refresh-cw"></i> Check Status
+            </button>
+          </div>
+        </div>
+
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.5rem;">
+          <h4 style="color:#FFF; font-size:1.1rem; margin:0 0 0.5rem 0; display:flex; align-items:center; gap:0.5rem;">
+            <i data-lucide="info" style="color:var(--cyan-accent);"></i> Registered Profile Information
+          </h4>
+          <div style="display:flex; flex-direction:column; gap:0.6rem; font-size:0.82rem; margin-top:0.75rem;">
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.4rem;">
+              <span style="color:var(--text-cyber-muted);">Candidate Name:</span>
+              <strong style="color:#FFF;">${user.displayName || 'Applicant'}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.4rem;">
+              <span style="color:var(--text-cyber-muted);">Account Email:</span>
+              <strong style="color:var(--cyan-accent);">${user.email}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.4rem;">
+              <span style="color:var(--text-cyber-muted);">Phone Number:</span>
+              <strong style="color:#FFF;">${user.phone || '+234 812 000 0000'}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding-top:0.2rem;">
+              <span style="color:var(--text-cyber-muted);">Account Status:</span>
+              <span class="badge badge-warning" style="font-size:0.68rem;">PENDING ADMIN APPROVAL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Render locked state on other tab containers
+    ['dashLmsContainer', 'dashSessionsContainer', 'dashAchievementsContainer', 'dashDiscussionsContainer', 'dashCommunityContainer', 'dashSupportContainer'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.innerHTML = `
+          <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:3rem 1.5rem; text-align:center; max-width:600px; margin:2rem auto;">
+            <i data-lucide="lock" style="width:48px; height:48px; color:#F59E0B; margin-bottom:1rem; display:inline-block;"></i>
+            <h4 style="color:#FFF; font-size:1.2rem; margin:0 0 0.5rem 0;">Section Locked Pending Admin Verification</h4>
+            <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin-bottom:1.5rem;">
+              This section contains private cohort materials, live build sessions, and lab grading. It will automatically unlock as soon as your account is approved by Nuel Effiong.
+            </p>
+            <button class="btn btn-outline btn-sm" onclick="window.location.reload()">
+              <i data-lucide="refresh-cw"></i> Refresh Access State
+            </button>
+          </div>
+        `;
+      }
+    });
 
     if (window.lucide) window.lucide.createIcons();
   }

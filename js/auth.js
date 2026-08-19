@@ -119,6 +119,12 @@ class AuthService {
     return !!this.currentUser && this.currentUser.role === 'client';
   }
 
+  isUserVerified(user = this.currentUser) {
+    if (!user) return false;
+    if (user.role === 'admin' || isMasterAdminEmail(user.email)) return true;
+    return user.verificationStatus === 'verified' && user.accessGranted !== false;
+  }
+
   toggleRole() {
     if (!this.currentUser) {
       this.loginAsAdmin();
@@ -140,10 +146,15 @@ class AuthService {
   // Sync profile document with Firestore / Local DB
   async syncUserProfile(fbUser, extra = {}) {
     let role = isMasterAdminEmail(fbUser.email) ? 'admin' : 'student';
+    let verificationStatus = isMasterAdminEmail(fbUser.email) ? 'verified' : 'pending';
+    let accessGranted = isMasterAdminEmail(fbUser.email);
+
     if (window.db && role !== 'admin') {
       const existing = await window.db.getUser(fbUser.uid);
-      if (existing && existing.role) {
-        role = existing.role;
+      if (existing) {
+        if (existing.role) role = existing.role;
+        if (existing.verificationStatus) verificationStatus = existing.verificationStatus;
+        if (existing.accessGranted !== undefined) accessGranted = existing.accessGranted;
       }
     }
 
@@ -156,6 +167,8 @@ class AuthService {
       role: role,
       phone: extra.phone || '+234 800 000 0000',
       referralSource: extra.referralSource || 'direct',
+      verificationStatus: verificationStatus,
+      accessGranted: accessGranted,
       lastLogin: new Date().toISOString(),
       ...extra
     };
@@ -193,7 +206,11 @@ class AuthService {
     } else {
       // Local Sandbox Simulation
       const uid = 'usr_' + Date.now();
-      const role = isMasterAdminEmail(email) ? 'admin' : 'student';
+      const isMasterAdmin = isMasterAdminEmail(email);
+      const role = isMasterAdmin ? 'admin' : 'student';
+      const verificationStatus = isMasterAdmin ? 'verified' : 'pending';
+      const accessGranted = isMasterAdmin ? true : false;
+
       const profile = {
         uid: uid,
         email: email,
@@ -203,13 +220,15 @@ class AuthService {
         referralSource: referralSource || 'direct',
         emailVerified: true,
         isLocalMock: true,
+        verificationStatus: verificationStatus,
+        accessGranted: accessGranted,
         createdAt: new Date().toISOString(),
         lastLogin: new Date().toISOString()
       };
 
       if (window.db) {
         await window.db.saveUser(profile);
-        // Automatically enroll newly registered student into VibeCode Labs
+        // Automatically create pending enrollment for student
         if (role === 'student') {
           await window.db.saveEnrollment({
             id: 'enroll_' + Date.now(),
@@ -219,15 +238,22 @@ class AuthService {
             courseId: 'course-vibecode-labs',
             courseTitle: 'The Zeerocodes VibeCode Labs',
             enrolledAt: new Date().toISOString(),
-            status: 'active',
-            completedLessons: ['lvl_1_mod_01_les_0'],
+            status: 'pending_verification',
+            completedLessons: [],
             quizScores: {}
           });
         }
       }
 
       this.setUser(profile);
-      if (window.toast) window.toast.success(`Account registered! Signed in as ${role.toUpperCase()}.`);
+      if (window.modal) window.modal.closeAll();
+      if (isMasterAdmin) {
+        if (window.toast) window.toast.success(`Account registered! Signed in as ADMIN.`);
+        window.location.hash = '#admin';
+      } else {
+        if (window.toast) window.toast.info(`Account registered! Awaiting Admin verification to unlock full dashboard access.`);
+        window.location.hash = '#dashboard';
+      }
       return profile;
     }
   }
@@ -254,7 +280,13 @@ class AuthService {
       if (match && match.role) role = match.role;
       if (isMasterAdminEmail(email)) role = 'admin';
       
-      const profile = match ? { ...match, role: role, lastLogin: new Date().toISOString() } : {
+      const profile = match ? { 
+        ...match, 
+        role: role, 
+        verificationStatus: match.verificationStatus || (isMasterAdminEmail(email) ? 'verified' : 'verified'),
+        accessGranted: match.accessGranted !== undefined ? match.accessGranted : true,
+        lastLogin: new Date().toISOString() 
+      } : {
         uid: isMasterAdminEmail(email) ? 'user-admin-zeerocodes' : ('usr_' + Date.now()),
         email: email,
         displayName: isMasterAdminEmail(email) ? 'Nuel Effiong (Zeerocodes)' : email.split('@')[0],
@@ -264,16 +296,24 @@ class AuthService {
         referralSource: 'direct',
         emailVerified: true,
         isLocalMock: true,
+        verificationStatus: isMasterAdminEmail(email) ? 'verified' : 'pending',
+        accessGranted: isMasterAdminEmail(email) ? true : false,
         lastLogin: new Date().toISOString()
       };
 
       if (window.db) await window.db.saveUser(profile);
       this.setUser(profile);
       if (window.modal) window.modal.closeAll();
-      if (window.toast) window.toast.success(`Welcome back, ${profile.displayName}! Signed in as ${role.toUpperCase()}.`);
+      
       if (role === 'admin') {
+        if (window.toast) window.toast.success(`Welcome back, ${profile.displayName}! Signed in as ADMIN.`);
         window.location.hash = '#admin';
       } else {
+        if (!this.isUserVerified(profile)) {
+          if (window.toast) window.toast.info(`Welcome, ${profile.displayName}. Your account is currently awaiting Admin Verification.`);
+        } else {
+          if (window.toast) window.toast.success(`Welcome back, ${profile.displayName}! Access verified.`);
+        }
         window.location.hash = '#dashboard';
       }
       return profile;
@@ -458,9 +498,14 @@ class AuthService {
       });
 
       userRoleBadges.forEach(el => {
-        const role = (this.currentUser.role || 'USER').toUpperCase();
-        el.textContent = role;
-        el.className = `user-role-badge badge ${role === 'ADMIN' ? 'badge-danger' : role === 'CLIENT' ? 'badge-teal' : 'badge-success'}`;
+        if (!this.isUserVerified(this.currentUser)) {
+          el.textContent = 'PENDING VERIFICATION';
+          el.className = 'user-role-badge badge badge-warning';
+        } else {
+          const role = (this.currentUser.role || 'USER').toUpperCase();
+          el.textContent = role;
+          el.className = `user-role-badge badge ${role === 'ADMIN' ? 'badge-danger' : role === 'CLIENT' ? 'badge-teal' : 'badge-success'}`;
+        }
       });
 
       if (this.isAdmin()) {

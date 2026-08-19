@@ -495,7 +495,9 @@ const DEFAULT_USERS = [
     phone: '+234 812 000 0000',
     referralSource: 'direct',
     joinedAt: '2026-01-01T08:00:00Z',
-    emailVerified: true
+    emailVerified: true,
+    verificationStatus: 'verified',
+    accessGranted: true
   },
   {
     uid: 'user-admin-ukeme',
@@ -507,7 +509,9 @@ const DEFAULT_USERS = [
     phone: '+234 812 000 0000',
     referralSource: 'direct',
     joinedAt: '2026-01-01T08:00:00Z',
-    emailVerified: true
+    emailVerified: true,
+    verificationStatus: 'verified',
+    accessGranted: true
   },
   {
     uid: 'user-admin-01',
@@ -518,7 +522,10 @@ const DEFAULT_USERS = [
     title: 'Principal AI Systems Architect',
     phone: '+234 812 345 6789',
     referralSource: 'direct',
-    joinedAt: '2026-01-10T08:00:00Z'
+    joinedAt: '2026-01-10T08:00:00Z',
+    emailVerified: true,
+    verificationStatus: 'verified',
+    accessGranted: true
   },
   {
     uid: 'user-student-01',
@@ -530,7 +537,23 @@ const DEFAULT_USERS = [
     phone: '+234 809 112 3344',
     referralSource: 'academy',
     joinedAt: '2026-07-15T14:20:00Z',
+    verificationStatus: 'verified',
+    accessGranted: true,
     bio: 'Building an automated medical appointment dispatcher for clinics across Lagos.'
+  },
+  {
+    uid: 'user-student-pending-01',
+    displayName: 'Kemi Adebayo',
+    email: 'kemi.adebayo@gmail.com',
+    role: 'student',
+    photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop',
+    title: 'Applicant • Cohort 4',
+    phone: '+234 814 990 1234',
+    referralSource: 'twitter',
+    joinedAt: '2026-08-18T16:45:00Z',
+    verificationStatus: 'pending',
+    accessGranted: false,
+    bio: 'Transitioning from operations into full-stack AI automation engineering.'
   },
   {
     uid: 'user-client-01',
@@ -542,6 +565,8 @@ const DEFAULT_USERS = [
     phone: '+234 803 555 7788',
     referralSource: 'studio',
     joinedAt: '2026-06-01T09:15:00Z',
+    verificationStatus: 'verified',
+    accessGranted: true,
     bio: 'Partnering with Zeerocodes Studio to scale our automated Paystack micro-lending engine.'
   }
 ];
@@ -1273,6 +1298,80 @@ class DatabaseLayer {
       this.setLocal('users', users);
     }
     return users;
+  }
+
+  async getPendingUsers() {
+    const users = await this.getAllUsers();
+    return users.filter(u => u.role !== 'admin' && (u.verificationStatus === 'pending' || u.accessGranted === false));
+  }
+
+  async verifyStudentAccess(uid, verifiedBy = 'Nuel Effiong') {
+    const users = await this.getAllUsers();
+    const idx = users.findIndex(u => u.uid === uid || u.email === uid);
+    if (idx >= 0) {
+      users[idx].verificationStatus = 'verified';
+      users[idx].accessGranted = true;
+      users[idx].verifiedAt = new Date().toISOString();
+      users[idx].verifiedBy = verifiedBy;
+      this.setLocal('users', users);
+
+      // Sync active session if the verified user is currently logged in
+      try {
+        const stored = localStorage.getItem('zeerocodes_current_user');
+        if (stored) {
+          const current = JSON.parse(stored);
+          if (current.uid === users[idx].uid || current.email === users[idx].email) {
+            current.verificationStatus = 'verified';
+            current.accessGranted = true;
+            localStorage.setItem('zeerocodes_current_user', JSON.stringify(current));
+            if (window.auth) window.auth.currentUser = current;
+          }
+        }
+      } catch (e) {
+        console.warn('Session sync on verify error', e);
+      }
+      return users[idx];
+    }
+    return null;
+  }
+
+  async revokeStudentAccess(uid) {
+    const users = await this.getAllUsers();
+    const idx = users.findIndex(u => u.uid === uid || u.email === uid);
+    if (idx >= 0) {
+      users[idx].verificationStatus = 'pending';
+      users[idx].accessGranted = false;
+      this.setLocal('users', users);
+
+      // Sync active session if matching
+      try {
+        const stored = localStorage.getItem('zeerocodes_current_user');
+        if (stored) {
+          const current = JSON.parse(stored);
+          if (current.uid === users[idx].uid || current.email === users[idx].email) {
+            current.verificationStatus = 'pending';
+            current.accessGranted = false;
+            localStorage.setItem('zeerocodes_current_user', JSON.stringify(current));
+            if (window.auth) window.auth.currentUser = current;
+          }
+        }
+      } catch (e) {
+        console.warn('Session sync on revoke error', e);
+      }
+      return users[idx];
+    }
+    return null;
+  }
+
+  async removeUser(uid) {
+    let users = await this.getAllUsers();
+    users = users.filter(u => u.uid !== uid && u.email !== uid);
+    this.setLocal('users', users);
+
+    let enrollments = this.getLocal('enrollments') || [];
+    enrollments = enrollments.filter(e => e.userId !== uid && e.userEmail !== uid);
+    this.setLocal('enrollments', enrollments);
+    return true;
   }
 
   // --- Enrollments ---

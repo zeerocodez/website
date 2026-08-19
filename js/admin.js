@@ -826,20 +826,77 @@ class AdminConsoleManager {
     const container = document.getElementById('adminStudentsContent');
     if (!container) return;
 
+    const studentUsers = (users || []).filter(u => u.role === 'student' || u.role === 'user');
+    const pendingStudents = studentUsers.filter(u => u.verificationStatus === 'pending' || u.accessGranted === false);
+
     container.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
         <div>
-          <h3 style="color:#FFF; font-size:1.25rem; margin:0;">Student Admissions & Cohort Management</h3>
+          <h3 style="color:#FFF; font-size:1.25rem; margin:0;">Student Admissions & Access Verification Hub</h3>
           <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0.2rem 0 0 0;">
-            Admit candidates, review graduation progress, manage access, and grade submitted practical labs.
+            Verify new signups, grant or revoke dashboard access, admit cohort candidates, and grade submitted code labs.
           </p>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="window.adminConsole.openAdmitStudentModal()">
-          <i data-lucide="user-plus"></i> Admit New Student
-        </button>
+        <div style="display:flex; gap:0.5rem;">
+          <button class="btn btn-primary btn-sm" onclick="window.adminConsole.openAdmitStudentModal()">
+            <i data-lucide="user-plus"></i> Direct Admit Candidate
+          </button>
+        </div>
       </div>
 
-      <!-- Enrolled Students Table -->
+      <!-- 1. PENDING STUDENT VERIFICATIONS & ACCESS QUEUE -->
+      <div style="background:#080D16; border:1px solid ${pendingStudents.length ? 'rgba(245, 158, 11, 0.4)' : 'var(--obsidian-border)'}; border-radius:var(--radius-sm); padding:1.25rem; margin-bottom:2rem; box-shadow:${pendingStudents.length ? '0 0 25px rgba(245, 158, 11, 0.1)' : 'none'};">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+          <h4 style="color:#FFF; font-size:1.1rem; margin:0; display:flex; align-items:center; gap:0.5rem;">
+            <i data-lucide="shield-alert" style="color:#F59E0B;"></i> Pending Student Approvals Queue (${pendingStudents.length})
+          </h4>
+          <span class="badge ${pendingStudents.length ? 'badge-warning' : 'badge-success'}" style="font-size:0.75rem;">
+            ${pendingStudents.length ? `${pendingStudents.length} Awaiting Verification` : 'Zero Pending Requests'}
+          </span>
+        </div>
+
+        ${pendingStudents.length ? `
+          <div style="display:flex; flex-direction:column; gap:0.75rem;">
+            ${pendingStudents.map(student => `
+              <div style="background:rgba(245, 158, 11, 0.05); border:1px solid rgba(245, 158, 11, 0.25); border-radius:12px; padding:1rem 1.25rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+                <div style="display:flex; align-items:center; gap:0.85rem;">
+                  <div style="width:40px; height:40px; border-radius:50%; border:2px solid #F59E0B; overflow:hidden; flex-shrink:0;">
+                    <img src="${student.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop'}" alt="${student.displayName}" style="width:100%; height:100%; object-fit:cover;">
+                  </div>
+                  <div>
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                      <strong style="color:#FFF; font-size:0.95rem;">${student.displayName || 'Applicant'}</strong>
+                      <span class="badge badge-warning" style="font-size:0.65rem;">PENDING APPROVAL</span>
+                    </div>
+                    <div style="font-size:0.78rem; color:var(--text-cyber-muted); margin-top:2px;">
+                      <span>${student.email}</span> • <span>${student.phone || '+234 812 000 0000'}</span> • <span style="color:var(--cyan-accent);">Source: ${student.referralSource || 'direct'}</span>
+                    </div>
+                    <div style="font-size:0.72rem; color:var(--text-cyber-muted); margin-top:2px;">
+                      Applied on: ${new Date(student.joinedAt || student.createdAt || Date.now()).toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                  <button class="btn btn-primary btn-xs" style="background:#10B981; border-color:#10B981; font-weight:700;" onclick="window.adminConsole.handleVerifyStudentAccess('${student.uid}', '${student.email}', '${student.displayName || student.email}')">
+                    <i data-lucide="check"></i> Verify & Grant Access
+                  </button>
+                  <button class="btn btn-ghost btn-xs" style="color:#F87171;" onclick="window.adminConsole.handleRejectStudentRegistration('${student.uid}', '${student.email}')">
+                    <i data-lucide="x"></i> Reject
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : `
+          <div style="padding:1.5rem; text-align:center; color:var(--text-cyber-muted); font-size:0.85rem;">
+            <i data-lucide="check-circle" style="color:var(--emerald-light); width:28px; height:28px; margin-bottom:0.4rem; display:inline-block;"></i>
+            <div>All registered students have been verified. No pending approvals in queue.</div>
+          </div>
+        `}
+      </div>
+
+      <!-- 2. Active Enrolled Students Table -->
       <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.25rem; margin-bottom:2rem;">
         <h4 style="color:#FFF; font-size:1.1rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
           <i data-lucide="graduation-cap" style="color:var(--emerald-light);"></i> Active Cohort Members (${enrollments.length})
@@ -852,32 +909,50 @@ class AdminConsoleManager {
                 <th style="padding:0.75rem;">Student Name</th>
                 <th style="padding:0.75rem;">Email & Phone</th>
                 <th style="padding:0.75rem;">Cohort</th>
-                <th style="padding:0.75rem;">Payment</th>
+                <th style="padding:0.75rem;">Access Status</th>
                 <th style="padding:0.75rem;">Lessons Done</th>
                 <th style="padding:0.75rem; text-align:right;">Actions</th>
               </tr>
             </thead>
             <tbody>
-              ${enrollments.map(e => `
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                  <td style="padding:0.75rem; color:#FFF; font-weight:600;">${e.studentName || 'Student Member'}</td>
-                  <td style="padding:0.75rem; color:var(--text-cyber-muted);">${e.userEmail}<br><span style="font-size:0.75rem; color:var(--cyan-accent);">${e.studentPhone || '+234 800 000 0000'}</span></td>
-                  <td style="padding:0.75rem; color:var(--emerald-light);">${e.cohort || 'October 15, 2026'}</td>
-                  <td style="padding:0.75rem;"><span class="badge badge-success">${(e.paymentStatus || 'PAID').toUpperCase()} (₦${((e.amountNGN || 95000)).toLocaleString()})</span></td>
-                  <td style="padding:0.75rem; color:#FFF;">${(e.completedLessons || []).length} / 88</td>
-                  <td style="padding:0.75rem; text-align:right;">
-                    <button class="btn btn-ghost btn-xs" style="color:#F87171;" onclick="window.adminConsole.handleRemoveStudent('${e.id}', '${e.userEmail}')" title="Revoke access">
-                      <i data-lucide="user-x"></i> Remove
-                    </button>
-                  </td>
-                </tr>
-              `).join('')}
+              ${enrollments.map(e => {
+                const userObj = (users || []).find(u => u.uid === e.userId || u.email === e.userEmail);
+                const isVerified = userObj ? (userObj.verificationStatus === 'verified' && userObj.accessGranted !== false) : true;
+
+                return `
+                  <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                    <td style="padding:0.75rem; color:#FFF; font-weight:600;">${e.userName || e.studentName || 'Student Member'}</td>
+                    <td style="padding:0.75rem; color:var(--text-cyber-muted);">${e.userEmail}<br><span style="font-size:0.75rem; color:var(--cyan-accent);">${e.studentPhone || userObj?.phone || '+234 800 000 0000'}</span></td>
+                    <td style="padding:0.75rem; color:var(--emerald-light);">${e.cohort || 'October 15, 2026'}</td>
+                    <td style="padding:0.75rem;">
+                      <span class="badge ${isVerified ? 'badge-success' : 'badge-warning'}">
+                        ${isVerified ? '✓ ACTIVE / VERIFIED' : '⏳ PENDING'}
+                      </span>
+                    </td>
+                    <td style="padding:0.75rem; color:#FFF;">${(e.completedLessons || []).length} / 88</td>
+                    <td style="padding:0.75rem; text-align:right;">
+                      ${isVerified ? `
+                        <button class="btn btn-ghost btn-xs" style="color:#F59E0B; margin-right:0.35rem;" onclick="window.adminConsole.handleRevokeStudentAccess('${e.userId || userObj?.uid}', '${e.userEmail}')" title="Revoke dashboard access">
+                          <i data-lucide="shield-alert"></i> Revoke
+                        </button>
+                      ` : `
+                        <button class="btn btn-ghost btn-xs" style="color:var(--emerald-light); margin-right:0.35rem;" onclick="window.adminConsole.handleVerifyStudentAccess('${e.userId || userObj?.uid}', '${e.userEmail}', '${e.userName || e.userEmail}')" title="Grant access">
+                          <i data-lucide="check"></i> Grant Access
+                        </button>
+                      `}
+                      <button class="btn btn-ghost btn-xs" style="color:#F87171;" onclick="window.adminConsole.handleRemoveStudent('${e.id}', '${e.userEmail}')" title="Remove student">
+                        <i data-lucide="user-x"></i> Remove
+                      </button>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- Lab Submissions Grading Queue -->
+      <!-- 3. Lab Submissions Grading Queue -->
       <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.25rem;">
         <h4 style="color:#FFF; font-size:1.1rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
           <i data-lucide="file-check" style="color:var(--cyan-accent);"></i> Practical Lab Grading Queue (${labSubs.length})
@@ -904,6 +979,34 @@ class AdminConsoleManager {
         </div>
       </div>
     `;
+  }
+
+  async handleVerifyStudentAccess(uid, email, name) {
+    if (!uid) {
+      window.toast?.error('Invalid user identifier');
+      return;
+    }
+    await window.db.verifyStudentAccess(uid, 'Nuel Effiong');
+    window.toast?.success(`✓ Access Granted: ${name || email} has been verified and granted full dashboard access!`);
+    this.renderAdminConsole();
+  }
+
+  async handleRevokeStudentAccess(uid, email) {
+    if (!uid) return;
+    if (confirm(`Revoke dashboard access for ${email}? Student will be set to Pending Verification.`)) {
+      await window.db.revokeStudentAccess(uid);
+      window.toast?.info(`Dashboard access revoked for ${email}.`);
+      this.renderAdminConsole();
+    }
+  }
+
+  async handleRejectStudentRegistration(uid, email) {
+    if (!uid) return;
+    if (confirm(`Reject and remove registration for ${email}?`)) {
+      await window.db.removeUser(uid);
+      window.toast?.info(`Registration for ${email} has been rejected.`);
+      this.renderAdminConsole();
+    }
   }
 
   openAdmitStudentModal() {
