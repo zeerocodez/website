@@ -987,7 +987,73 @@ class AdminConsoleManager {
       return;
     }
     await window.db.verifyStudentAccess(uid, 'Nuel Effiong');
-    window.toast?.success(`✓ Access Granted: ${name || email} has been verified and granted full dashboard access!`);
+
+    // Automatically trigger transactional emails & notification
+    if (window.notifications) {
+      await window.notifications.dispatch('student_payment_verified', {
+        studentName: name || email.split('@')[0],
+        userEmail: email,
+        courseTitle: 'The Zeerocodes VibeCode Labs',
+        amountNGN: 95000,
+        cohort: 'Cohort 4',
+        paymentRef: 'ZC_ADM_VERIF_' + Date.now().toString(36).toUpperCase(),
+        invoiceId: 'INV-' + (uid.length > 6 ? uid.slice(-6).toUpperCase() : '2026-088')
+      });
+    }
+
+    // Log payment event into verified database ledger
+    if (window.db) {
+      await window.db.logPaymentEvent({
+        id: 'evt_adm_' + Date.now(),
+        provider: 'Admin Ledger Verification',
+        reference: 'ADM-' + Math.random().toString(36).substring(2, 9).toUpperCase(),
+        amountNGN: 95000,
+        currency: 'NGN',
+        status: 'verified',
+        customerEmail: email,
+        item: 'The Zeerocodes VibeCode Labs Admission Pass',
+        verifiedAt: new Date().toISOString()
+      });
+    }
+
+    window.toast?.success(`✓ Payment & Access Verified: ${name || email} has been granted full LMS dashboard access and received Admission Pass emails!`);
+    this.renderAdminConsole();
+  }
+
+  async handleVerifyEnterprisePayment(invoiceId, clientEmail, clientName, amountNGN, projectTitle) {
+    if (!invoiceId) return;
+
+    await window.db.verifyEnterpriseAccess(clientEmail, invoiceId, 'Nuel Effiong');
+
+    // Automatically trigger transactional emails & notification
+    if (window.notifications) {
+      await window.notifications.dispatch('enterprise_payment_verified', {
+        clientName: clientName || 'Enterprise Partner',
+        userEmail: clientEmail,
+        projectTitle: projectTitle || 'Custom Web Application & Workflow Engine',
+        amountNGN: amountNGN || 2500000,
+        invoiceId: invoiceId,
+        paymentRef: 'ZC_ENT_VERIF_' + Date.now().toString(36).toUpperCase(),
+        stagingUrl: 'https://staging.zeerocodes.com'
+      });
+    }
+
+    // Log payment event into verified ledger
+    if (window.db) {
+      await window.db.logPaymentEvent({
+        id: 'evt_ent_' + Date.now(),
+        provider: 'Enterprise Invoice Verified',
+        reference: 'INV_VERIF_' + invoiceId,
+        amountNGN: amountNGN || 2500000,
+        currency: 'NGN',
+        status: 'verified',
+        customerEmail: clientEmail,
+        item: `${projectTitle || 'Studio Custom System'} (${invoiceId})`,
+        verifiedAt: new Date().toISOString()
+      });
+    }
+
+    window.toast?.success(`✓ Enterprise Milestone Verified: ${clientName} (${invoiceId}) verified! Workspace sprint unlocked and confirmation email dispatched.`);
     this.renderAdminConsole();
   }
 
@@ -996,6 +1062,15 @@ class AdminConsoleManager {
     if (confirm(`Revoke dashboard access for ${email}? Student will be set to Pending Verification.`)) {
       await window.db.revokeStudentAccess(uid);
       window.toast?.info(`Dashboard access revoked for ${email}.`);
+      this.renderAdminConsole();
+    }
+  }
+
+  async handleRevokeEnterpriseAccess(clientEmail) {
+    if (!clientEmail) return;
+    if (confirm(`Revoke enterprise dashboard access for ${clientEmail}?`)) {
+      await window.db.revokeEnterpriseAccess(clientEmail);
+      window.toast?.info(`Enterprise access revoked for ${clientEmail}.`);
       this.renderAdminConsole();
     }
   }
@@ -1174,42 +1249,89 @@ class AdminConsoleManager {
         </div>
       </div>
 
-      <!-- Invoices Ledger -->
-      <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.25rem; margin-bottom:2rem;">
-        <h4 style="color:#FFF; font-size:1.1rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
-          <i data-lucide="receipt" style="color:var(--emerald-light);"></i> Client Invoices Ledger (${invoices.length})
-        </h4>
+      <!-- Enterprise Invoices & Payment Verification Queue -->
+      ${(() => {
+        const pendingInvoices = (invoices || []).filter(i => i.status === 'pending');
+        return `
+          <div style="background:#080D16; border:1px solid ${pendingInvoices.length ? 'rgba(245, 158, 11, 0.4)' : 'var(--obsidian-border)'}; border-radius:var(--radius-sm); padding:1.25rem; margin-bottom:2rem; box-shadow:${pendingInvoices.length ? '0 0 25px rgba(245, 158, 11, 0.1)' : 'none'};">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+              <h4 style="color:#FFF; font-size:1.1rem; margin:0; display:flex; align-items:center; gap:0.5rem;">
+                <i data-lucide="shield-alert" style="color:#F59E0B;"></i> Pending Enterprise Invoice Verifications (${pendingInvoices.length})
+              </h4>
+              <span class="badge ${pendingInvoices.length ? 'badge-warning' : 'badge-success'}" style="font-size:0.75rem;">
+                ${pendingInvoices.length ? `${pendingInvoices.length} Awaiting Ledger Approval` : 'Zero Pending Invoices'}
+              </span>
+            </div>
 
-        <div style="overflow-x:auto;">
-          <table style="width:100%; border-collapse:collapse; font-size:0.85rem; text-align:left;">
-            <thead>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:var(--text-cyber-muted);">
-                <th style="padding:0.75rem;">Invoice Ref</th>
-                <th style="padding:0.75rem;">Client & Project</th>
-                <th style="padding:0.75rem;">Amount (NGN)</th>
-                <th style="padding:0.75rem;">Due Date</th>
-                <th style="padding:0.75rem;">Status</th>
-                <th style="padding:0.75rem; text-align:right;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${invoices.map(inv => `
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                  <td style="padding:0.75rem; color:#FFF; font-family:var(--font-mono); font-weight:700;">${inv.id}</td>
-                  <td style="padding:0.75rem; color:#FFF;">${inv.clientName}<br><span style="font-size:0.75rem; color:var(--text-cyber-muted);">${inv.projectTitle}</span></td>
-                  <td style="padding:0.75rem; color:var(--emerald-light); font-weight:700;">₦${(inv.amountNGN).toLocaleString()}</td>
-                  <td style="padding:0.75rem; color:var(--text-cyber-muted);">${inv.dueDate}</td>
-                  <td style="padding:0.75rem;"><span class="badge ${inv.status === 'paid' ? 'badge-success' : 'badge-warning'}">${inv.status.toUpperCase()}</span></td>
-                  <td style="padding:0.75rem; text-align:right;">
-                    <button class="btn btn-ghost btn-xs" style="color:var(--cyan-accent);" onclick="window.toast?.success('Paystack payment link copied for ' + '${inv.id}')" title="Copy Pay link"><i data-lucide="copy"></i></button>
-                    <button class="btn btn-ghost btn-xs" style="color:#F87171;" onclick="window.adminConsole.handleDeleteInvoice('${inv.id}')" title="Delete invoice"><i data-lucide="trash-2"></i></button>
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            ${pendingInvoices.length ? `
+              <div style="display:flex; flex-direction:column; gap:0.75rem; margin-bottom:1.25rem;">
+                ${pendingInvoices.map(inv => `
+                  <div style="background:rgba(245, 158, 11, 0.05); border:1px solid rgba(245, 158, 11, 0.25); border-radius:12px; padding:1rem 1.25rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+                    <div>
+                      <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <span class="badge badge-warning" style="font-size:0.65rem;">PENDING PAYMENT VERIFICATION</span>
+                        <strong style="color:#FFF; font-size:0.95rem;">${inv.clientName}</strong>
+                        <span style="font-family:var(--font-mono); color:var(--text-cyber-muted); font-size:0.8rem;">(${inv.id})</span>
+                      </div>
+                      <div style="font-size:0.82rem; color:var(--emerald-light); font-weight:600; margin-top:0.2rem;">
+                        ${inv.projectTitle} • Amount: <strong style="color:#85C79A;">₦${(inv.amountNGN).toLocaleString()}</strong> • Due: ${inv.dueDate}
+                      </div>
+                      <div style="font-size:0.75rem; color:var(--text-cyber-muted); margin-top:0.2rem;">
+                        Email: ${inv.clientEmail} • Items: ${inv.items ? inv.items.map(it => it.desc).join(', ') : 'Milestone sprint delivery'}
+                      </div>
+                    </div>
+
+                    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                      <button class="btn btn-primary btn-xs" style="background:#10B981; border-color:#10B981; font-weight:700;" onclick="window.adminConsole.handleVerifyEnterprisePayment('${inv.id}', '${inv.clientEmail}', '${inv.clientName.replace(/'/g, "\\'")}', ${inv.amountNGN}, '${inv.projectTitle.replace(/'/g, "\\'")}')">
+                        <i data-lucide="check"></i> Verify & Unlock Workspace
+                      </button>
+                      <button class="btn btn-outline btn-xs" style="color:var(--cyan-accent);" onclick="window.toast?.success('Payment reminder link sent to ' + '${inv.clientEmail}')">
+                        <i data-lucide="mail"></i> Send Reminder
+                      </button>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+
+            <h5 style="color:#FFF; font-size:0.95rem; margin:1rem 0 0.75rem 0;">All Client Invoices & Settlement History:</h5>
+            <div style="overflow-x:auto;">
+              <table style="width:100%; border-collapse:collapse; font-size:0.85rem; text-align:left;">
+                <thead>
+                  <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:var(--text-cyber-muted);">
+                    <th style="padding:0.75rem;">Invoice Ref</th>
+                    <th style="padding:0.75rem;">Client & Project</th>
+                    <th style="padding:0.75rem;">Amount (NGN)</th>
+                    <th style="padding:0.75rem;">Due Date</th>
+                    <th style="padding:0.75rem;">Status</th>
+                    <th style="padding:0.75rem; text-align:right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${invoices.map(inv => `
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                      <td style="padding:0.75rem; color:#FFF; font-family:var(--font-mono); font-weight:700;">${inv.id}</td>
+                      <td style="padding:0.75rem; color:#FFF;">${inv.clientName}<br><span style="font-size:0.75rem; color:var(--text-cyber-muted);">${inv.projectTitle}</span></td>
+                      <td style="padding:0.75rem; color:var(--emerald-light); font-weight:700;">₦${(inv.amountNGN).toLocaleString()}</td>
+                      <td style="padding:0.75rem; color:var(--text-cyber-muted);">${inv.dueDate}</td>
+                      <td style="padding:0.75rem;"><span class="badge ${inv.status === 'paid' ? 'badge-success' : 'badge-warning'}">${inv.status.toUpperCase()}</span></td>
+                      <td style="padding:0.75rem; text-align:right;">
+                        ${inv.status === 'pending' ? `
+                          <button class="btn btn-ghost btn-xs" style="color:var(--emerald-light); font-weight:700; margin-right:0.25rem;" onclick="window.adminConsole.handleVerifyEnterprisePayment('${inv.id}', '${inv.clientEmail}', '${inv.clientName.replace(/'/g, "\\'")}', ${inv.amountNGN}, '${inv.projectTitle.replace(/'/g, "\\'")}')" title="Verify Payment">
+                            <i data-lucide="check"></i> Verify
+                          </button>
+                        ` : ''}
+                        <button class="btn btn-ghost btn-xs" style="color:var(--cyan-accent);" onclick="window.toast?.success('Paystack payment link copied for ' + '${inv.id}')" title="Copy Pay link"><i data-lucide="copy"></i></button>
+                        <button class="btn btn-ghost btn-xs" style="color:#F87171;" onclick="window.adminConsole.handleDeleteInvoice('${inv.id}')" title="Delete invoice"><i data-lucide="trash-2"></i></button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      })()}
 
       <!-- Operating Expenses Table -->
       <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.25rem;">

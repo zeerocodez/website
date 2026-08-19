@@ -402,23 +402,64 @@ class AuthService {
         referralSource: 'direct',
         photoURL: 'logo.png',
         emailVerified: true,
+        verificationStatus: 'verified',
+        accessGranted: true,
         isLocalMock: true
       };
-    } else if (persona === 'client') {
+    } else if (persona === 'client' || persona === 'enterprise') {
       profile = {
         uid: 'user-client-01',
         displayName: 'Tunde Balogun',
         email: 'client@zeerocodes.com',
         role: 'client',
+        company: 'PayQuick Africa',
         title: 'COO, PayQuick Africa',
         phone: '+234 803 555 7788',
         referralSource: 'studio',
         photoURL: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop',
         emailVerified: true,
+        verificationStatus: 'verified',
+        accessGranted: true,
+        activeProject: 'WhatsApp Paystack Invoicing Engine',
+        slaTier: '24/7 Managed Operations (Enterprise SLA)',
+        isLocalMock: true
+      };
+    } else if (persona === 'pending_client') {
+      profile = {
+        uid: 'user-client-pending-01',
+        displayName: 'Dr. Folake Adeyemi',
+        email: 'folake@medlagos.ng',
+        role: 'client',
+        company: 'MedLagos Telehealth',
+        title: 'Managing Director, MedLagos Telehealth',
+        phone: '+234 802 333 4455',
+        referralSource: 'studio',
+        photoURL: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop',
+        emailVerified: true,
+        verificationStatus: 'pending',
+        accessGranted: false,
+        activeProject: 'Clinical Telehealth Platform & Patient Portal',
+        pendingInvoiceId: 'INV-2026-002',
+        pendingInvoiceAmount: 4800000,
+        isLocalMock: true
+      };
+    } else if (persona === 'pending_student') {
+      profile = {
+        uid: 'user-student-pending-01',
+        displayName: 'Chidi Okafor',
+        email: 'chidi.okafor@gmail.com',
+        role: 'student',
+        title: 'Cohort 4 Candidate',
+        phone: '+234 814 999 8877',
+        referralSource: 'academy',
+        photoURL: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop',
+        emailVerified: true,
+        verificationStatus: 'pending',
+        accessGranted: false,
         isLocalMock: true
       };
     } else {
-      // Student
+      // Verified Student
       profile = {
         uid: 'user-student-01',
         displayName: 'Amina Yusuf',
@@ -429,6 +470,8 @@ class AuthService {
         referralSource: 'academy',
         photoURL: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop',
         emailVerified: true,
+        verificationStatus: 'verified',
+        accessGranted: true,
         isLocalMock: true
       };
     }

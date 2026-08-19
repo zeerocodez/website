@@ -117,6 +117,7 @@ class NotificationService {
 
       case 'enrollment_confirmed':
       case 'student_admitted':
+      case 'student_payment_verified':
         // 1. Student Welcome Pass
         await window.emailEngine.dispatchEmail('welcome_student', emailTo, data);
         // 2. Payment Receipt
@@ -124,6 +125,25 @@ class NotificationService {
         // 3. Admin Alert Email
         for (const adminEmail of adminEmails) {
           await window.emailEngine.dispatchEmail('admin_new_course_enrollment', adminEmail, data);
+        }
+        break;
+
+      case 'enterprise_payment_verified':
+      case 'enterprise_workspace_unlocked':
+        // 1. Enterprise Workspace Activation Email
+        await window.emailEngine.dispatchEmail('enterprise_payment_verified', emailTo, data);
+        // 2. Cryptographic Payment Receipt
+        await window.emailEngine.dispatchEmail('payment_receipt', emailTo, data);
+        break;
+
+      case 'enterprise_invoice_generated':
+        await window.emailEngine.dispatchEmail('enterprise_invoice_generated', emailTo, data);
+        break;
+
+      case 'student_payment_pending':
+        await window.emailEngine.dispatchEmail('student_payment_pending', emailTo, data);
+        for (const adminEmail of adminEmails) {
+          await window.emailEngine.dispatchEmail('admin_payment_verification_alert', adminEmail, data);
         }
         break;
 

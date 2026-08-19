@@ -53,18 +53,26 @@
     <priority>0.80</priority>
   </url>
 
-  <!-- 7. About Founder & Company -->
+  <!-- 7. Public VibeCert Cryptographic Verification Registry -->
+  <url>
+    <loc>https://zeerocodes.com/#verify</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- 8. About Founder & Company -->
   <url>
     <loc>https://zeerocodes.com/#about</loc>
-    <lastmod>2026-08-10</lastmod>
+    <lastmod>2026-08-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
 
-  <!-- 8. Start a Project / Contact -->
+  <!-- 9. Start a Project / Contact -->
   <url>
     <loc>https://zeerocodes.com/#contact</loc>
-    <lastmod>2026-08-10</lastmod>
+    <lastmod>2026-08-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>

@@ -556,8 +556,47 @@ app.get('/uploads/pdf/:file', (req, res) => {
   return res.sendFile(filePath);
 });
 
-app.listen(PORT, () => {
+// =========================================================================
+// PRODUCTION HEALTH CHECK & TELEMETRY PROBES
+// =========================================================================
+app.get(['/healthz', '/api/health'], (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptimeSeconds: Math.floor(process.uptime()),
+    memoryUsageMB: Math.round(process.memoryUsage().rss / 1024 / 1024),
+    version: '2.0.0',
+    services: {
+      server: 'operational',
+      securityGuardrails: 'active',
+      cryptoEngine: 'active',
+      rateLimiter: 'active'
+    }
+  });
+});
+
+const server = app.listen(PORT, () => {
   console.log(`⚡ Zeerocodes & VibeScan Hardened Backend running on http://localhost:${PORT}`);
   console.log(`🛡️ Security Guardrails Active: Timing-safe HMAC, rate limiter, CSP headers.`);
+  console.log(`💓 Health probe available at http://localhost:${PORT}/healthz`);
 });
+
+// Graceful Shutdown
+function handleShutdown(signal) {
+  console.log(`\n🛑 Received ${signal}. Starting graceful shutdown...`);
+  server.close(() => {
+    console.log('✅ HTTP server closed. Process terminating cleanly.');
+    process.exit(0);
+  });
+
+  // Force close if graceful shutdown takes too long
+  setTimeout(() => {
+    console.error('⚠️ Forcefully terminating process after timeout.');
+    process.exit(1);
+  }, 10000);
+}
+
+process.on('SIGTERM', () => handleShutdown('SIGTERM'));
+process.on('SIGINT', () => handleShutdown('SIGINT'));
+
 

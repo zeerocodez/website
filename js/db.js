@@ -1335,6 +1335,75 @@ class DatabaseLayer {
     return null;
   }
 
+  async verifyEnterpriseAccess(uidOrEmail, invoiceId = null, verifiedBy = 'Nuel Effiong') {
+    const users = await this.getAllUsers();
+    const idx = users.findIndex(u => u.uid === uidOrEmail || u.email === uidOrEmail);
+    if (idx >= 0) {
+      users[idx].verificationStatus = 'verified';
+      users[idx].accessGranted = true;
+      users[idx].verifiedAt = new Date().toISOString();
+      users[idx].verifiedBy = verifiedBy;
+      this.setLocal('users', users);
+
+      // If an invoice is tied, mark it paid
+      if (invoiceId) {
+        const invoices = await this.getInvoices();
+        const invIdx = invoices.findIndex(i => i.id === invoiceId);
+        if (invIdx >= 0) {
+          invoices[invIdx].status = 'paid';
+          invoices[invIdx].paidAt = new Date().toISOString();
+          invoices[invIdx].verifiedBy = verifiedBy;
+          this.setLocal('invoices', invoices);
+        }
+      }
+
+      // Sync active session if matching
+      try {
+        const stored = localStorage.getItem('zeerocodes_current_user');
+        if (stored) {
+          const current = JSON.parse(stored);
+          if (current.uid === users[idx].uid || current.email === users[idx].email) {
+            current.verificationStatus = 'verified';
+            current.accessGranted = true;
+            localStorage.setItem('zeerocodes_current_user', JSON.stringify(current));
+            if (window.auth) window.auth.currentUser = current;
+          }
+        }
+      } catch (e) {
+        console.warn('Session sync on enterprise verify error', e);
+      }
+      return users[idx];
+    }
+    return null;
+  }
+
+  async revokeEnterpriseAccess(uidOrEmail) {
+    const users = await this.getAllUsers();
+    const idx = users.findIndex(u => u.uid === uidOrEmail || u.email === uidOrEmail);
+    if (idx >= 0) {
+      users[idx].verificationStatus = 'pending';
+      users[idx].accessGranted = false;
+      this.setLocal('users', users);
+
+      try {
+        const stored = localStorage.getItem('zeerocodes_current_user');
+        if (stored) {
+          const current = JSON.parse(stored);
+          if (current.uid === users[idx].uid || current.email === users[idx].email) {
+            current.verificationStatus = 'pending';
+            current.accessGranted = false;
+            localStorage.setItem('zeerocodes_current_user', JSON.stringify(current));
+            if (window.auth) window.auth.currentUser = current;
+          }
+        }
+      } catch (e) {
+        console.warn('Session sync on enterprise revoke error', e);
+      }
+      return users[idx];
+    }
+    return null;
+  }
+
   async revokeStudentAccess(uid) {
     const users = await this.getAllUsers();
     const idx = users.findIndex(u => u.uid === uid || u.email === uid);
@@ -1896,16 +1965,105 @@ class DatabaseLayer {
 
   // --- Studio Projects ---
   async getStudioProjectsForUser(userId) {
-    const projects = this.getLocal('studioProjects') || [];
-    return projects.filter(p => p.userId === userId || p.userEmail === userId);
+    const defaultProjects = [
+      {
+        id: 'proj-payquick-01',
+        title: 'WhatsApp Paystack Invoicing Engine',
+        clientName: 'PayQuick Africa',
+        userEmail: 'client@zeerocodes.com',
+        userId: 'user-client-01',
+        stage: 'Phase 4: Staging Review & HMAC Penetration Test',
+        progress: 85,
+        budgetNGN: 2500000,
+        stagingUrl: 'https://payquick-staging.zeerocodes.com',
+        repoUrl: 'https://github.com/payquick/invoicing-engine-bot',
+        architect: 'Nuel Effiong (Principal AI Systems Architect)',
+        slaTier: '24/7 Managed Operations (Enterprise 99.99%)',
+        startDate: '2026-08-01',
+        targetLaunch: '2026-08-28',
+        deliverables: [
+          { name: 'Next.js 15 Enterprise Portal', status: 'completed' },
+          { name: 'n8n Webhook HMAC Dispatcher', status: 'completed' },
+          { name: 'WhatsApp Cloud API 90-Sec Bot', status: 'completed' },
+          { name: 'Supabase PostgreSQL RLS Hardening', status: 'completed' },
+          { name: 'OWASP LLM Pentest & VibeCert Grade A', status: 'in_progress' }
+        ],
+        milestones: [
+          { number: 1, title: 'Scope Discovery & System Architecture', status: 'completed', date: 'Aug 01, 2026' },
+          { number: 2, title: 'n8n Autonomous Node Workflows', status: 'completed', date: 'Aug 06, 2026' },
+          { number: 3, title: 'WhatsApp 90-Second Invoicing Engine', status: 'completed', date: 'Aug 12, 2026' },
+          { number: 4, title: 'Cryptographic HMAC & AST Security Audit', status: 'in_progress', date: 'Aug 20, 2026' },
+          { number: 5, title: 'Production Launch & 24/7 SLA Operations', status: 'upcoming', date: 'Aug 28, 2026' }
+        ]
+      },
+      {
+        id: 'proj-medlagos-02',
+        title: 'Clinical Telehealth Platform & Patient Portal',
+        clientName: 'MedLagos Telehealth',
+        userEmail: 'folake@medlagos.ng',
+        userId: 'user-client-pending-01',
+        stage: 'Phase 3: Webhook Payment & Supabase Hardening',
+        progress: 60,
+        budgetNGN: 4800000,
+        stagingUrl: 'https://medlagos-telehealth.zeerocodes.com',
+        repoUrl: 'https://github.com/medlagos/telehealth-portal',
+        architect: 'Nuel Effiong',
+        slaTier: '24/7 Managed Operations',
+        startDate: '2026-08-05',
+        targetLaunch: '2026-09-10',
+        deliverables: [
+          { name: 'Next.js Patient Portal', status: 'completed' },
+          { name: 'Automated Consultation Calendar Bot', status: 'completed' },
+          { name: 'Supabase HIPAA-Compliant RLS Policies', status: 'in_progress' }
+        ],
+        milestones: [
+          { number: 1, title: 'Architecture Blueprint', status: 'completed', date: 'Aug 05, 2026' },
+          { number: 2, title: 'Full-Stack Portal Build', status: 'completed', date: 'Aug 14, 2026' },
+          { number: 3, title: 'HIPAA & OWASP Security Audit', status: 'in_progress', date: 'Aug 25, 2026' }
+        ]
+      },
+      {
+        id: 'proj-swiftship-03',
+        title: 'Real-time Driver Dispatch & Automated SMS Tracking',
+        clientName: 'SwiftShip Logistics',
+        userEmail: 'ops@swiftship.africa',
+        userId: 'user-client-03',
+        stage: 'Phase 2: Full-Stack Implementation',
+        progress: 40,
+        budgetNGN: 1850000,
+        stagingUrl: 'https://swiftship-dispatch.zeerocodes.com',
+        repoUrl: 'https://github.com/swiftship/fleet-tracking-api',
+        architect: 'Nuel Effiong',
+        slaTier: 'Standard Operations',
+        startDate: '2026-08-10',
+        targetLaunch: '2026-09-01',
+        deliverables: [
+          { name: 'Driver Geolocation Dispatch Engine', status: 'in_progress' },
+          { name: 'SMS & WhatsApp Waybill Bot', status: 'in_progress' }
+        ],
+        milestones: [
+          { number: 1, title: 'API Gateway Setup', status: 'completed', date: 'Aug 10, 2026' },
+          { number: 2, title: 'Driver Telemetry Engine', status: 'in_progress', date: 'Aug 22, 2026' }
+        ]
+      }
+    ];
+
+    const projects = this.getLocal('studioProjects');
+    if (!projects || projects.length === 0) {
+      this.setLocal('studioProjects', defaultProjects);
+      return defaultProjects.filter(p => p.userId === userId || p.userEmail === userId || userId === 'user-client-01' || !userId);
+    }
+    return projects.filter(p => p.userId === userId || p.userEmail === userId || (userId === 'user-client-01' && p.userEmail === 'client@zeerocodes.com'));
   }
 
   async getAllStudioProjects() {
-    return this.getLocal('studioProjects') || [];
+    const projects = this.getLocal('studioProjects');
+    if (projects && projects.length > 0) return projects;
+    return this.getStudioProjectsForUser('user-client-01');
   }
 
   async saveStudioProject(proj) {
-    const projects = this.getLocal('studioProjects') || [];
+    const projects = await this.getAllStudioProjects();
     const idx = projects.findIndex(p => p.id === proj.id);
     if (idx >= 0) {
       projects[idx] = { ...projects[idx], ...proj };
@@ -1913,6 +2071,56 @@ class DatabaseLayer {
       projects.unshift(proj);
     }
     this.setLocal('studioProjects', projects);
+  }
+
+  // --- Enterprise Team Members ---
+  async getEnterpriseTeamMembers(orgId = 'payquick-org') {
+    const defaultTeam = [
+      { id: 'tm-1', name: 'Tunde Balogun', email: 'tunde@payquick.africa', role: 'Executive Sponsor / COO', access: 'Admin', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop', status: 'Active' },
+      { id: 'tm-2', name: 'Kemi Adebayo', email: 'kemi@payquick.africa', role: 'Head of Engineering', access: 'Technical Admin', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop', status: 'Active' },
+      { id: 'tm-3', name: 'Emeka Nwosu', email: 'emeka@payquick.africa', role: 'Product Operations Lead', access: 'Read & Test', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop', status: 'Active' }
+    ];
+    const key = `team_${orgId}`;
+    const members = this.getLocal(key);
+    if (members && members.length > 0) return members;
+    this.setLocal(key, defaultTeam);
+    return defaultTeam;
+  }
+
+  async addEnterpriseTeamMember(orgId = 'payquick-org', member) {
+    const members = await this.getEnterpriseTeamMembers(orgId);
+    const newMember = {
+      id: 'tm_' + Date.now(),
+      status: 'Active',
+      ...member
+    };
+    members.push(newMember);
+    this.setLocal(`team_${orgId}`, members);
+    return newMember;
+  }
+
+  // --- Enterprise Guardrail Governance Settings ---
+  async getGuardrailSettings(orgId = 'payquick-org') {
+    const key = `guardrails_${orgId}`;
+    const saved = this.getLocal(key);
+    if (saved) return saved;
+
+    const defaults = {
+      promptInjectionDefense: true,
+      hmacConstantTimeVerification: true,
+      supabaseRlsEnforcer: true,
+      piiSanitizationFilter: true,
+      rateLimiter60ReqMin: true,
+      zeroSecretsClientExposure: true,
+      kyberQuantumKeyExchange: true
+    };
+    this.setLocal(key, defaults);
+    return defaults;
+  }
+
+  async saveGuardrailSettings(orgId = 'payquick-org', settings) {
+    this.setLocal(`guardrails_${orgId}`, settings);
+    return settings;
   }
 
   // --- VibeScan Submissions & Certifications ---

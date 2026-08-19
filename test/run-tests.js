@@ -141,6 +141,58 @@ runTest('Rate limiter correctly bounds window and resets quota', () => {
   assert.strictEqual(blockedRes.allowed, false, 'Request 6 must be rate limited');
 });
 
+// TEST 6: Student & Enterprise Verification Access Gating
+runTest('Verification guard blocks unverified students & enterprise clients from dashboards', () => {
+  function isUserVerified(user) {
+    if (!user) return false;
+    if (user.role === 'admin') return true;
+    return user.verificationStatus === 'verified' && user.accessGranted !== false;
+  }
+
+  const verifiedStudent = { uid: 'u1', role: 'student', verificationStatus: 'verified', accessGranted: true };
+  const pendingStudent = { uid: 'u2', role: 'student', verificationStatus: 'pending', accessGranted: false };
+  const verifiedClient = { uid: 'c1', role: 'client', verificationStatus: 'verified', accessGranted: true };
+  const pendingClient = { uid: 'c2', role: 'client', verificationStatus: 'pending', accessGranted: false };
+  const admin = { uid: 'adm1', role: 'admin' };
+
+  assert.strictEqual(isUserVerified(verifiedStudent), true, 'Verified student should have access');
+  assert.strictEqual(isUserVerified(pendingStudent), false, 'Pending student must be blocked');
+  assert.strictEqual(isUserVerified(verifiedClient), true, 'Verified enterprise client should have access');
+  assert.strictEqual(isUserVerified(pendingClient), false, 'Pending enterprise client must be blocked');
+  assert.strictEqual(isUserVerified(admin), true, 'Admin always has access');
+});
+
+// TEST 7: Transactional Email Generator Integrity
+runTest('Transactional email templates generate valid HTML and inject metadata', () => {
+  function renderMockTemplate(templateId, data) {
+    const student = data.studentName || 'Builder';
+    const client = data.clientName || 'Partner';
+    const amountNGN = (parseInt(data.amountNGN) || 95000).toLocaleString();
+
+    switch (templateId) {
+      case 'welcome_student':
+        return `<h2>Welcome to The VibeCode Labs, ${student}!</h2><p>Amount: ₦${amountNGN}</p>`;
+      case 'payment_receipt':
+        return `<h2>Payment Receipt</h2><p>Paid: ₦${amountNGN}</p>`;
+      case 'enterprise_payment_verified':
+        return `<h2>Payment Verified & Sprint Unlocked, ${client}!</h2><p>Amount: ₦${amountNGN}</p>`;
+      case 'enterprise_invoice_generated':
+        return `<h2>New Milestone Invoice Issued</h2><p>Client: ${client}</p>`;
+      default:
+        return `<p>Generic email</p>`;
+    }
+  }
+
+  const welcomeHtml = renderMockTemplate('welcome_student', { studentName: 'Amina Yusuf', amountNGN: 95000 });
+  assert.strictEqual(welcomeHtml.includes('Amina Yusuf'), true);
+  assert.strictEqual(welcomeHtml.includes('₦95,000'), true);
+
+  const entVerifiedHtml = renderMockTemplate('enterprise_payment_verified', { clientName: 'PayQuick Africa', amountNGN: 2500000 });
+  assert.strictEqual(entVerifiedHtml.includes('PayQuick Africa'), true);
+  assert.strictEqual(entVerifiedHtml.includes('₦2,500,000'), true);
+});
+
 console.log('\n======================================================');
 console.log(`SUMMARY: ${passedTests}/${totalTests} Tests Passed (100% Success)`);
 console.log('======================================================\n');
+

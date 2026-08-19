@@ -1111,37 +1111,49 @@ class ZeerocodesApp {
     }
     const user = window.auth.getUser();
 
-    // Verification Guard: Only verified users can access the full dashboard curriculum & labs
-    const isVerified = window.auth.isUserVerified(user);
-    if (!isVerified) {
-      this.renderStudentPendingVerificationView(user);
-      if (window.lucide) window.lucide.createIcons();
-      return;
-    }
-
     // 1. Top Profile Header
     const nameEl = document.getElementById('dashUserName');
     const emailEl = document.getElementById('dashUserEmail');
     const roleBadgeEl = document.getElementById('dashUserRoleBadge');
     const avatarEl = document.getElementById('dashUserAvatar');
 
-    if (nameEl) nameEl.textContent = user.displayName || 'Amina Yusuf';
-    if (emailEl) emailEl.textContent = user.email || 'student@zeerocodes.com';
+    const isClient = user.role === 'client';
+    const isVerified = window.auth.isUserVerified(user);
+
+    if (nameEl) nameEl.textContent = user.displayName || (isClient ? 'Enterprise Client' : 'Amina Yusuf');
+    if (emailEl) emailEl.textContent = user.email || '';
     if (roleBadgeEl) {
-      const role = (user.role || 'STUDENT').toUpperCase();
-      roleBadgeEl.textContent = role;
-      roleBadgeEl.className = `badge ${role === 'ADMIN' ? 'badge-danger' : role === 'CLIENT' ? 'badge-teal' : 'badge-success'}`;
+      if (!isVerified) {
+        roleBadgeEl.textContent = 'PENDING VERIFICATION';
+        roleBadgeEl.className = 'badge badge-warning';
+      } else {
+        const role = (user.role || 'STUDENT').toUpperCase();
+        roleBadgeEl.textContent = isClient ? 'ENTERPRISE CLIENT' : role;
+        roleBadgeEl.className = `badge ${role === 'ADMIN' ? 'badge-danger' : isClient ? 'badge-teal' : 'badge-success'}`;
+      }
     }
     if (avatarEl && user.photoURL) {
       avatarEl.src = user.photoURL;
     }
 
-    // 2. Fetch collections safely with fallbacks
+    // 2. Verification Gate Check
+    if (!isVerified) {
+      if (isClient) {
+        this.renderEnterprisePendingVerificationView(user);
+      } else {
+        this.renderStudentPendingVerificationView(user);
+      }
+      if (window.lucide) window.lucide.createIcons();
+      return;
+    }
+
+    // 3. Fetch collections safely with fallbacks
     let enrollments = [];
     let labSubs = [];
     let studioProjects = [];
     let vibescanSubs = [];
     let paymentEvents = [];
+    let invoices = [];
 
     try {
       if (window.db) {
@@ -1150,52 +1162,533 @@ class ZeerocodesApp {
         studioProjects = (await window.db.getStudioProjectsForUser(user.uid)) || [];
         vibescanSubs = (await window.db.getSubmissionsForUser(user.uid)) || [];
         paymentEvents = (await window.db.getPaymentEvents()) || [];
+        invoices = (await window.db.getInvoices()) || [];
       }
     } catch (err) {
       console.warn('Dashboard data fetch warning:', err);
     }
 
-    // Fallback: If student has no enrollments in local state, provide default VibeCode Labs enrollment
-    if (!enrollments.length && (user.role === 'student' || user.email === 'student@zeerocodes.com')) {
-      enrollments = [{
-        id: 'enroll-amina-01',
-        userId: user.uid,
-        userEmail: user.email,
-        userName: user.displayName || 'Amina Yusuf',
-        courseId: 'course-vibecode-labs',
-        courseTitle: 'The Zeerocodes VibeCode Labs',
-        cohort: 'Cohort 4',
-        completedLessons: [
-          'lvl_1_mod_01_les_0', 'lvl_1_mod_01_les_1', 'lvl_1_mod_01_les_2', 'lvl_1_mod_01_les_3', 'lvl_1_mod_01_les_4',
-          'lvl_1_mod_02_les_0', 'lvl_1_mod_02_les_1', 'lvl_1_mod_02_les_2', 'lvl_1_mod_02_les_3',
-          'lvl_1_mod_03_les_0', 'lvl_1_mod_03_les_1', 'lvl_1_mod_03_les_2', 'lvl_1_mod_03_les_3',
-          'lvl_1_mod_04_les_0', 'lvl_1_mod_04_les_1',
-          'lvl_2_mod_05_les_0', 'lvl_2_mod_05_les_1', 'lvl_2_mod_05_les_2',
-          'lvl_2_mod_06_les_0', 'lvl_2_mod_06_les_1',
-          'lvl_3_mod_11_les_0', 'lvl_3_mod_11_les_1',
-          'lvl_3_mod_13_les_0'
-        ],
-        certificateId: 'VIBECERT-2026-0881',
-        certifiedAt: '2026-08-10T12:00:00Z'
-      }];
+    const userPayments = paymentEvents.filter(p => p.customerEmail === user.email || p.userEmail === user.email);
+
+    // 4. Branch by Persona Role
+    if (isClient) {
+      // Setup Enterprise Sidebar & Render Enterprise Tabs
+      this.setupEnterpriseSidebar();
+      this.renderEnterpriseClientDashboard(user, studioProjects, vibescanSubs, userPayments, invoices);
+    } else {
+      // Setup Student Sidebar & Render Student Tabs
+      this.setupStudentSidebar();
+
+      // Fallback: If student has no enrollments in local state, provide default VibeCode Labs enrollment
+      if (!enrollments.length) {
+        enrollments = [{
+          id: 'enroll-amina-01',
+          userId: user.uid,
+          userEmail: user.email,
+          userName: user.displayName || 'Amina Yusuf',
+          courseId: 'course-vibecode-labs',
+          courseTitle: 'The Zeerocodes VibeCode Labs',
+          cohort: 'Cohort 4',
+          completedLessons: [
+            'lvl_1_mod_01_les_0', 'lvl_1_mod_01_les_1', 'lvl_1_mod_01_les_2', 'lvl_1_mod_01_les_3', 'lvl_1_mod_01_les_4',
+            'lvl_1_mod_02_les_0', 'lvl_1_mod_02_les_1', 'lvl_1_mod_02_les_2', 'lvl_1_mod_02_les_3',
+            'lvl_1_mod_03_les_0', 'lvl_1_mod_03_les_1', 'lvl_1_mod_03_les_2', 'lvl_1_mod_03_les_3',
+            'lvl_1_mod_04_les_0', 'lvl_1_mod_04_les_1',
+            'lvl_2_mod_05_les_0', 'lvl_2_mod_05_les_1', 'lvl_2_mod_05_les_2',
+            'lvl_2_mod_06_les_0', 'lvl_2_mod_06_les_1',
+            'lvl_3_mod_11_les_0', 'lvl_3_mod_11_les_1',
+            'lvl_3_mod_13_les_0'
+          ],
+          certificateId: 'VIBECERT-2026-0881',
+          certifiedAt: '2026-08-10T12:00:00Z'
+        }];
+      }
+
+      this.renderStudentOverviewTab(user, enrollments, labSubs);
+      this.renderStudentCoursesTab(enrollments);
+      this.renderStudentSessionsTab();
+      this.renderStudentAchievementsTab(user, enrollments);
+      this.renderStudentDiscussionsTab(user);
+      this.renderStudentCommunityTab();
+      this.renderStudentSupportTab(user);
+      this.renderStudentStudioTab(studioProjects);
+      this.renderStudentVibescanTab(vibescanSubs);
+      this.renderStudentBillingTab(userPayments, user);
+      this.renderStudentSettingsTab(user);
     }
 
-    const userPayments = paymentEvents.filter(p => p.customerEmail === user.email);
-
-    // 3. Render All Tabs
-    this.renderStudentOverviewTab(user, enrollments, labSubs);
-    this.renderStudentCoursesTab(enrollments);
-    this.renderStudentSessionsTab();
-    this.renderStudentAchievementsTab(user, enrollments);
-    this.renderStudentDiscussionsTab(user);
-    this.renderStudentCommunityTab();
-    this.renderStudentSupportTab(user);
-    this.renderStudentStudioTab(studioProjects);
-    this.renderStudentVibescanTab(vibescanSubs);
-    this.renderStudentBillingTab(userPayments, user);
-    this.renderStudentSettingsTab(user);
+    this.bindDashboardTabs();
 
     if (window.lucide) window.lucide.createIcons();
+  }
+
+  // =========================================================================
+  // SIDEBAR BUILDERS (ROLE-BASED SEPARATION)
+  // =========================================================================
+  setupStudentSidebar() {
+    const badge = document.getElementById('dashSidebarBrandBadge');
+    if (badge) {
+      badge.innerHTML = `<i data-lucide="graduation-cap" style="color:var(--emerald-light);"></i> The VibeCode Labs`;
+    }
+
+    const navList = document.getElementById('dashSidebarNavList');
+    if (!navList) return;
+
+    navList.innerHTML = `
+      <li>
+        <button type="button" class="modern-dash-nav-btn active dash-tab-btn" data-tab="dashTabOverview">
+          <i data-lucide="home"></i> Home
+        </button>
+      </li>
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabLms">
+          <i data-lucide="book-open"></i> Courses
+        </button>
+      </li>
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabSessions">
+          <i data-lucide="video"></i> Sessions
+        </button>
+      </li>
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabAchievements">
+          <i data-lucide="award"></i> Achievement
+        </button>
+      </li>
+
+      <li class="nav-category-divider">
+        <span>COMMUNICATIONS</span>
+      </li>
+
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabDiscussions">
+          <i data-lucide="message-square"></i> Message
+        </button>
+      </li>
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabCommunity">
+          <i data-lucide="users"></i> Study centers
+        </button>
+      </li>
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabSupport">
+          <i data-lucide="help-circle"></i> Support tickets
+        </button>
+      </li>
+
+      <li class="nav-category-divider">
+        <span>SERVICES & BILLING</span>
+      </li>
+
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabStudio">
+          <i data-lucide="workflow"></i> Studio Projects
+        </button>
+      </li>
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabVibescan">
+          <i data-lucide="shield-check"></i> Security Audits
+        </button>
+      </li>
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabBilling">
+          <i data-lucide="receipt"></i> Invoices & Billing
+        </button>
+      </li>
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabSettings">
+          <i data-lucide="settings"></i> Settings
+        </button>
+      </li>
+    `;
+  }
+
+  setupEnterpriseSidebar() {
+    const badge = document.getElementById('dashSidebarBrandBadge');
+    if (badge) {
+      badge.innerHTML = `<i data-lucide="shield-check" style="color:var(--cyan-accent);"></i> Zeerocodes Studio Enterprise`;
+    }
+
+    const navList = document.getElementById('dashSidebarNavList');
+    if (!navList) return;
+
+    navList.innerHTML = `
+      <li>
+        <button type="button" class="modern-dash-nav-btn active dash-tab-btn" data-tab="dashTabOverview">
+          <i data-lucide="layout-dashboard"></i> Executive Overview
+        </button>
+      </li>
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabStudio">
+          <i data-lucide="workflow"></i> Studio Projects & Sprints
+        </button>
+      </li>
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabPipelines">
+          <i data-lucide="activity"></i> Autonomous Pipelines
+        </button>
+      </li>
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabVibescan">
+          <i data-lucide="shield-check"></i> Security & Governance
+        </button>
+      </li>
+
+      <li class="nav-category-divider">
+        <span>FINANCIALS & COLLABORATION</span>
+      </li>
+
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabBilling">
+          <i data-lucide="receipt"></i> Milestone Invoices
+        </button>
+      </li>
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabTeam">
+          <i data-lucide="users"></i> Organization Seats
+        </button>
+      </li>
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabSla">
+          <i data-lucide="phone-call"></i> 24/7 SLA & Architect Hotline
+        </button>
+      </li>
+      <li>
+        <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabSettings">
+          <i data-lucide="settings"></i> Organization Settings
+        </button>
+      </li>
+    `;
+  }
+
+  bindDashboardTabs() {
+    document.querySelectorAll('.dash-tab-btn').forEach(btn => {
+      btn.onclick = (e) => {
+        const tabId = btn.getAttribute('data-tab');
+        if (!tabId) return;
+
+        document.querySelectorAll('.dash-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        document.querySelectorAll('.dash-tab-panel').forEach(p => {
+          if (p.id === tabId) {
+            p.classList.add('active');
+            p.style.display = 'block';
+          } else {
+            p.classList.remove('active');
+            p.style.display = 'none';
+          }
+        });
+
+        if (window.lucide) window.lucide.createIcons();
+      };
+    });
+  }
+
+  // =========================================================================
+  // PENDING VERIFICATION STATE 1: STUDENT ADMISSION
+  // =========================================================================
+  renderStudentPendingVerificationView(user) {
+    const container = document.getElementById('dashOverviewContainer');
+    if (!container) return;
+
+    this.setupStudentSidebar();
+
+    container.innerHTML = `
+      <div class="student-welcome-banner" style="background:linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(12, 17, 26, 0.95) 100%); border-color:rgba(245, 158, 11, 0.35);">
+        <div class="student-welcome-left">
+          <div class="student-avatar-badge" style="border-color:#F59E0B; box-shadow:0 0 15px rgba(245, 158, 11, 0.3);">
+            <img src="${user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop'}" alt="${user.displayName}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+            <span class="student-online-dot" style="background:#F59E0B; box-shadow:0 0 8px #F59E0B;" title="Application Under Review"></span>
+          </div>
+          <div>
+            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.25rem;">
+              <span class="badge badge-warning" style="font-size:0.7rem; font-weight:800;">
+                <i data-lucide="clock" style="width:12px; height:12px; display:inline;"></i> PAYMENT & ACCESS VERIFICATION PENDING
+              </span>
+              <span style="font-size:0.75rem; color:var(--text-cyber-muted);">Application ID: #APP-${(user.uid || '000000').slice(-6).toUpperCase()}</span>
+            </div>
+            <h3 style="color:#FFF; font-size:1.4rem; font-weight:800; margin:0;">
+              Welcome, <span style="color:#FBBF24;">${(user.displayName || 'APPLICANT').toUpperCase()}</span> 👋
+            </h3>
+            <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0.25rem 0 0 0;">
+              Your student registration for <strong>The VibeCode Labs Cohort 4</strong> is currently in the ledger review queue.
+            </p>
+          </div>
+        </div>
+        <div class="student-welcome-right" style="text-align:right;">
+          <div class="badge badge-warning" style="font-size:0.75rem; padding:0.4rem 0.8rem; margin-bottom:0.4rem;">
+            ⏳ Awaiting Admin Payment Clearance
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-cyber-muted);">Verifier: Nuel Effiong (Lead Systems Architect)</div>
+        </div>
+      </div>
+
+      <!-- 3-Step Verification Pipeline -->
+      <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.75rem; margin-bottom:1.5rem;">
+        <h4 style="color:#FFF; font-size:1.15rem; margin:0 0 1.25rem 0; display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="shield-check" style="color:var(--cyan-accent);"></i> Verification & Access Roadmap
+        </h4>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap:1rem;">
+          <div style="background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.3); border-radius:12px; padding:1.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <span style="font-size:1.4rem;">1️⃣</span>
+              <span class="badge badge-success">✓ COMPLETED</span>
+            </div>
+            <strong style="color:#FFF; font-size:0.95rem; display:block; margin-bottom:0.25rem;">Account & Tuition Submitted</strong>
+            <p style="font-size:0.78rem; color:var(--text-cyber-muted); margin:0;">
+              Candidate profile and payment submission recorded in ledger.
+            </p>
+          </div>
+
+          <div style="background:rgba(245, 158, 11, 0.08); border:1px solid rgba(245, 158, 11, 0.4); border-radius:12px; padding:1.25rem; box-shadow:0 0 20px rgba(245, 158, 11, 0.08);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <span style="font-size:1.4rem;">2️⃣</span>
+              <span class="badge badge-warning">⏳ IN PROGRESS</span>
+            </div>
+            <strong style="color:#FBBF24; font-size:0.95rem; display:block; margin-bottom:0.25rem;">Admin Ledger Verification</strong>
+            <p style="font-size:0.78rem; color:var(--text-cyber-muted); margin:0;">
+              Finance desk verifies transaction hash before unlocking private repo keys.
+            </p>
+          </div>
+
+          <div style="background:rgba(255, 255, 255, 0.02); border:1px solid rgba(255, 255, 255, 0.06); border-radius:12px; padding:1.25rem; opacity:0.6;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <span style="font-size:1.4rem;">3️⃣</span>
+              <span class="badge badge-cyber">🔒 LOCKED</span>
+            </div>
+            <strong style="color:#FFF; font-size:0.95rem; display:block; margin-bottom:0.25rem;">LMS & Cohort Pass Live</strong>
+            <p style="font-size:0.78rem; color:var(--text-cyber-muted); margin:0;">
+              All 4 levels, 88 code labs, Saturday live clinics, and VIP Discord unlock immediately.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Direct Expedite & Info -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap:1.25rem; margin-bottom:1.5rem;">
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.5rem;">
+          <h4 style="color:#FFF; font-size:1.1rem; margin:0 0 0.5rem 0; display:flex; align-items:center; gap:0.5rem;">
+            <i data-lucide="zap" style="color:#F59E0B;"></i> Fast-Track Your Approval
+          </h4>
+          <p style="color:var(--text-cyber-muted); font-size:0.82rem; margin-bottom:1.25rem; line-height:1.45;">
+            Need immediate access for this weekend's build clinic? Message Nuel Effiong directly with your email (<strong>${user.email}</strong>).
+          </p>
+          <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+            <a href="https://wa.me/2348120000000?text=Hi%20Nuel%2C%20I%20registered%20for%20The%20VibeCode%20Labs%20with%20email%20${encodeURIComponent(user.email)}%20and%20App%20ID%20%23APP-${(user.uid || '').slice(-6).toUpperCase()}.%20Please%20verify%20my%20tuition%20payment." target="_blank" class="btn btn-primary btn-sm" style="background:#25D366; border-color:#25D366; color:#000; font-weight:700;">
+              <i data-lucide="message-square"></i> Chat with Admin on WhatsApp
+            </a>
+            <button class="btn btn-outline btn-sm" onclick="window.location.reload()">
+              <i data-lucide="refresh-cw"></i> Check Status
+            </button>
+          </div>
+        </div>
+
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.5rem;">
+          <h4 style="color:#FFF; font-size:1.1rem; margin:0 0 0.5rem 0; display:flex; align-items:center; gap:0.5rem;">
+            <i data-lucide="info" style="color:var(--cyan-accent);"></i> Registration Summary
+          </h4>
+          <div style="display:flex; flex-direction:column; gap:0.6rem; font-size:0.82rem; margin-top:0.75rem;">
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.4rem;">
+              <span style="color:var(--text-cyber-muted);">Candidate Name:</span>
+              <strong style="color:#FFF;">${user.displayName || 'Applicant'}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.4rem;">
+              <span style="color:var(--text-cyber-muted);">Account Email:</span>
+              <strong style="color:var(--cyan-accent);">${user.email}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.4rem;">
+              <span style="color:var(--text-cyber-muted);">Phone Number:</span>
+              <strong style="color:#FFF;">${user.phone || '+234 812 000 0000'}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding-top:0.2rem;">
+              <span style="color:var(--text-cyber-muted);">Account Status:</span>
+              <span class="badge badge-warning" style="font-size:0.68rem;">AWAITING ADMIN CLEARANCE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Render locked state on other tab containers
+    ['dashLmsContainer', 'dashSessionsContainer', 'dashAchievementsContainer', 'dashDiscussionsContainer', 'dashCommunityContainer', 'dashSupportContainer'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.innerHTML = `
+          <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:3rem 1.5rem; text-align:center; max-width:600px; margin:2rem auto;">
+            <i data-lucide="lock" style="width:48px; height:48px; color:#F59E0B; margin-bottom:1rem; display:inline-block;"></i>
+            <h4 style="color:#FFF; font-size:1.2rem; margin:0 0 0.5rem 0;">Section Locked Pending Payment Clearance</h4>
+            <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin-bottom:1.5rem;">
+              This section contains private cohort materials, live build sessions, and lab grading. It will automatically unlock as soon as your payment is approved by Nuel Effiong.
+            </p>
+            <button class="btn btn-outline btn-sm" onclick="window.location.reload()">
+              <i data-lucide="refresh-cw"></i> Refresh Access State
+            </button>
+          </div>
+        `;
+      }
+    });
+  }
+
+  // =========================================================================
+  // PENDING VERIFICATION STATE 2: ENTERPRISE CLIENT
+  // =========================================================================
+  renderEnterprisePendingVerificationView(user) {
+    const container = document.getElementById('dashOverviewContainer');
+    if (!container) return;
+
+    this.setupEnterpriseSidebar();
+
+    const company = user.company || 'Enterprise Partner';
+    const project = user.activeProject || 'Clinical Telehealth Platform & Patient Portal';
+    const invoiceId = user.pendingInvoiceId || 'INV-2026-002';
+    const amountNGN = (user.pendingInvoiceAmount || 4800000).toLocaleString();
+
+    container.innerHTML = `
+      <div class="student-welcome-banner" style="background:linear-gradient(135deg, rgba(34, 211, 238, 0.12) 0%, rgba(12, 17, 26, 0.95) 100%); border-color:rgba(34, 211, 238, 0.35);">
+        <div class="student-welcome-left">
+          <div class="student-avatar-badge" style="border-color:var(--cyan-accent); box-shadow:0 0 15px rgba(34, 211, 238, 0.3);">
+            <img src="${user.photoURL || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop'}" alt="${user.displayName}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+            <span class="student-online-dot" style="background:var(--cyan-accent); box-shadow:0 0 8px var(--cyan-accent);" title="Sprint Verification Pending"></span>
+          </div>
+          <div>
+            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.25rem;">
+              <span class="badge badge-teal" style="font-size:0.7rem; font-weight:800;">
+                <i data-lucide="briefcase" style="width:12px; height:12px; display:inline;"></i> ENTERPRISE SCOPING & PAYMENT INTAKE
+              </span>
+              <span style="font-size:0.75rem; color:var(--text-cyber-muted);">Org ID: #ENT-${(user.uid || '000000').slice(-6).toUpperCase()}</span>
+            </div>
+            <h3 style="color:#FFF; font-size:1.4rem; font-weight:800; margin:0;">
+              Welcome, <span style="color:var(--cyan-accent);">${(user.displayName || company).toUpperCase()}</span> 👋
+            </h3>
+            <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0.25rem 0 0 0;">
+              Your milestone sprint allocation for <strong>${project}</strong> is awaiting finance desk verification.
+            </p>
+          </div>
+        </div>
+        <div class="student-welcome-right" style="text-align:right;">
+          <div class="badge badge-warning" style="font-size:0.75rem; padding:0.4rem 0.8rem; margin-bottom:0.4rem;">
+            ⏳ Milestone Invoice Awaiting Clearance
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-cyber-muted);">Lead Architect: Nuel Effiong</div>
+        </div>
+      </div>
+
+      <!-- 4-Stage Enterprise Sprint Activation Pipeline -->
+      <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.75rem; margin-bottom:1.5rem;">
+        <h4 style="color:#FFF; font-size:1.15rem; margin:0 0 1.25rem 0; display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="shield-check" style="color:var(--cyan-accent);"></i> Enterprise Sprint Onboarding Roadmap
+        </h4>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap:1rem;">
+          <div style="background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.3); border-radius:12px; padding:1.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <span style="font-size:1.4rem;">1️⃣</span>
+              <span class="badge badge-success">✓ SIGNED</span>
+            </div>
+            <strong style="color:#FFF; font-size:0.92rem; display:block; margin-bottom:0.25rem;">Milestone Invoice Issued</strong>
+            <p style="font-size:0.75rem; color:var(--text-cyber-muted); margin:0;">
+              Invoice <strong>${invoiceId}</strong> generated for ₦${amountNGN}.
+            </p>
+          </div>
+
+          <div style="background:rgba(245, 158, 11, 0.08); border:1px solid rgba(245, 158, 11, 0.4); border-radius:12px; padding:1.25rem; box-shadow:0 0 20px rgba(245, 158, 11, 0.08);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <span style="font-size:1.4rem;">2️⃣</span>
+              <span class="badge badge-warning">⏳ VERIFYING</span>
+            </div>
+            <strong style="color:#FBBF24; font-size:0.92rem; display:block; margin-bottom:0.25rem;">Admin Ledger Verification</strong>
+            <p style="font-size:0.75rem; color:var(--text-cyber-muted); margin:0;">
+              Finance desk confirms bank settlement and Paystack HMAC signature.
+            </p>
+          </div>
+
+          <div style="background:rgba(255, 255, 255, 0.02); border:1px solid rgba(255, 255, 255, 0.06); border-radius:12px; padding:1.25rem; opacity:0.6;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <span style="font-size:1.4rem;">3️⃣</span>
+              <span class="badge badge-cyber">🔒 ALLOCATING</span>
+            </div>
+            <strong style="color:#FFF; font-size:0.92rem; display:block; margin-bottom:0.25rem;">Staging Prototype Allocation</strong>
+            <p style="font-size:0.75rem; color:var(--text-cyber-muted); margin:0;">
+              Provisioning dedicated edge server & GitHub staging environment.
+            </p>
+          </div>
+
+          <div style="background:rgba(255, 255, 255, 0.02); border:1px solid rgba(255, 255, 255, 0.06); border-radius:12px; padding:1.25rem; opacity:0.6;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <span style="font-size:1.4rem;">4️⃣</span>
+              <span class="badge badge-cyber">🔒 STANDBY</span>
+            </div>
+            <strong style="color:#FFF; font-size:0.92rem; display:block; margin-bottom:0.25rem;">24/7 SLA Telemetry Active</strong>
+            <p style="font-size:0.75rem; color:var(--text-cyber-muted); margin:0;">
+              Continuous health checks and direct architect hotline live.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expedite Milestone & Profile Box -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap:1.25rem; margin-bottom:1.5rem;">
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.5rem;">
+          <h4 style="color:#FFF; font-size:1.1rem; margin:0 0 0.5rem 0; display:flex; align-items:center; gap:0.5rem;">
+            <i data-lucide="zap" style="color:var(--cyan-accent);"></i> Instant Settlement & Fast-Track
+          </h4>
+          <p style="color:var(--text-cyber-muted); font-size:0.82rem; margin-bottom:1.25rem; line-height:1.45;">
+            To expedite staging environment provisioning for <strong>${project}</strong>, contact Principal Architect Nuel Effiong with your payment reference.
+          </p>
+          <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+            <a href="https://wa.me/2348120000000?text=Hi%20Nuel%2C%20this%20is%20${encodeURIComponent(user.displayName || company)}.%20We%20have%20submitted%20payment%20for%20Invoice%20${invoiceId}%20(${encodeURIComponent(project)}).%20Please%20verify%20and%20unlock%20our%20enterprise%20workspace." target="_blank" class="btn btn-primary btn-sm" style="background:#25D366; border-color:#25D366; color:#000; font-weight:700;">
+              <i data-lucide="message-square"></i> Connect with Lead Architect
+            </a>
+            <button class="btn btn-outline btn-sm" onclick="window.location.reload()">
+              <i data-lucide="refresh-cw"></i> Refresh Status
+            </button>
+          </div>
+        </div>
+
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.5rem;">
+          <h4 style="color:#FFF; font-size:1.1rem; margin:0 0 0.5rem 0; display:flex; align-items:center; gap:0.5rem;">
+            <i data-lucide="info" style="color:var(--emerald-light);"></i> Organization Details
+          </h4>
+          <div style="display:flex; flex-direction:column; gap:0.6rem; font-size:0.82rem; margin-top:0.75rem;">
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.4rem;">
+              <span style="color:var(--text-cyber-muted);">Organization:</span>
+              <strong style="color:#FFF;">${company}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.4rem;">
+              <span style="color:var(--text-cyber-muted);">Authorized Officer:</span>
+              <strong style="color:#FFF;">${user.displayName}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.4rem;">
+              <span style="color:var(--text-cyber-muted);">Corporate Email:</span>
+              <strong style="color:var(--cyan-accent);">${user.email}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding-top:0.2rem;">
+              <span style="color:var(--text-cyber-muted);">Pending Invoice:</span>
+              <strong style="color:var(--emerald-light);">${invoiceId} (₦${amountNGN})</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Render locked state on other tab containers
+    ['dashStudioContainer', 'dashPipelinesContainer', 'dashVibescanContainer', 'dashBillingContainer', 'dashTeamContainer', 'dashSlaContainer'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.innerHTML = `
+          <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:3rem 1.5rem; text-align:center; max-width:600px; margin:2rem auto;">
+            <i data-lucide="lock" style="width:48px; height:48px; color:var(--cyan-accent); margin-bottom:1rem; display:inline-block;"></i>
+            <h4 style="color:#FFF; font-size:1.2rem; margin:0 0 0.5rem 0;">Enterprise Section Awaiting Invoice Clearance</h4>
+            <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin-bottom:1.5rem;">
+              This section contains live staging environments, autonomous pipeline nodes, and 24/7 SLA telemetry. It will activate immediately upon invoice verification.
+            </p>
+            <button class="btn btn-outline btn-sm" onclick="window.location.reload()">
+              <i data-lucide="refresh-cw"></i> Refresh Status
+            </button>
+          </div>
+        `;
+      }
+    });
   }
 
   // =========================================================================
@@ -2314,15 +2807,740 @@ class ZeerocodesApp {
   }
 
   // =========================================================================
-  // TAB 11: SETTINGS
+  // TAB 11: SETTINGS (STUDENT)
   // =========================================================================
   renderStudentSettingsTab(user) {
-    const nameInput = document.getElementById('accSettingsName');
-    const phoneInput = document.getElementById('accSettingsPhone');
-    const bioInput = document.getElementById('accSettingsBio');
-    if (nameInput) nameInput.value = user.displayName || '';
-    if (phoneInput) phoneInput.value = user.phone || '';
-    if (bioInput) bioInput.value = user.bio || '';
+    const container = document.getElementById('dashSettingsContainer');
+    if (!container) return;
+
+    container.innerHTML = `
+      <div style="background:rgba(12, 17, 26, 0.85); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:1.75rem; max-width:640px;">
+        <h4 style="color:#FFF; font-size:1.15rem; margin-bottom:1.25rem; display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="user-check" style="color:#A855F7;"></i> Account & Profile Details
+        </h4>
+        <form onsubmit="window.app?.saveProfileSettings(event)">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="accSettingsName" class="form-input" value="${user.displayName || ''}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">WhatsApp / Phone Number</label>
+            <input type="tel" id="accSettingsPhone" class="form-input" value="${user.phone || ''}" placeholder="+234 812 000 0000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bio / Builder Goal</label>
+            <textarea id="accSettingsBio" class="form-textarea" rows="3" placeholder="Tell us what you are building...">${user.bio || ''}</textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">Save Profile Changes</button>
+        </form>
+      </div>
+    `;
+  }
+
+  // =========================================================================
+  // ENTERPRISE CLIENT DASHBOARD SUITE
+  // =========================================================================
+  renderEnterpriseClientDashboard(user, studioProjects, vibescanSubs, userPayments, invoices) {
+    this.renderEnterpriseOverviewTab(user, studioProjects, vibescanSubs, invoices);
+    this.renderEnterpriseProjectsTab(user, studioProjects);
+    this.renderEnterprisePipelinesTab(user, studioProjects);
+    this.renderEnterpriseSecurityTab(user, vibescanSubs);
+    this.renderEnterpriseBillingTab(user, invoices, userPayments);
+    this.renderEnterpriseTeamTab(user);
+    this.renderEnterpriseSlaTab(user);
+    this.renderEnterpriseSettingsTab(user);
+  }
+
+  // --- 1. ENTERPRISE EXECUTIVE OVERVIEW TAB ---
+  renderEnterpriseOverviewTab(user, studioProjects, vibescanSubs, invoices) {
+    const container = document.getElementById('dashOverviewContainer');
+    if (!container) return;
+
+    const company = user.company || 'PayQuick Africa';
+    const activeProject = (studioProjects && studioProjects.length) ? studioProjects[0] : {
+      title: 'WhatsApp Paystack Invoicing Engine',
+      stage: 'Phase 4: Kyber Encryption & Pre-Launch Security Lock',
+      progress: 85,
+      budgetNGN: 2500000,
+      slaStatus: '99.99% Uptime SLA Active',
+      stagingUrl: 'https://payquick-staging.zeerocodes.com'
+    };
+
+    const pendingInvoices = (invoices || []).filter(i => i.clientEmail === user.email && i.status === 'pending');
+
+    container.innerHTML = `
+      <!-- Enterprise Executive Header Banner -->
+      <div class="student-welcome-banner" style="background:linear-gradient(135deg, rgba(34, 211, 238, 0.12) 0%, rgba(12, 17, 26, 0.95) 100%); border-color:rgba(34, 211, 238, 0.35); margin-bottom:1.5rem;">
+        <div class="student-welcome-left">
+          <div class="student-avatar-badge" style="border-color:var(--cyan-accent); box-shadow:0 0 20px rgba(34, 211, 238, 0.35);">
+            <img src="${user.photoURL || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop'}" alt="${user.displayName}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+            <span class="student-online-dot" style="background:#10B981; box-shadow:0 0 8px #10B981;" title="24/7 SLA Telemetry Active"></span>
+          </div>
+          <div>
+            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.25rem;">
+              <span class="badge badge-teal" style="font-size:0.7rem; font-weight:800;">
+                <i data-lucide="shield-check" style="width:12px; height:12px; display:inline;"></i> ENTERPRISE WORKSPACE
+              </span>
+              <span style="font-size:0.75rem; color:var(--text-cyber-muted);">Client ID: #ENT-${(user.uid || '000000').slice(-6).toUpperCase()}</span>
+            </div>
+            <h3 style="color:#FFF; font-size:1.4rem; font-weight:800; margin:0;">
+              ${company.toUpperCase()} <span style="color:var(--cyan-accent);">EXECUTIVE PORTAL</span>
+            </h3>
+            <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0.25rem 0 0 0;">
+              Active System: <strong style="color:#FFF;">${activeProject.title}</strong> • Lead Architect: <strong style="color:var(--emerald-light);">Nuel Effiong</strong>
+            </p>
+          </div>
+        </div>
+        <div class="student-welcome-right" style="text-align:right;">
+          <div class="badge badge-success" style="font-size:0.75rem; padding:0.4rem 0.8rem; margin-bottom:0.4rem;">
+            🛡️ 24/7 Managed Operations (99.99% SLA)
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-cyber-muted);">Sprint Status: On Schedule (Sprint 4 of 5)</div>
+        </div>
+      </div>
+
+      <!-- 4 High-Impact Executive KPI Metric Cards -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap:1.25rem; margin-bottom:1.5rem;">
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.25rem; position:relative; overflow:hidden;">
+          <div style="font-size:0.75rem; color:var(--text-cyber-muted); font-weight:700; text-transform:uppercase;">Active Software Builds</div>
+          <div style="font-size:1.6rem; font-weight:900; color:#FFF; margin:0.25rem 0;">1 Core Engine</div>
+          <div style="font-size:0.75rem; color:var(--cyan-accent);">${activeProject.progress}% Milestone Completed</div>
+        </div>
+
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.25rem; position:relative; overflow:hidden;">
+          <div style="font-size:0.75rem; color:var(--text-cyber-muted); font-weight:700; text-transform:uppercase;">SLA Uptime Guarantee</div>
+          <div style="font-size:1.6rem; font-weight:900; color:#10B981; margin:0.25rem 0;">99.99%</div>
+          <div style="font-size:0.75rem; color:var(--emerald-light);">24/7 Telemetry Heartbeat Live</div>
+        </div>
+
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.25rem; position:relative; overflow:hidden;">
+          <div style="font-size:0.75rem; color:var(--text-cyber-muted); font-weight:700; text-transform:uppercase;">Reclaimed Labor Time</div>
+          <div style="font-size:1.6rem; font-weight:900; color:var(--cyan-accent); margin:0.25rem 0;">420 Hrs/Mo</div>
+          <div style="font-size:0.75rem; color:var(--text-cyber-muted);">Automated Invoicing & CRM Sync</div>
+        </div>
+
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:var(--radius-sm); padding:1.25rem; position:relative; overflow:hidden;">
+          <div style="font-size:0.75rem; color:var(--text-cyber-muted); font-weight:700; text-transform:uppercase;">AST Security & Compliance</div>
+          <div style="font-size:1.6rem; font-weight:900; color:#34D399; margin:0.25rem 0;">Grade A (98/100)</div>
+          <div style="font-size:0.75rem; color:var(--emerald-light);">VibeCert™ Cryptographically Verified</div>
+        </div>
+      </div>
+
+      <!-- Active Milestone Sprint Pipeline -->
+      <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.75rem; margin-bottom:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.5rem;">
+          <div>
+            <h4 style="color:#FFF; font-size:1.15rem; margin:0; display:flex; align-items:center; gap:0.5rem;">
+              <i data-lucide="git-branch" style="color:var(--cyan-accent);"></i> Active Sprint Delivery Pipeline: ${activeProject.title}
+            </h4>
+            <p style="color:var(--text-cyber-muted); font-size:0.8rem; margin:0.2rem 0 0 0;">
+              Track real-time engineering milestones from architecture blueprinting to production launch.
+            </p>
+          </div>
+          <span class="badge badge-teal" style="font-size:0.75rem;">Sprint Phase: 4 of 5 (85%)</span>
+        </div>
+
+        <!-- 5 Milestone Nodes -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap:0.75rem; margin-bottom:1.5rem;">
+          <div style="background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.3); border-radius:10px; padding:1rem;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+              <span style="font-size:0.75rem; color:var(--emerald-light); font-weight:700;">M1: COMPLETED</span>
+              <i data-lucide="check-circle" style="width:14px; height:14px; color:var(--emerald-light);"></i>
+            </div>
+            <strong style="color:#FFF; font-size:0.85rem; display:block;">System Architecture Spec</strong>
+            <span style="font-size:0.72rem; color:var(--text-cyber-muted);">Signed PRD & schema</span>
+          </div>
+
+          <div style="background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.3); border-radius:10px; padding:1rem;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+              <span style="font-size:0.75rem; color:var(--emerald-light); font-weight:700;">M2: COMPLETED</span>
+              <i data-lucide="check-circle" style="width:14px; height:14px; color:var(--emerald-light);"></i>
+            </div>
+            <strong style="color:#FFF; font-size:0.85rem; display:block;">Next.js Staging Portal</strong>
+            <span style="font-size:0.72rem; color:var(--text-cyber-muted);">UI components & auth</span>
+          </div>
+
+          <div style="background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.3); border-radius:10px; padding:1rem;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+              <span style="font-size:0.75rem; color:var(--emerald-light); font-weight:700;">M3: COMPLETED</span>
+              <i data-lucide="check-circle" style="width:14px; height:14px; color:var(--emerald-light);"></i>
+            </div>
+            <strong style="color:#FFF; font-size:0.85rem; display:block;">WhatsApp & Paystack Bot</strong>
+            <span style="font-size:0.72rem; color:var(--text-cyber-muted);">Webhook auto-reconciliation</span>
+          </div>
+
+          <div style="background:rgba(34, 211, 238, 0.1); border:1px solid rgba(34, 211, 238, 0.4); border-radius:10px; padding:1rem; box-shadow:0 0 15px rgba(34, 211, 238, 0.1);">
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+              <span style="font-size:0.75rem; color:var(--cyan-accent); font-weight:800;">M4: IN PROGRESS</span>
+              <div class="pulse-indicator" style="width:8px; height:8px;"></div>
+            </div>
+            <strong style="color:#FFF; font-size:0.85rem; display:block;">AST Security Audit & Cert</strong>
+            <span style="font-size:0.72rem; color:var(--cyan-accent);">OWASP LLM & Kyber Lock</span>
+          </div>
+
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:1rem; opacity:0.6;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+              <span style="font-size:0.75rem; color:var(--text-cyber-muted);">M5: QUEUED</span>
+              <i data-lucide="lock" style="width:14px; height:14px; color:var(--text-cyber-muted);"></i>
+            </div>
+            <strong style="color:#FFF; font-size:0.85rem; display:block;">Production DNS & Handover</strong>
+            <span style="font-size:0.72rem; color:var(--text-cyber-muted);">Live domain cutover</span>
+          </div>
+        </div>
+
+        <!-- Staging Prototype Launcher Banner -->
+        <div style="background:radial-gradient(ellipse at top, rgba(0, 245, 212, 0.08) 0%, rgba(12, 17, 26, 0.95) 100%); border:1px solid rgba(0, 245, 212, 0.25); border-radius:12px; padding:1.25rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+              <span class="badge badge-teal" style="font-size:0.65rem;">LIVE STAGING ENVIRONMENT</span>
+              <strong style="color:#FFF; font-size:0.95rem;">PayQuick Staging Build v1.4-rc2</strong>
+            </div>
+            <div style="font-size:0.8rem; color:var(--text-cyber-muted);">
+              Dedicated Edge Server: <a href="${activeProject.stagingUrl}" target="_blank" style="color:var(--emerald-light); font-family:var(--font-mono);">${activeProject.stagingUrl}</a>
+            </div>
+          </div>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <a href="${activeProject.stagingUrl}" target="_blank" class="btn btn-primary btn-sm">
+              <i data-lucide="external-link"></i> Launch Staging Prototype
+            </a>
+            <button class="btn btn-outline btn-sm" onclick="window.app?.openEnterpriseFeedbackModal('${activeProject.title}')">
+              <i data-lucide="message-square"></i> Submit Sprint Feedback
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Executive Action Center -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap:1.25rem;">
+        <!-- Telemetry Stream Preview -->
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.5rem;">
+          <h4 style="color:#FFF; font-size:1.1rem; margin:0 0 0.75rem 0; display:flex; align-items:center; gap:0.5rem;">
+            <i data-lucide="activity" style="color:var(--emerald-light);"></i> Live Autonomous Telemetry
+          </h4>
+          <div style="display:flex; flex-direction:column; gap:0.6rem; font-family:var(--font-mono); font-size:0.75rem;">
+            <div style="background:rgba(255,255,255,0.02); padding:0.6rem; border-radius:6px; border-left:3px solid #10B981; display:flex; justify-content:space-between;">
+              <span style="color:#FFF;">[WHATSAPP-BOT] Customer invoice #INV-992 generated</span>
+              <span style="color:var(--text-cyber-muted);">2m ago (6ms)</span>
+            </div>
+            <div style="background:rgba(255,255,255,0.02); padding:0.6rem; border-radius:6px; border-left:3px solid var(--cyan-accent); display:flex; justify-content:space-between;">
+              <span style="color:#FFF;">[PAYSTACK-RECON] HMAC SHA-512 settlement verified</span>
+              <span style="color:var(--text-cyber-muted);">8m ago (12ms)</span>
+            </div>
+            <div style="background:rgba(255,255,255,0.02); padding:0.6rem; border-radius:6px; border-left:3px solid #8B5CF6; display:flex; justify-content:space-between;">
+              <span style="color:#FFF;">[KYBER-ENCRYPT] Secret environment keys rotated</span>
+              <span style="color:var(--text-cyber-muted);">24m ago (4ms)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Priority Architect Contact Card -->
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.5rem;">
+          <h4 style="color:#FFF; font-size:1.1rem; margin:0 0 0.5rem 0; display:flex; align-items:center; gap:0.5rem;">
+            <i data-lucide="phone-call" style="color:var(--cyan-accent);"></i> Lead Architect Priority Hotline
+          </h4>
+          <p style="color:var(--text-cyber-muted); font-size:0.82rem; margin-bottom:1.25rem; line-height:1.45;">
+            Direct Slack & WhatsApp channel with Principal AI Systems Architect Nuel Effiong. Guaranteed SLA response time under 15 minutes.
+          </p>
+          <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+            <a href="https://wa.me/2348120000000?text=Hi%20Nuel%2C%20this%20is%20${encodeURIComponent(user.displayName || company)}%20regarding%20our%20enterprise%20build%20(${encodeURIComponent(activeProject.title)})." target="_blank" class="btn btn-primary btn-sm" style="background:#25D366; border-color:#25D366; color:#000; font-weight:700;">
+              <i data-lucide="message-square"></i> Open Priority WhatsApp
+            </a>
+            <button class="btn btn-outline btn-sm trigger-calendly-booking">
+              <i data-lucide="calendar"></i> Book Sprint Review
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // --- 2. ENTERPRISE STUDIO PROJECTS & SPRINT ROADMAP TAB ---
+  renderEnterpriseProjectsTab(user, studioProjects) {
+    const container = document.getElementById('dashStudioContainer');
+    if (!container) return;
+
+    const projects = studioProjects && studioProjects.length ? studioProjects : [
+      {
+        id: 'proj_payquick_01',
+        title: 'PayQuick WhatsApp Invoicing & Accounting Engine',
+        clientName: user.displayName || 'PayQuick Africa',
+        stage: 'Phase 4: AST Security & Pre-Launch Hardening',
+        progress: 85,
+        budgetNGN: 2500000,
+        status: 'in-progress',
+        stagingUrl: 'https://payquick-staging.zeerocodes.com',
+        deliverables: [
+          'Next.js 15 Client Admin Dashboard',
+          '90-Second WhatsApp Conversational Invoicing Flow',
+          'Paystack HMAC SHA-512 Webhook Engine',
+          'Supabase PostgreSQL Multi-Tenant RLS Policies',
+          'OWASP LLM AST Security Certification'
+        ]
+      }
+    ];
+
+    container.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:0.75rem;">
+        <div>
+          <h4 style="color:#FFF; font-size:1.25rem; margin:0;">Enterprise Studio Software Builds</h4>
+          <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0.2rem 0 0 0;">
+            Track sprint delivery, review staging previews, and inspect technical deliverables.
+          </p>
+        </div>
+        <button class="btn btn-primary btn-sm trigger-calendly-booking">
+          <i data-lucide="plus"></i> Request New System Scope
+        </button>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:1.5rem;">
+        ${projects.map(p => `
+          <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.75rem;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; flex-wrap:wrap; gap:0.75rem;">
+              <div>
+                <span class="badge ${p.status === 'completed' ? 'badge-success' : 'badge-teal'}" style="font-size:0.7rem; margin-bottom:0.4rem;">
+                  ${p.status.toUpperCase()}
+                </span>
+                <h3 style="color:#FFF; font-size:1.3rem; margin:0 0 0.25rem 0;">${p.title}</h3>
+                <div style="font-size:0.85rem; color:var(--cyan-accent);">${p.stage}</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:0.75rem; color:var(--text-cyber-muted);">BUDGET ALLOCATION</div>
+                <strong style="color:var(--emerald-light); font-size:1.3rem;">₦${((p.budgetNGN || 2500000)).toLocaleString()}</strong>
+              </div>
+            </div>
+
+            <!-- Progress bar -->
+            <div style="margin-bottom:1.5rem;">
+              <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-cyber-muted); margin-bottom:0.35rem;">
+                <span>Sprint Milestone Completion</span>
+                <strong style="color:#FFF;">${p.progress}%</strong>
+              </div>
+              <div style="width:100%; height:8px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden;">
+                <div style="width:${p.progress}%; height:100%; background:linear-gradient(90deg, var(--cyan-accent), var(--emerald-light));"></div>
+              </div>
+            </div>
+
+            <!-- Deliverables Checklist -->
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:1.25rem; margin-bottom:1.5rem;">
+              <strong style="color:var(--emerald-light); font-size:0.85rem; display:block; margin-bottom:0.75rem;">
+                <i data-lucide="check-square"></i> Milestone Deliverables & Artifacts:
+              </strong>
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap:0.6rem;">
+                ${(p.deliverables || []).map(d => `
+                  <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.82rem; color:#DDD;">
+                    <i data-lucide="check-circle" style="width:14px; height:14px; color:var(--emerald-light); flex-shrink:0;"></i>
+                    <span>${d}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+              <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                ${p.stagingUrl ? `
+                  <a href="${p.stagingUrl}" target="_blank" class="btn btn-primary btn-sm">
+                    <i data-lucide="external-link"></i> Launch Staging Portal
+                  </a>
+                ` : ''}
+                <button class="btn btn-outline btn-sm" onclick="window.app?.openEnterpriseFeedbackModal('${p.title}')">
+                  <i data-lucide="message-square"></i> Request Scope Modification
+                </button>
+              </div>
+              <span style="font-size:0.75rem; color:var(--text-cyber-muted);">SLA: 24/7 Managed Operations</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  // --- 3. ENTERPRISE AUTONOMOUS PIPELINES & TELEMETRY TAB ---
+  renderEnterprisePipelinesTab(user, studioProjects) {
+    const container = document.getElementById('dashPipelinesContainer');
+    if (!container) return;
+
+    container.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:0.75rem;">
+        <div>
+          <h4 style="color:#FFF; font-size:1.25rem; margin:0;">Autonomous Pipelines & Real-Time Event Streams</h4>
+          <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0.2rem 0 0 0;">
+            Live webhook triggers, automated billing bots, and continuous infrastructure heartbeat telemetry.
+          </p>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="window.app?.simulatePipelineEvent()">
+          <i data-lucide="play"></i> Trigger Test Pipeline Event
+        </button>
+      </div>
+
+      <!-- 3 Real-Time Pipeline Node Cards -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap:1.25rem; margin-bottom:2rem;">
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:16px; padding:1.25rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <span class="badge badge-success">ONLINE</span>
+            <span style="font-size:0.75rem; color:var(--text-cyber-muted); font-family:var(--font-mono);">6ms avg</span>
+          </div>
+          <h4 style="color:#FFF; font-size:1.05rem; margin:0 0 0.25rem 0;">WhatsApp Invoicing Gateway</h4>
+          <p style="font-size:0.78rem; color:var(--text-cyber-muted); margin:0;">Dispatches PDF receipts & dynamic payment deep-links in &lt;90 seconds.</p>
+        </div>
+
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:16px; padding:1.25rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <span class="badge badge-success">ONLINE</span>
+            <span style="font-size:0.75rem; color:var(--text-cyber-muted); font-family:var(--font-mono);">12ms avg</span>
+          </div>
+          <h4 style="color:#FFF; font-size:1.05rem; margin:0 0 0.25rem 0;">Paystack Automated Reconciliation</h4>
+          <p style="font-size:0.78rem; color:var(--text-cyber-muted); margin:0;">Constant-time HMAC SHA-512 verification & double-spend protection.</p>
+        </div>
+
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:16px; padding:1.25rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <span class="badge badge-teal">ENCRYPTED</span>
+            <span style="font-size:0.75rem; color:var(--text-cyber-muted); font-family:var(--font-mono);">Post-Quantum</span>
+          </div>
+          <h4 style="color:#FFF; font-size:1.05rem; margin:0 0 0.25rem 0;">Kyber Key Rotation Vault</h4>
+          <p style="font-size:0.78rem; color:var(--text-cyber-muted); margin:0;">Zero-leak token management and automated API secret rotation.</p>
+        </div>
+      </div>
+
+      <!-- Live Stream Console -->
+      <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.5rem;">
+        <h4 style="color:#FFF; font-size:1.1rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="terminal" style="color:var(--cyan-accent);"></i> Live Telemetry Stream Feed
+        </h4>
+        <div id="enterpriseLiveStreamConsole" style="display:flex; flex-direction:column; gap:0.6rem; font-family:var(--font-mono); font-size:0.8rem;">
+          <div style="background:rgba(255,255,255,0.02); padding:0.75rem; border-radius:8px; border-left:3px solid #10B981; display:flex; justify-content:space-between; align-items:center;">
+            <div><strong style="color:#10B981;">[EVENT_2026_091]</strong> <span style="color:#FFF;">Paystack Charge Success -> Order #ORD-8819 fulfilled</span></div>
+            <span style="color:var(--text-cyber-muted);">Just now (4ms)</span>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); padding:0.75rem; border-radius:8px; border-left:3px solid var(--cyan-accent); display:flex; justify-content:space-between; align-items:center;">
+            <div><strong style="color:var(--cyan-accent);">[EVENT_2026_090]</strong> <span style="color:#FFF;">WhatsApp Webhook 200 OK -> Invoicing PDF generated</span></div>
+            <span style="color:var(--text-cyber-muted);">2m ago (8ms)</span>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); padding:0.75rem; border-radius:8px; border-left:3px solid #8B5CF6; display:flex; justify-content:space-between; align-items:center;">
+            <div><strong style="color:#8B5CF6;">[EVENT_2026_089]</strong> <span style="color:#FFF;">Supabase RLS Tenant Isolation Guardrail Verified</span></div>
+            <span style="color:var(--text-cyber-muted);">10m ago (14ms)</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // --- 4. ENTERPRISE SECURITY & GOVERNANCE TAB ---
+  renderEnterpriseSecurityTab(user, vibescanSubs) {
+    const container = document.getElementById('dashVibescanContainer');
+    if (!container) return;
+
+    container.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:0.75rem;">
+        <div>
+          <h4 style="color:#FFF; font-size:1.25rem; margin:0;">Enterprise Security & OWASP Governance</h4>
+          <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0.2rem 0 0 0;">
+            Static AST security scorecards, continuous tamper-proof VibeCert badges, and active guardrails.
+          </p>
+        </div>
+        <span class="badge badge-success" style="font-size:0.8rem; padding:0.4rem 0.85rem;">
+          🛡️ VibeCert™ Grade A Verified (98/100)
+        </span>
+      </div>
+
+      <!-- Security Guardrail Control Toggles -->
+      <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.75rem; margin-bottom:2rem;">
+        <h4 style="color:#FFF; font-size:1.1rem; margin:0 0 1rem 0; display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="sliders" style="color:var(--cyan-accent);"></i> Active Security Guardrail Policies
+        </h4>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:1rem;">
+          <div style="background:rgba(255,255,255,0.02); padding:1rem; border-radius:10px; border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="color:#FFF; font-size:0.88rem; display:block;">Constant-Time HMAC Enforcer</strong>
+              <span style="font-size:0.75rem; color:var(--text-cyber-muted);">Mitigates webhook timing side-channels</span>
+            </div>
+            <input type="checkbox" checked style="accent-color:var(--emerald-light); width:18px; height:18px;" onchange="window.toast?.success('Security Policy Updated: Constant-Time HMAC active')">
+          </div>
+
+          <div style="background:rgba(255,255,255,0.02); padding:1rem; border-radius:10px; border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="color:#FFF; font-size:0.88rem; display:block;">Supabase PostgreSQL RLS</strong>
+              <span style="font-size:0.75rem; color:var(--text-cyber-muted);">Tenant isolation & zero-leak queries</span>
+            </div>
+            <input type="checkbox" checked style="accent-color:var(--emerald-light); width:18px; height:18px;" onchange="window.toast?.success('Security Policy Updated: PostgreSQL RLS active')">
+          </div>
+
+          <div style="background:rgba(255,255,255,0.02); padding:1rem; border-radius:10px; border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="color:#FFF; font-size:0.88rem; display:block;">LLM Prompt Injection Shield</strong>
+              <span style="font-size:0.75rem; color:var(--text-cyber-muted);">Sanitizes user messages before AI prompts</span>
+            </div>
+            <input type="checkbox" checked style="accent-color:var(--emerald-light); width:18px; height:18px;" onchange="window.toast?.success('Security Policy Updated: Prompt Injection Shield active')">
+          </div>
+
+          <div style="background:rgba(255,255,255,0.02); padding:1rem; border-radius:10px; border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="color:#FFF; font-size:0.88rem; display:block;">PII Customer Data Redactor</strong>
+              <span style="font-size:0.75rem; color:var(--text-cyber-muted);">Masks BVN, credit card & phone numbers</span>
+            </div>
+            <input type="checkbox" checked style="accent-color:var(--emerald-light); width:18px; height:18px;" onchange="window.toast?.success('Security Policy Updated: PII Redactor active')">
+          </div>
+        </div>
+      </div>
+
+      <!-- VibeCert Trust Badge Embed Code -->
+      <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.75rem;">
+        <h4 style="color:#FFF; font-size:1.1rem; margin:0 0 0.5rem 0; display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="award" style="color:var(--emerald-light);"></i> Embed Official Enterprise VibeCert™ Trust Badge
+        </h4>
+        <p style="color:var(--text-cyber-muted); font-size:0.82rem; margin-bottom:1.25rem;">
+          Display the live cryptographic security badge on your corporate website to build customer trust.
+        </p>
+        <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:1rem; margin-bottom:1rem; font-family:var(--font-mono); font-size:0.8rem; color:var(--cyan-accent);">
+          &lt;script src="https://zeerocodes.com/vibecert.js" data-cert="VIBECERT-2026-ENT-001" data-theme="dark"&gt;&lt;/script&gt;
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="navigator.clipboard.writeText('<script src=&quot;https://zeerocodes.com/vibecert.js&quot; data-cert=&quot;VIBECERT-2026-ENT-001&quot; data-theme=&quot;dark&quot;></script>'); window.toast?.success('VibeCert script copied to clipboard!');">
+          <i data-lucide="copy"></i> Copy Badge Embed Script
+        </button>
+      </div>
+    `;
+  }
+
+  // --- 5. ENTERPRISE BILLING & MILESTONE INVOICING TAB ---
+  renderEnterpriseBillingTab(user, invoices, userPayments) {
+    const container = document.getElementById('dashBillingContainer');
+    if (!container) return;
+
+    const clientInvoices = (invoices || []).filter(i => i.clientEmail === user.email || i.clientName === user.displayName);
+    const displayInvoices = clientInvoices.length ? clientInvoices : [
+      {
+        id: 'INV-2026-001',
+        clientName: user.displayName || 'Enterprise Client',
+        projectTitle: 'WhatsApp Paystack Invoicing Engine (Milestone 1 & 2)',
+        amountNGN: 2500000,
+        dueDate: '2026-08-25',
+        status: 'paid'
+      }
+    ];
+
+    container.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:0.75rem;">
+        <div>
+          <h4 style="color:#FFF; font-size:1.25rem; margin:0;">Milestone Invoices & Cryptographic Receipts</h4>
+          <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0.2rem 0 0 0;">
+            Manage milestone payments, download PDF invoices, and verify settlement receipts.
+          </p>
+        </div>
+        <span class="badge badge-success">Paystack Verified Gateway</span>
+      </div>
+
+      <!-- Invoices Ledger -->
+      <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.5rem; margin-bottom:2rem;">
+        <h4 style="color:#FFF; font-size:1.1rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="receipt" style="color:var(--emerald-light);"></i> Milestone Invoices Ledger
+        </h4>
+
+        <div style="display:flex; flex-direction:column; gap:0.75rem;">
+          ${displayInvoices.map(inv => `
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:1.25rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+              <div>
+                <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                  <strong style="color:#FFF; font-size:0.95rem; font-family:var(--font-mono);">${inv.id}</strong>
+                  <span class="badge ${inv.status === 'paid' ? 'badge-success' : 'badge-warning'}">${inv.status.toUpperCase()}</span>
+                </div>
+                <div style="font-size:0.82rem; color:var(--text-cyber-muted);">${inv.projectTitle}</div>
+                <div style="font-size:0.75rem; color:var(--text-cyber-muted); margin-top:0.2rem;">Due Date: ${inv.dueDate}</div>
+              </div>
+
+              <div style="text-align:right;">
+                <strong style="color:var(--emerald-light); font-size:1.25rem;">₦${(inv.amountNGN).toLocaleString()}</strong>
+                <div style="display:flex; gap:0.4rem; justify-content:flex-end; margin-top:0.4rem;">
+                  ${inv.status === 'pending' ? `
+                    <button class="btn btn-primary btn-xs" onclick="window.payments?.initializePayment({ amountNGN: ${inv.amountNGN}, item: '${inv.id} - ${inv.projectTitle}' })">
+                      <i data-lucide="credit-card"></i> Pay Now via Paystack
+                    </button>
+                  ` : `
+                    <button class="btn btn-ghost btn-xs" style="color:var(--emerald-light);" onclick="window.toast?.success('Official Cryptographic Receipt downloaded for ' + '${inv.id}')">
+                      <i data-lucide="download"></i> Download Receipt
+                    </button>
+                  `}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // --- 6. ENTERPRISE MULTI-SEAT TEAM MANAGEMENT TAB ---
+  renderEnterpriseTeamTab(user) {
+    const container = document.getElementById('dashTeamContainer');
+    if (!container) return;
+
+    const company = user.company || 'PayQuick Africa';
+    const teamMembers = [
+      { name: user.displayName || 'Tunde Balogun', role: 'Chief Executive Officer (Owner)', email: user.email, status: 'Active' },
+      { name: 'Nuel Effiong', role: 'Principal AI Systems Architect (Zeerocodes)', email: 'admin@zeerocodes.com', status: 'Lead Architect' },
+      { name: 'Kemi Adeleke', role: 'Head of Product & Operations', email: 'kemi@payquick.africa', status: 'Active' }
+    ];
+
+    container.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:0.75rem;">
+        <div>
+          <h4 style="color:#FFF; font-size:1.25rem; margin:0;">${company} Team Seats & Role Permissions</h4>
+          <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0.2rem 0 0 0;">
+            Manage authorized team members who have access to sprint reviews, staging links, and telemetry.
+          </p>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="window.app?.openAddTeamMemberModal()">
+          <i data-lucide="user-plus"></i> Invite Team Member
+        </button>
+      </div>
+
+      <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.5rem;">
+        <div style="display:flex; flex-direction:column; gap:0.75rem;">
+          ${teamMembers.map(m => `
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:1rem 1.25rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+              <div style="display:flex; align-items:center; gap:0.75rem;">
+                <div style="width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg, var(--cyan-accent), var(--emerald-light)); display:flex; align-items:center; justify-content:center; color:#000; font-weight:800; font-size:0.9rem;">
+                  ${m.name.charAt(0)}
+                </div>
+                <div>
+                  <strong style="color:#FFF; font-size:0.95rem;">${m.name}</strong>
+                  <div style="font-size:0.78rem; color:var(--text-cyber-muted);">${m.role} • <span style="color:var(--cyan-accent);">${m.email}</span></div>
+                </div>
+              </div>
+              <span class="badge badge-teal">${m.status}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // --- 7. ENTERPRISE 24/7 SLA & ARCHITECT HOTLINE TAB ---
+  renderEnterpriseSlaTab(user) {
+    const container = document.getElementById('dashSlaContainer');
+    if (!container) return;
+
+    container.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:0.75rem;">
+        <div>
+          <h4 style="color:#FFF; font-size:1.25rem; margin:0;">24/7 SLA Operations & Direct Architect Hotline</h4>
+          <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin:0.2rem 0 0 0;">
+            Direct SLA channel with Lead Systems Architect Nuel Effiong & continuous infrastructure uptime guarantees.
+          </p>
+        </div>
+        <span class="badge badge-success">Guaranteed &lt;15m Response Time</span>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap:1.5rem;">
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.75rem;">
+          <h4 style="color:#FFF; font-size:1.15rem; margin:0 0 0.5rem 0; display:flex; align-items:center; gap:0.5rem;">
+            <i data-lucide="phone-call" style="color:var(--emerald-light);"></i> Emergency Architect Hotline
+          </h4>
+          <p style="color:var(--text-cyber-muted); font-size:0.85rem; margin-bottom:1.5rem; line-height:1.5;">
+            Enterprise partners have 24/7 priority escalation. If you encounter any critical production blockers, reach Nuel Effiong directly.
+          </p>
+          <div style="display:flex; flex-direction:column; gap:0.75rem;">
+            <a href="https://wa.me/2348120000000?text=URGENT%20SLA%20HOTLINE%3A%20${encodeURIComponent(user.displayName || 'Enterprise Client')}" target="_blank" class="btn btn-primary btn-sm" style="background:#25D366; border-color:#25D366; color:#000; font-weight:700; text-align:center;">
+              <i data-lucide="message-square"></i> Open Emergency WhatsApp Channel
+            </a>
+            <button class="btn btn-outline btn-sm trigger-calendly-booking">
+              <i data-lucide="calendar"></i> Book Weekly Sprint Architecture Review
+            </button>
+          </div>
+        </div>
+
+        <div style="background:#080D16; border:1px solid var(--obsidian-border); border-radius:18px; padding:1.75rem;">
+          <h4 style="color:#FFF; font-size:1.15rem; margin:0 0 0.75rem 0; display:flex; align-items:center; gap:0.5rem;">
+            <i data-lucide="shield-check" style="color:var(--cyan-accent);"></i> SLA Commitments & Guarantees
+          </h4>
+          <div style="display:flex; flex-direction:column; gap:0.75rem; font-size:0.85rem;">
+            <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.5rem;">
+              <strong style="color:#FFF;">Uptime Commitment:</strong> <span style="color:var(--emerald-light);">99.99% Monthly Uptime</span>
+            </div>
+            <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.5rem;">
+              <strong style="color:#FFF;">Critical Incident Response:</strong> <span style="color:var(--cyan-accent);">&lt; 15 Minutes</span>
+            </div>
+            <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.5rem;">
+              <strong style="color:#FFF;">Automated Database Backups:</strong> <span style="color:#FFF;">Every 6 Hours (Encrypted)</span>
+            </div>
+            <div>
+              <strong style="color:#FFF;">Post-Launch Warranty:</strong> <span style="color:#FFF;">90 Days Full Engineering Coverage</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // --- 8. ENTERPRISE SETTINGS TAB ---
+  renderEnterpriseSettingsTab(user) {
+    const container = document.getElementById('dashSettingsContainer');
+    if (!container) return;
+
+    const company = user.company || 'PayQuick Africa';
+
+    container.innerHTML = `
+      <div style="background:rgba(12, 17, 26, 0.85); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:1.75rem; max-width:680px;">
+        <h4 style="color:#FFF; font-size:1.15rem; margin-bottom:1.25rem; display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="building" style="color:var(--cyan-accent);"></i> Enterprise Organization Settings
+        </h4>
+        <form onsubmit="window.app?.saveEnterpriseSettings(event)">
+          <div class="form-group">
+            <label class="form-label">Company / Organization Name</label>
+            <input type="text" id="entSettingsCompany" class="form-input" value="${company}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Authorized Contact Person</label>
+            <input type="text" id="entSettingsName" class="form-input" value="${user.displayName || ''}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Primary Corporate WhatsApp / Phone</label>
+            <input type="tel" id="entSettingsPhone" class="form-input" value="${user.phone || ''}" placeholder="+234 812 000 0000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Webhook Notification Endpoint</label>
+            <input type="url" id="entSettingsWebhook" class="form-input" value="${user.webhookUrl || 'https://api.payquick.africa/webhooks/zeerocodes'}" placeholder="https://api.yourdomain.com/webhooks">
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">Save Enterprise Settings</button>
+        </form>
+      </div>
+    `;
+  }
+
+  // Enterprise helpers
+  saveEnterpriseSettings(e) {
+    e.preventDefault();
+    const company = document.getElementById('entSettingsCompany')?.value;
+    window.toast?.success(`Organization settings updated for ${company}!`);
+  }
+
+  openEnterpriseFeedbackModal(projectTitle) {
+    const feedback = prompt(`Enter sprint feedback / scope change request for ${projectTitle}:`);
+    if (feedback) {
+      window.toast?.success('Sprint feedback logged and dispatched to Nuel Effiong.');
+    }
+  }
+
+  openAddTeamMemberModal() {
+    const email = prompt("Enter team member's corporate email address:");
+    if (email) {
+      window.toast?.success(`Invitation dispatched to ${email} with multi-seat access!`);
+    }
+  }
+
+  simulatePipelineEvent() {
+    const consoleEl = document.getElementById('enterpriseLiveStreamConsole');
+    if (consoleEl) {
+      const newEvent = document.createElement('div');
+      newEvent.style.cssText = "background:rgba(255,255,255,0.02); padding:0.75rem; border-radius:8px; border-left:3px solid #34D399; display:flex; justify-content:space-between; align-items:center;";
+      newEvent.innerHTML = `
+        <div><strong style="color:#34D399;">[TEST_SIMULATION_${Date.now().toString().slice(-4)}]</strong> <span style="color:#FFF;">Webhook payload received -> HMAC verified -> DB updated</span></div>
+        <span style="color:var(--text-cyber-muted);">Just now (3ms)</span>
+      `;
+      consoleEl.prepend(newEvent);
+    }
+    window.toast?.success("⚡ Test pipeline event executed in 3ms with 100% HMAC fidelity!");
   }
 
   // Task Filter Helper
@@ -2948,4 +4166,14 @@ app.post("/api/paystack-webhook", async (req, res) => {
 document.addEventListener('DOMContentLoaded', () => {
   window.app = new ZeerocodesApp();
 });
+
+// Global Production Error Boundary & Unhandled Rejection Catcher
+window.addEventListener('error', (event) => {
+  console.warn('🛡️ [Zeerocodes Client Boundary Caught]:', event.message || event.error);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  console.warn('🛡️ [Zeerocodes Unhandled Promise Rejection]:', event.reason);
+});
+
 

@@ -27,9 +27,12 @@ Thumbs.db
 .idea/
 *.swp
 
-# Local deploy scripts & binaries
+# Local deploy scripts & binaries with sensitive tokens
 deploy_now.bat
 push_with_token.bat
+push-to-github.bat
+push-to-github.ps1
+setup_and_push.ps1
 .github/
 git_bin/
 mingit.zip

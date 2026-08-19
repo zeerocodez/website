@@ -1,60 +1,147 @@
 # Zeerocodes Platform (Teach • Build • Protect)
 
-Zeerocodes is a Lagos-based AI automation and security company run by **Nuel Effiong (Emmanuel Effiong)**. The platform unites three divisions under one customer journey:
+[![CI Test & Security Suite](https://github.com/zeerocodez/website/actions/workflows/ci.yml/badge.svg)](https://github.com/zeerocodez/website/actions/workflows/ci.yml)
+[![VibeScan OWASP LLM Safe](https://img.shields.io/badge/VibeScan-OWASP%20LLM%20Safe%20(Grade%20A)-016B61?style=flat&logo=shield)](https://zeerocodes.com/#verify?cert=VIBECERT-2026-0881)
+[![License: MIT](https://img.shields.io/badge/License-MIT-85C79A.svg)](https://opensource.org/licenses/MIT)
 
-1. **Teach (AI Income Academy)**: Online masterclasses in n8n automation, WhatsApp bot engineering, and secure AI coding for emerging African markets.
-2. **Build (Automation Studio)**: Custom workflow automation consulting, WhatsApp CRM bots, and Paystack/Flutterwave transaction reconciliation.
-3. **Protect (VibeScan)**: Independent security audits and **VibeCert™** certification for apps built with AI assistants (Cursor, Lovable, v0, Claude), verified against the **OWASP Top 10 for LLM Applications**. Official GitHub repository: [github.com/zeerocodez/vibescan](https://github.com/zeerocodez/vibescan).
+**Zeerocodes** is a Lagos-based AI systems engineering, automation, and cybersecurity company led by **Nuel Effiong (Emmanuel Effiong)**. The platform integrates three core operational divisions under a unified user and client experience:
+
+1. **Teach (The VibeCode Labs / Academy)**: High-impact online cohort training in AI engineering, n8n automations, WhatsApp bots, and full-stack software development with 4 levels, 88 interactive code labs, Saturday live clinics, and cryptographically verifiable **VibeCert™** certification.
+2. **Build (Automation Studio)**: Custom web applications, enterprise client portals, 90-second conversational WhatsApp invoicing bots, and automated Paystack/Flutterwave transaction reconciliation for African high-growth businesses.
+3. **Protect (VibeScan)**: Independent AST static security scanner and **VibeCert™** audit trust badge verification for applications built with AI assistants (Cursor, Lovable, v0, Claude), audited against the **OWASP Top 10 for LLM Applications**. Official GitHub repository: [github.com/zeerocodez/vibescan](https://github.com/zeerocodez/vibescan).
 
 ---
 
-## ⚡ 1-Click Deployment to Vercel
+## 🏛️ Platform Architecture & User Flows
 
-The platform is configured with zero-config **Vercel Serverless & Static Edge deployment**:
+```mermaid
+graph TD
+  A[User Registration / Login] --> B{Account Persona & Verification}
+  B -->|Student / Unverified| C[Student Payment & Admission Gate]
+  B -->|Student / Verified| D[The VibeCode Labs Academy LMS]
+  B -->|Enterprise Client / Unverified| E[Enterprise Milestone Clearance Gate]
+  B -->|Enterprise Client / Verified| F[Enterprise Client Workspace & Telemetry]
+  B -->|Super Admin| G[Admin Financial & Admissions Console]
 
-### Option 1: Via Vercel CLI
+  C -->|Admin 1-Click Verification| D
+  E -->|Milestone Ledger Settlement| F
+  G -->|Dispatches Transactional Emails| H[Resend Branded Email Engine]
+```
+
+### 1. Student Builder Flow
+- New students enter a `pending_verification` state awaiting ledger confirmation.
+- Admin verifies admission in 1-click from the **Student Admissions Hub**.
+- Automated email dispatches `welcome_student` (Cohort Admission Pass) + `payment_receipt`.
+- Unlocks 4 Levels, 88 Code Labs, Saturday Live Clinics, and VIP Discord.
+
+### 2. Enterprise Client Flow
+- Enterprise partners enter a dedicated scoping & invoice verification state.
+- Once verified, unlocks the **Dedicated Enterprise Users Dashboard**:
+  - **Executive Overview**: Active builds, 99.99% SLA Uptime, 420 Hrs/Mo Reclaimed, AST Grade A (98/100).
+  - **Studio Projects & Sprints**: 5-stage milestone roadmap, staging prototypes, and deliverables.
+  - **Autonomous Pipelines**: Live telemetry event stream (WhatsApp bots, Paystack auto-reconciliation, Kyber encryption).
+  - **Security & OWASP Governance**: Active guardrails (HMAC, RLS, Prompt Injection Shield, PII Redactor) & VibeCert™ badge embedder.
+  - **Milestone Invoicing**: 1-click Paystack settlement & cryptographic PDF receipts.
+  - **Multi-Seat Organization Team**: Team seat permissions.
+  - **24/7 SLA Hotline**: Direct emergency channel with Lead Systems Architect Nuel Effiong.
+
+### 3. Automated Admin Verification & Transactional Email Pipeline
+- Integrated ledger in `js/admin.js` for 1-click payment verification.
+- Automated email dispatch via `js/emails.js` and `js/notifications.js` for all transaction events.
+
+---
+
+## 🔒 Security Engineering & Guardrails
+
+- **Zero Hardcoded Secrets**: All credentials reside in `.env` (enforced via `.gitignore`).
+- **Constant-Time Webhook Verification**: All Paystack and Flutterwave webhooks are validated using `crypto.timingSafeEqual` over HMAC SHA-512 signatures to prevent timing side-channel attacks.
+- **Database Row Level Security (RLS)**: PostgreSQL schema enforces strict tenant isolation via `auth.uid() = user_id`.
+- **Sliding-Window Rate Limiter**: Server-side in-memory rate limiting bounds abuse to 60 req/min per IP.
+- **AST Static Scanner & OWASP LLM Top 10**: Real-time detection of exposed secrets, missing RLS, and prompt injection vectors.
+
+---
+
+## 🚀 Quick Start & Local Development
+
+### 1. Prerequisites
+- Node.js (v18.x or v20.x recommended)
+- Git
+
+### 2. Installation
 ```bash
-# 1. Install Vercel CLI (if not already installed)
+# Clone the repository
+git clone https://github.com/zeerocodez/website.git
+cd website
+
+# Install dependencies
+npm install
+
+# Copy environment variables template
+cp .env.example .env
+
+# Run automated security and test suite
+npm test
+
+# Start the local development server
+npm start
+# Server will run on http://localhost:8080 (Health probe: http://localhost:8080/healthz)
+```
+
+---
+
+## ⚡ Deployment Options
+
+### Option 1: Vercel (Recommended for Edge)
+```bash
+# Install Vercel CLI
 npm install -g vercel
 
-# 2. Deploy to preview
+# Deploy preview
 vercel
 
-# 3. Deploy to production
+# Deploy to production
 vercel --prod
 ```
 
-### Option 2: Via GitHub Integration
-1. Push this repository to GitHub (`main` branch).
-2. Go to [vercel.com/new](https://vercel.com/new) → Import your repository.
-3. Keep default settings (Framework Preset: **Other**, Root Directory: `./`).
-4. (Optional) Set your production Environment Variables in the Vercel Dashboard:
-   - `PAYSTACK_SECRET_KEY` = your Paystack live/test secret key
-   - `FLUTTERWAVE_SECRET_KEY` = your Flutterwave secret key
-   - `FLUTTERWAVE_WEBHOOK_SECRET` = your Flutterwave webhook secret hash
-   - `SESSION_SECRET` = secure random session signing secret
-5. Click **Deploy**. Vercel will build and assign your live production URL (e.g., `https://zeerocodes.vercel.app`).
+### Option 2: Docker / Containerized Node
+```bash
+# Start server with production environment
+NODE_ENV=production node server.js
+```
+
+### Option 3: GitHub Pages
+Configured via `.github/workflows/deploy.yml` on push to `main`.
 
 ---
 
-## 🎨 Brand Palette System
+## 🧪 Automated Test Suite
 
-The platform strictly adheres to the requested brand palette with zero substitutions:
-- **`#016B61` (Teal)** — Primary brand color, headers, primary action buttons, active navigation accents.
-- **`#85C79A` (Green)** — Secondary accent, success badges, progress indicators, secondary CTAs.
-- **`#E4EEE7` (Mint)** — Backgrounds, section tints, card containers to avoid flat white.
-- **`#D9D9D9` (Gray)** — Neutral borders, dividers, disabled states, structural lines.
-- **`#0C221F` & `#1E3531`** — High-contrast dark charcoal for readable body and heading typography.
+Run the full security, HMAC validation, rate limiting, and verification gate tests:
+```bash
+node test/run-tests.js
+```
+```text
+======================================================
+🔒 RUNNING ZEEROCODES SECURITY & ARCHITECTURE TEST SUITE
+======================================================
+
+  ✓ PASS: Constant-Time HMAC SHA-512 matches authentic signature
+  ✓ PASS: HMAC SHA-512 rejects tampered webhook payload
+  ✓ PASS: Input sanitizer strips potential script tags & malicious XSS vectors
+  ✓ PASS: Idempotency engine prevents duplicate payment fulfillment
+  ✓ PASS: Rate limiter correctly bounds window and resets quota
+  ✓ PASS: Verification guard blocks unverified students & enterprise clients from dashboards
+  ✓ PASS: Transactional email templates generate valid HTML and inject metadata
+
+======================================================
+SUMMARY: 7/7 Tests Passed (100% Success)
+======================================================
+```
 
 ---
 
-## 🛡️ VibeScan Repository Integration (`zeerocodez/vibescan`)
+## 📄 License & Security Policy
 
-- **GitHub Action Workflow**: `uses: zeerocodez/vibescan@v1` with configurable `fail-on` grade thresholds (A-F).
-- **Interactive Async Scanner**: Evaluates codebases across all 10 OWASP LLM categories with BullMQ worker simulation.
-- **Public Verification Portal**: Universal verification at `https://zeerocodes.com/verify/:certId` with copy-pasteable HTML and Markdown embed badges.
-- **Security Hardening**:
-  - Bcrypt password hashing (12 salt rounds)
-  - Zod `.strict()` mass-assignment blocker on `/api/users/me`
-  - Out-of-band CLI admin promotion (`scripts/promote-admin.js`)
-  - Server-side cryptographic HMAC SHA-512 webhook signature verification
+- **License**: [MIT License](LICENSE)
+- **Security Policy**: [SECURITY.md](SECURITY.md) — Responsible disclosure response within <12 hours.
+- **Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md)

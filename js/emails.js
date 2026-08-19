@@ -96,6 +96,34 @@ class TransactionalEmailEngine {
         category: 'Studio (Build)',
         defaultSubject: '⚡ We received your inquiry — Zeerocodes Engineering Team',
         render: (data) => this.templateInquiryReceived(data)
+      },
+      student_payment_pending: {
+        id: 'student_payment_pending',
+        name: 'Student Payment Awaiting Ledger Verification',
+        category: 'Academy (Teach)',
+        defaultSubject: '⏳ Tuition Payment Received — Queued for Verification ({{courseTitle}})',
+        render: (data) => this.templateStudentPaymentPending(data)
+      },
+      enterprise_invoice_generated: {
+        id: 'enterprise_invoice_generated',
+        name: 'Enterprise Milestone Invoice Issued',
+        category: 'Studio (Build)',
+        defaultSubject: '📑 Official Studio Milestone Invoice {{invoiceId}} — {{projectTitle}}',
+        render: (data) => this.templateEnterpriseInvoiceGenerated(data)
+      },
+      enterprise_payment_verified: {
+        id: 'enterprise_payment_verified',
+        name: 'Enterprise Milestone Confirmed & Workspace Unlocked',
+        category: 'Studio (Build)',
+        defaultSubject: '🛡️ Studio Workspace & Sprint Activated: {{projectTitle}}',
+        render: (data) => this.templateEnterprisePaymentVerified(data)
+      },
+      admin_payment_verification_alert: {
+        id: 'admin_payment_verification_alert',
+        name: 'Admin Alert: Payment Awaiting Verification',
+        category: 'Admin Notifications',
+        defaultSubject: '🚨 [Action Required] Payment Verification Pending: {{payerName}} (₦{{amountNGN}})',
+        render: (data) => this.templateAdminPaymentAlert(data)
       }
     };
   }
@@ -613,6 +641,158 @@ class TransactionalEmailEngine {
     `;
 
     return this.wrapEmail(`Inquiry Received: ${topic}`, `We have received your Zeerocodes inquiry (${ref}). We will respond within 24 hours.`, body);
+  }
+
+  // =========================================================================
+  // 13. STUDENT PAYMENT PENDING VERIFICATION
+  // =========================================================================
+  templateStudentPaymentPending(data) {
+    const student = data.studentName || 'Builder';
+    const course = data.courseTitle || 'The Zeerocodes VibeCode Labs';
+    const amountNGN = (parseInt(data.amountNGN) || 95000).toLocaleString();
+    const ref = data.paymentRef || data.reference || ('ZC_TXN_' + Date.now().toString(36).toUpperCase());
+
+    const body = `
+      <div style="margin-bottom:16px;">
+        <span class="badge" style="background:rgba(245,158,11,0.15); color:#FBBF24; border:1px solid rgba(245,158,11,0.3);">⏳ PAYMENT QUEUED FOR VERIFICATION</span>
+      </div>
+      <h2>Tuition Payment Received, ${student}!</h2>
+      <p>We have received your payment submission for <strong>${course}</strong>. Our finance desk and lead instructor are verifying the transaction record against our ledger.</p>
+
+      <div class="card-box">
+        <table class="table-data">
+          <tbody>
+            <tr><td style="color:#6B7280; width:35%;">Transaction Ref:</td><td><strong style="font-family:monospace; color:#85C79A;">${ref}</strong></td></tr>
+            <tr><td style="color:#6B7280;">Course Track:</td><td><strong>${course}</strong></td></tr>
+            <tr><td style="color:#6B7280;">Amount Paid:</td><td><strong style="color:#85C79A; font-size:15px;">₦${amountNGN}</strong></td></tr>
+            <tr><td style="color:#6B7280;">Status:</td><td><span class="badge" style="background:rgba(245,158,11,0.15); color:#FBBF24;">Awaiting Admin Approval</span></td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:13px; color:#9CA3AF; margin:8px 0 0 0;">
+          As soon as verified, your full LMS dashboard, 88 lessons, and weekend live build clinics will unlock automatically, and you'll receive your official Cohort Pass.
+        </p>
+      </div>
+
+      <div style="text-align:center; margin:28px 0;">
+        <a href="https://zeerocodes.com/#dashboard" class="btn-primary">Check Verification Status in Portal &rarr;</a>
+      </div>
+    `;
+
+    return this.wrapEmail(`Payment Received: ${course}`, `Tuition payment queued for verification for ${course}.`, body);
+  }
+
+  // =========================================================================
+  // 14. ENTERPRISE MILESTONE INVOICE GENERATED
+  // =========================================================================
+  templateEnterpriseInvoiceGenerated(data) {
+    const client = data.clientName || 'Enterprise Partner';
+    const project = data.projectTitle || 'Studio Custom System';
+    const invId = data.invoiceId || 'INV-2026-001';
+    const amountNGN = (parseInt(data.amountNGN) || 2500000).toLocaleString();
+    const dueDate = data.dueDate || '2026-08-25';
+
+    const body = `
+      <div style="margin-bottom:16px;">
+        <span class="badge badge-teal">📑 MILESTONE INVOICE ISSUED</span>
+      </div>
+      <h2>New Milestone Invoice Issued: ${invId}</h2>
+      <p>Dear ${client}, Zeerocodes Studio has generated invoice <strong>${invId}</strong> for project milestone deliverables on <strong>${project}</strong>.</p>
+
+      <div class="card-box">
+        <div style="display:flex; justify-content:space-between; border-bottom:1px solid #1A2634; padding-bottom:12px; margin-bottom:12px;">
+          <div>
+            <div style="font-size:11px; color:#6B7280;">INVOICE ID</div>
+            <strong style="color:#FFF; font-family:monospace;">${invId}</strong>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px; color:#6B7280;">AMOUNT DUE</div>
+            <strong style="color:#85C79A; font-size:18px;">₦${amountNGN}</strong>
+          </div>
+        </div>
+        <div style="font-size:13px; color:#9CA3AF; margin-bottom:6px;"><strong>Project:</strong> ${project}</div>
+        <div style="font-size:13px; color:#9CA3AF;"><strong>Due Date:</strong> ${dueDate}</div>
+      </div>
+
+      <div style="text-align:center; margin:28px 0;">
+        <a href="https://zeerocodes.com/#dashboard" class="btn-primary">View & Pay in Enterprise Portal &rarr;</a>
+      </div>
+    `;
+
+    return this.wrapEmail(`Invoice ${invId} for ${project}`, `Invoice ${invId} (₦${amountNGN}) issued for ${project}.`, body);
+  }
+
+  // =========================================================================
+  // 15. ENTERPRISE PAYMENT VERIFIED & WORKSPACE ACTIVATED
+  // =========================================================================
+  templateEnterprisePaymentVerified(data) {
+    const client = data.clientName || 'Partner Client';
+    const project = data.projectTitle || 'WhatsApp Paystack Invoicing Engine';
+    const amountNGN = (parseInt(data.amountNGN) || 2500000).toLocaleString();
+    const invId = data.invoiceId || 'INV-2026-001';
+    const stagingUrl = data.stagingUrl || 'https://staging.zeerocodes.com';
+
+    const body = `
+      <div style="margin-bottom:16px;">
+        <span class="badge badge-success">🛡️ ENTERPRISE WORKSPACE & SPRINT ACTIVATED</span>
+      </div>
+      <h2>Payment Verified & Sprint Unlocked, ${client}!</h2>
+      <p>Thank you for your payment of <strong>₦${amountNGN}</strong> (Invoice: <strong>${invId}</strong>). Your transaction has been verified by the Zeerocodes finance and engineering desk.</p>
+
+      <div class="card-box">
+        <h4 style="color:#FFF; margin-bottom:12px; font-size:14px;">Enterprise Workspace Status</h4>
+        <table class="table-data">
+          <tbody>
+            <tr><td style="color:#6B7280; width:35%;">Project:</td><td><strong>${project}</strong></td></tr>
+            <tr><td style="color:#6B7280;">SLA Tier:</td><td><span class="badge badge-success">24/7 Managed Operations (99.99% Uptime)</span></td></tr>
+            <tr><td style="color:#6B7280;">Lead Architect:</td><td>Nuel Effiong (Principal AI Systems Architect)</td></tr>
+            <tr><td style="color:#6B7280;">Staging Prototype:</td><td><a href="${stagingUrl}" style="color:#85C79A;">${stagingUrl}</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="text-align:center; margin:28px 0;">
+        <a href="https://zeerocodes.com/#dashboard" class="btn-primary">Launch Enterprise Client Dashboard &rarr;</a>
+      </div>
+    `;
+
+    return this.wrapEmail(`Workspace Activated: ${project}`, `Payment verified for ${project} (${invId}). Workspace sprint is live.`, body);
+  }
+
+  // =========================================================================
+  // 16. ADMIN ALERT: PAYMENT AWAITING VERIFICATION
+  // =========================================================================
+  templateAdminPaymentAlert(data) {
+    const payer = data.payerName || data.clientName || data.studentName || 'Client / Student';
+    const email = data.payerEmail || data.userEmail || data.clientEmail || 'payer@example.com';
+    const item = data.itemTitle || data.courseTitle || data.projectTitle || 'Studio Service / Cohort Admission';
+    const amountNGN = (parseInt(data.amountNGN) || 95000).toLocaleString();
+    const ref = data.paymentRef || data.reference || 'ZC_TXN_' + Date.now().toString(36);
+
+    const body = `
+      <div style="margin-bottom:16px;">
+        <span class="badge" style="background:rgba(239,68,68,0.15); color:#F87171; border:1px solid rgba(239,68,68,0.3);">🚨 ACTION REQUIRED: PAYMENT VERIFICATION</span>
+      </div>
+      <h2>Payment Verification Pending Approval</h2>
+      <p>A new customer payment has been recorded and is awaiting administrative verification before full dashboard activation.</p>
+
+      <div class="card-box">
+        <table class="table-data">
+          <tbody>
+            <tr><td style="color:#6B7280; width:35%;">Payer Name:</td><td><strong>${payer}</strong></td></tr>
+            <tr><td style="color:#6B7280;">Payer Email:</td><td><a href="mailto:${email}" style="color:#85C79A;">${email}</a></td></tr>
+            <tr><td style="color:#6B7280;">Item / Service:</td><td><strong>${item}</strong></td></tr>
+            <tr><td style="color:#6B7280;">Amount:</td><td><strong style="color:#85C79A; font-size:16px;">₦${amountNGN}</strong></td></tr>
+            <tr><td style="color:#6B7280;">Transaction Ref:</td><td><span style="font-family:monospace; color:#FFF;">${ref}</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="text-align:center; margin:28px 0;">
+        <a href="https://zeerocodes.com/#admin" class="btn-primary">Review & Grant Access in Admin Hub &rarr;</a>
+      </div>
+    `;
+
+    return this.wrapEmail(`Payment Verification Required: ${payer}`, `Payment verification pending for ${payer} (₦${amountNGN})`, body);
   }
 
   // --- Render Template with Variable Interpolation ---
