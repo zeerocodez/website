@@ -1086,13 +1086,29 @@ class ZeerocodesApp {
   // 9. CLIENT & ADMIN WORKSPACE DASHBOARD RENDERERS
   // =========================================================================
   async renderAdminDashboard() {
+    if (!window.auth || !window.auth.isAuthenticated()) {
+      if (window.toast) window.toast.warning("Admin sign-in required.");
+      if (window.modal) window.modal.openAuth('login');
+      window.location.hash = '#home';
+      return;
+    }
+    if (!window.auth.isAdmin()) {
+      if (window.toast) window.toast.error("Access Restricted: Admin privileges required.");
+      window.location.hash = '#dashboard';
+      return;
+    }
     if (window.adminConsole && window.adminConsole.renderAdminConsole) {
       await window.adminConsole.renderAdminConsole();
     }
   }
 
   async renderUserDashboard() {
-    if (!window.auth || !window.auth.isAuthenticated()) return;
+    if (!window.auth || !window.auth.isAuthenticated()) {
+      if (window.toast) window.toast.warning("Please sign in or register to access your dashboard.");
+      if (window.modal) window.modal.openAuth('login');
+      window.location.hash = '#home';
+      return;
+    }
     const user = window.auth.getUser();
 
     // 1. Top Profile Header

@@ -78,6 +78,10 @@
   --transition-smooth: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.d-none {
+  display: none !important;
+}
+
 /* ==========================================================================
    GLOBAL RESET & FULL-WIDTH RESPONSIVE ARCHITECTURE
    ========================================================================== */
@@ -369,9 +373,9 @@ img, svg, video {
   color: #FFF;
 }
 
-.nav-btn-admin-pill, .nav-admin-btn-auth {
+.nav-admin-btn-auth {
   height: 36px;
-  padding: 0 0.65rem;
+  padding: 0 0.75rem;
   font-size: 0.8rem;
   font-weight: 700;
   border-color: rgba(16, 185, 129, 0.5);
@@ -381,11 +385,13 @@ img, svg, video {
   gap: 0.35rem;
   text-decoration: none;
   border-radius: var(--radius-xs);
-  background: rgba(16, 185, 129, 0.06);
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  transition: var(--transition-smooth);
 }
 
-.nav-btn-admin-pill:hover, .nav-admin-btn-auth:hover {
-  background: rgba(16, 185, 129, 0.18);
+.nav-admin-btn-auth:hover {
+  background: rgba(16, 185, 129, 0.22);
   border-color: var(--emerald-primary);
   color: #FFFFFF;
 }

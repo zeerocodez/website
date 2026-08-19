@@ -439,7 +439,7 @@ class AuthService {
   updateNavigationUI() {
     const unauthGroup = document.querySelectorAll('.nav-unauthenticated');
     const authGroup = document.querySelectorAll('.nav-authenticated');
-    const adminLinks = document.querySelectorAll('.nav-admin-link');
+    const adminElements = document.querySelectorAll('.nav-admin-btn-auth, .nav-admin-link');
     const userRoleBadges = document.querySelectorAll('.user-role-badge');
     const userDisplayNames = document.querySelectorAll('.user-display-name');
 
@@ -463,13 +463,13 @@ class AuthService {
         el.className = `user-role-badge badge ${role === 'ADMIN' ? 'badge-danger' : role === 'CLIENT' ? 'badge-teal' : 'badge-success'}`;
       });
 
-      if (this.currentUser.role === 'admin') {
-        adminLinks.forEach(el => {
+      if (this.isAdmin()) {
+        adminElements.forEach(el => {
           el.classList.remove('d-none');
-          el.style.display = 'block';
+          el.style.display = el.tagName === 'LI' ? 'block' : 'inline-flex';
         });
       } else {
-        adminLinks.forEach(el => {
+        adminElements.forEach(el => {
           el.classList.add('d-none');
           el.style.display = 'none';
         });
@@ -483,10 +483,14 @@ class AuthService {
         el.classList.add('d-none');
         el.style.display = 'none';
       });
-      adminLinks.forEach(el => {
+      adminElements.forEach(el => {
         el.classList.add('d-none');
         el.style.display = 'none';
       });
+    }
+
+    if (window.lucide) {
+      window.lucide.createIcons();
     }
   }
 }

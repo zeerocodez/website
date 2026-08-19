@@ -128,7 +128,7 @@
 
   <!-- Lucide Icons & Stylesheet -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="styles.css?v=20260819v2">
+  <link rel="stylesheet" href="styles.css?v=20260819v3">
 </head>
 <body>
 
@@ -151,7 +151,6 @@
         <li><a href="#blog" class="nav-link">Blog</a></li>
         <li><a href="#about" class="nav-link">About</a></li>
         <li><a href="#contact" class="nav-link">Contact</a></li>
-        <li class="nav-admin-link d-none"><a href="#admin" class="nav-link" style="color:var(--emerald-light); font-weight:700;"><i data-lucide="shield-alert" style="width:14px; height:14px; display:inline;"></i> Admin</a></li>
       </ul>
 
       <!-- Nav Actions -->
@@ -178,9 +177,6 @@
           <button class="btn btn-outline btn-sm nav-btn-signup" onclick="window.modal.openAuth('signup')" title="Create Free Account">
             <i data-lucide="user-plus"></i> <span>Sign Up</span>
           </button>
-          <a href="#admin" class="btn btn-outline btn-sm nav-btn-admin-pill" style="border-color:rgba(16,185,129,0.45); color:var(--emerald-light);" title="Admin Control Center">
-            <i data-lucide="shield-alert"></i> <span>Admin</span>
-          </a>
           <button class="btn btn-primary btn-sm nav-btn-cta trigger-calendly-booking">
             <i data-lucide="calendar"></i> <span>Book Call</span>
           </button>
@@ -188,14 +184,14 @@
 
         <!-- Authenticated -->
         <div class="nav-authenticated d-none">
-          <a href="#admin" class="btn btn-outline btn-sm nav-admin-btn-auth" style="border-color:rgba(16,185,129,0.5); color:var(--emerald-light);" title="Admin Control Center">
+          <a href="#admin" class="btn btn-outline btn-sm nav-admin-btn-auth d-none" style="border-color:rgba(16,185,129,0.5); color:var(--emerald-light);" title="Admin Control Center">
             <i data-lucide="shield-alert"></i> <span>Admin</span>
           </a>
           <a href="#dashboard" class="btn btn-primary btn-sm">
             <i data-lucide="layout-dashboard"></i> <span>Dashboard</span>
           </a>
           <span class="user-role-badge badge badge-teal">USER</span>
-          <button class="btn btn-ghost btn-xs btn-sign-out" title="Sign Out">
+          <button class="btn btn-ghost btn-xs btn-sign-out" title="Sign Out" onclick="window.auth?.signOut()">
             <i data-lucide="log-out"></i>
           </button>
         </div>
@@ -3773,25 +3769,25 @@ const isValid = crypto.timingSafeEqual(
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="https://js.paystack.co/v1/inline.js"></script>
-  <script src="js/toast.js?v=20260819v2"></script>
-  <script src="js/firebase-config.js?v=20260819v2"></script>
-  <script src="js/db.js?v=20260819v2"></script>
-  <script src="js/auth.js?v=20260819v2"></script>
-  <script src="js/emails.js?v=20260819v2"></script>
-  <script src="js/notifications.js?v=20260819v2"></script>
-  <script src="js/payments.js?v=20260819v2"></script>
-  <script src="js/lms.js?v=20260819v2"></script>
-  <script src="js/vibescanReview.js?v=20260819v2"></script>
-  <script src="js/vibescanLiveEngine.js?v=20260819v2"></script>
-  <script src="js/roiCalculator.js?v=20260819v2"></script>
-  <script src="js/encryptionVisualizer.js?v=20260819v2"></script>
-  <script src="js/knowledgeBase.js?v=20260819v2"></script>
-  <script src="js/blog.js?v=20260819v2"></script>
-  <script src="js/admin.js?v=20260819v2"></script>
-  <script src="js/studio.js?v=20260819v2"></script>
-  <script src="js/bookingModal.js?v=20260819v2"></script>
-  <script src="js/router.js?v=20260819v2"></script>
-  <script src="js/app.js?v=20260819v2"></script>
+  <script src="js/toast.js?v=20260819v3"></script>
+  <script src="js/firebase-config.js?v=20260819v3"></script>
+  <script src="js/db.js?v=20260819v3"></script>
+  <script src="js/auth.js?v=20260819v3"></script>
+  <script src="js/emails.js?v=20260819v3"></script>
+  <script src="js/notifications.js?v=20260819v3"></script>
+  <script src="js/payments.js?v=20260819v3"></script>
+  <script src="js/lms.js?v=20260819v3"></script>
+  <script src="js/vibescanReview.js?v=20260819v3"></script>
+  <script src="js/vibescanLiveEngine.js?v=20260819v3"></script>
+  <script src="js/roiCalculator.js?v=20260819v3"></script>
+  <script src="js/encryptionVisualizer.js?v=20260819v3"></script>
+  <script src="js/knowledgeBase.js?v=20260819v3"></script>
+  <script src="js/blog.js?v=20260819v3"></script>
+  <script src="js/admin.js?v=20260819v3"></script>
+  <script src="js/studio.js?v=20260819v3"></script>
+  <script src="js/bookingModal.js?v=20260819v3"></script>
+  <script src="js/router.js?v=20260819v3"></script>
+  <script src="js/app.js?v=20260819v3"></script>
 
 </body>
 </html>
