@@ -1083,8 +1083,14 @@ class ZeerocodesApp {
   }
 
   // =========================================================================
-  // 9. CLIENT & STUDENT WORKSPACE DASHBOARD RENDERER (REFERENCE UI UPGRADE)
+  // 9. CLIENT & ADMIN WORKSPACE DASHBOARD RENDERERS
   // =========================================================================
+  async renderAdminDashboard() {
+    if (window.adminConsole && window.adminConsole.renderAdminConsole) {
+      await window.adminConsole.renderAdminConsole();
+    }
+  }
+
   async renderUserDashboard() {
     if (!window.auth || !window.auth.isAuthenticated()) return;
     const user = window.auth.getUser();

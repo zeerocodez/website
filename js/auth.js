@@ -119,6 +119,24 @@ class AuthService {
     return !!this.currentUser && this.currentUser.role === 'client';
   }
 
+  toggleRole() {
+    if (!this.currentUser) {
+      this.loginAsAdmin();
+      return;
+    }
+    const newRole = this.currentUser.role === 'admin' ? 'student' : 'admin';
+    this.currentUser.role = newRole;
+    this.setUser({ ...this.currentUser, role: newRole });
+    if (window.toast) {
+      window.toast.info(`Switched role to ${newRole.toUpperCase()}`);
+    }
+    if (newRole === 'admin') {
+      window.location.hash = '#admin';
+    } else {
+      window.location.hash = '#dashboard';
+    }
+  }
+
   // Sync profile document with Firestore / Local DB
   async syncUserProfile(fbUser, extra = {}) {
     let role = isMasterAdminEmail(fbUser.email) ? 'admin' : 'student';

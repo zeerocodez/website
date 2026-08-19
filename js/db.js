@@ -1276,6 +1276,22 @@ class DatabaseLayer {
   }
 
   // --- Enrollments ---
+  async createEnrollment(enrollmentData) {
+    const enrollments = this.getLocal('enrollments') || [];
+    const newEnrollment = {
+      id: 'enr-' + Date.now(),
+      enrolledAt: new Date().toISOString(),
+      completed: false,
+      progressPercent: 0,
+      completedLessons: [],
+      status: 'active',
+      ...enrollmentData
+    };
+    enrollments.unshift(newEnrollment);
+    this.setLocal('enrollments', enrollments);
+    return newEnrollment;
+  }
+
   async saveEnrollment(enrollment) {
     const enrollments = this.getLocal('enrollments') || [];
     const idx = enrollments.findIndex(e => e.id === enrollment.id || (e.userId === enrollment.userId && e.courseId === enrollment.courseId));
@@ -1800,7 +1816,20 @@ class DatabaseLayer {
     this.setLocal('studioProjects', projects);
   }
 
-  // --- VibeScan Submissions ---
+  // --- VibeScan Submissions & Certifications ---
+  async createVibescanSubmission(subData) {
+    const subs = this.getLocal('vibescanSubmissions') || [];
+    const newSub = {
+      id: 'sub-' + Date.now(),
+      submittedAt: new Date().toISOString(),
+      status: 'pending_review',
+      ...subData
+    };
+    subs.unshift(newSub);
+    this.setLocal('vibescanSubmissions', subs);
+    return newSub;
+  }
+
   async getSubmissionsForUser(userId) {
     const subs = this.getLocal('vibescanSubmissions') || [];
     return subs.filter(s => s.userId === userId || s.userEmail === userId);
@@ -1829,6 +1858,62 @@ class DatabaseLayer {
       subs[idx] = { ...subs[idx], ...updates };
       this.setLocal('vibescanSubmissions', subs);
     }
+  }
+
+  async updateSubmissionStatus(submissionId, newStatus, certRecord = null) {
+    const subs = this.getLocal('vibescanSubmissions') || [];
+    const idx = subs.findIndex(s => s.id === submissionId);
+    if (idx >= 0) {
+      subs[idx].status = newStatus;
+      if (certRecord) {
+        subs[idx].certificationId = certRecord.certId || certRecord.id;
+        subs[idx].certification = certRecord;
+      }
+      this.setLocal('vibescanSubmissions', subs);
+      return subs[idx];
+    }
+    return null;
+  }
+
+  async issueCertification(certData) {
+    const certs = this.getLocal('certifications') || [];
+    const newCert = {
+      id: 'cert-' + Date.now(),
+      issuedAt: new Date().toISOString(),
+      ...certData
+    };
+    certs.unshift(newCert);
+    this.setLocal('certifications', certs);
+    return newCert;
+  }
+
+  async getCertifications() {
+    return this.getLocal('certifications') || [];
+  }
+
+  // --- Payment Events & Webhook Logs ---
+  async getPaymentEvents() {
+    return this.getLocal('paymentEvents') || [];
+  }
+
+  async logPaymentEvent(event) {
+    const events = this.getLocal('paymentEvents') || [];
+    const newEvent = {
+      id: event.id || ('pay-evt-' + Date.now()),
+      reference: event.reference || ('ZC_REF_' + Date.now()),
+      provider: event.provider || 'Paystack',
+      customerEmail: event.customerEmail || event.userEmail || 'customer@zeerocodes.com',
+      amountNGN: event.amountNGN || 95000,
+      currency: event.currency || 'NGN',
+      status: event.status || 'success',
+      verifiedAt: event.verifiedAt || new Date().toISOString(),
+      hmacSignatureVerified: true,
+      item: event.item || event.itemTitle || 'Zeerocodes Transaction',
+      ...event
+    };
+    events.unshift(newEvent);
+    this.setLocal('paymentEvents', events);
+    return newEvent;
   }
 
   // --- Blog Posts ---
