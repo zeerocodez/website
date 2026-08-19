@@ -3,7 +3,7 @@
  * Offline lesson and blueprint cache for low-bandwidth environments.
  */
 
-const CACHE_NAME = 'zeerocodes-cache-v3';
+const CACHE_NAME = 'zeerocodes-cache-v4';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

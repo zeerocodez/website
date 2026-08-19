@@ -4459,5 +4459,421 @@ img, svg, video {
   margin-bottom: 0.75rem;
 }
 
+/* ==========================================================================
+   ZEEROCODES ACADEMY STUDENT DASHBOARD (REFERENCE LMS UPGRADE)
+   ========================================================================== */
+
+/* Category Divider in Sidebar */
+.nav-category-divider {
+  padding: 0.85rem 0.75rem 0.35rem 0.75rem;
+  list-style: none;
+}
+
+.nav-category-divider span {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #64748B;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* 1. Hero Welcome Card with Progress & Streak */
+.student-welcome-banner {
+  background: radial-gradient(circle at 10% 0%, rgba(139, 92, 246, 0.12) 0%, transparent 60%),
+              radial-gradient(circle at 90% 100%, rgba(0, 245, 212, 0.08) 0%, transparent 50%),
+              rgba(12, 17, 26, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.student-welcome-left {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+}
+
+.student-avatar-badge {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8B5CF6, #00F5D4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #FFF;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.35);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.student-welcome-info h2 {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 0 0 0.25rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.student-welcome-info p {
+  font-size: 0.85rem;
+  color: #94A3B8;
+  margin: 0;
+}
+
+.student-welcome-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6rem;
+  min-width: 260px;
+}
+
+@media (max-width: 768px) {
+  .student-welcome-right {
+    align-items: flex-start;
+    width: 100%;
+  }
+}
+
+.student-streak-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #F59E0B;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.15);
+}
+
+.student-progress-wrap {
+  width: 100%;
+  max-width: 260px;
+}
+
+.student-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #94A3B8;
+  margin-bottom: 0.35rem;
+}
+
+.student-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.5) inset;
+}
+
+.student-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10B981 0%, #00F5D4 50%, #8B5CF6 100%);
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 245, 212, 0.5);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 2. Notice / Next Action Milestone Card */
+.student-notice-card {
+  background: radial-gradient(ellipse at left, rgba(56, 189, 248, 0.1) 0%, transparent 70%),
+              rgba(12, 17, 26, 0.9);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 18px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 20px rgba(56, 189, 248, 0.06);
+}
+
+.student-notice-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 280px;
+}
+
+.student-notice-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0284C7, #38BDF8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFF;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
+}
+
+.student-notice-body h4 {
+  color: #FFFFFF;
+  font-size: 1.05rem;
+  margin: 0 0 0.2rem 0;
+  font-weight: 700;
+}
+
+.student-notice-body p {
+  color: #94A3B8;
+  font-size: 0.85rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* 3. Two-Column Dashboard Layout */
+.student-dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 1080px) {
+  .student-dash-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 4. Tasks & Practical Labs Container */
+.student-tasks-container {
+  background: rgba(12, 17, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.student-tasks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.student-tasks-header h3 {
+  color: #FFFFFF;
+  font-size: 1.2rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.student-task-filter-pills {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.task-filter-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94A3B8;
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.task-filter-btn:hover, .task-filter-btn.active {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: #10B981;
+  color: #FFFFFF;
+}
+
+.student-task-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  transition: all 0.25s ease;
+}
+
+.student-task-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(139, 92, 246, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.student-task-card.active-task {
+  border-left: 3px solid #00F5D4;
+  background: linear-gradient(90deg, rgba(0, 245, 212, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+}
+
+.student-task-card.passed-task {
+  border-left: 3px solid #10B981;
+}
+
+.student-task-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.student-task-title {
+  color: #FFFFFF;
+  font-size: 0.98rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.student-task-sub {
+  color: #94A3B8;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+/* 5. Right Sidebar Widgets */
+.student-widgets-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.student-widget-card {
+  background: rgba(12, 17, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 1.25rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.student-widget-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.widget-icon-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.widget-icon-pill {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.widget-title-text {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.widget-body-text {
+  font-size: 0.82rem;
+  color: #94A3B8;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.streak-day-dots {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.streak-day-dot {
+  flex: 1;
+  text-align: center;
+  padding: 6px 0;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #64748B;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.streak-day-dot.active {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: #F59E0B;
+  color: #F59E0B;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+}
+
+.streak-day-dot.done {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: #10B981;
+  color: #34D399;
+}
+
+/* Discussion & Sessions Cards */
+.student-session-row {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.student-qa-card {
+  background: #080D16;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.student-qa-reply {
+  background: rgba(16, 185, 129, 0.06);
+  border-left: 3px solid #10B981;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+}
+
+
 
 

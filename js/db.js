@@ -1303,9 +1303,9 @@ class DatabaseLayer {
     this.setLocal('enrollments', enrollments);
   }
 
-  async getUserEnrollments(userId) {
+  async getUserEnrollments(userId, userEmail = '') {
     const enrollments = this.getLocal('enrollments') || [];
-    return enrollments.filter(e => e.userId === userId || e.userEmail === userId);
+    return enrollments.filter(e => e.userId === userId || e.userEmail === userId || (userEmail && e.userEmail === userEmail));
   }
 
   async getAllEnrollments() {

@@ -128,7 +128,7 @@
 
   <!-- Lucide Icons & Stylesheet -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="styles.css?v=20260818v2">
+  <link rel="stylesheet" href="styles.css?v=20260819v2">
 </head>
 <body>
 
@@ -2167,21 +2167,56 @@ const isValid = crypto.timingSafeEqual(
                 <div>
                   <div class="dash-brand-header">
                     <span class="dash-brand-badge">
-                      <i data-lucide="layers" style="color:#A855F7;"></i> Zeerocodes Labs
+                      <i data-lucide="graduation-cap" style="color:var(--emerald-light);"></i> The VibeCode Labs
                     </span>
                   </div>
 
                   <ul class="modern-dash-nav-list">
                     <li>
                       <button type="button" class="modern-dash-nav-btn active dash-tab-btn" data-tab="dashTabOverview">
-                        <i data-lucide="layout-dashboard"></i> Overview
+                        <i data-lucide="home"></i> Home
                       </button>
                     </li>
                     <li>
                       <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabLms">
-                        <i data-lucide="graduation-cap"></i> Learning Hub
+                        <i data-lucide="book-open"></i> Courses
                       </button>
                     </li>
+                    <li>
+                      <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabSessions">
+                        <i data-lucide="video"></i> Sessions
+                      </button>
+                    </li>
+                    <li>
+                      <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabAchievements">
+                        <i data-lucide="award"></i> Achievement
+                      </button>
+                    </li>
+
+                    <li class="nav-category-divider">
+                      <span>COMMUNICATIONS</span>
+                    </li>
+
+                    <li>
+                      <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabDiscussions">
+                        <i data-lucide="message-square"></i> Message
+                      </button>
+                    </li>
+                    <li>
+                      <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabCommunity">
+                        <i data-lucide="users"></i> Study centers
+                      </button>
+                    </li>
+                    <li>
+                      <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabSupport">
+                        <i data-lucide="help-circle"></i> Support tickets
+                      </button>
+                    </li>
+
+                    <li class="nav-category-divider">
+                      <span>SERVICES & BILLING</span>
+                    </li>
+
                     <li>
                       <button type="button" class="modern-dash-nav-btn dash-tab-btn" data-tab="dashTabStudio">
                         <i data-lucide="workflow"></i> Studio Projects
@@ -2217,42 +2252,77 @@ const isValid = crypto.timingSafeEqual(
               <!-- Main Dashboard Canvas -->
               <main class="modern-dash-main">
                 
-                <!-- Tab 1: Overview & Analytics (Flagship Reference Layout) -->
+                <!-- Tab 1: Home / Overview (Reference UI Layout) -->
                 <div id="dashTabOverview" class="dash-tab-panel active">
                   <div id="dashOverviewContainer">
                     <!-- Rendered dynamically by app.js -->
                   </div>
                 </div>
 
-                <!-- Tab 2: LMS Learning Hub -->
+                <!-- Tab 2: LMS Courses / Curriculum -->
                 <div id="dashTabLms" class="dash-tab-panel">
                   <div id="dashLmsContainer">
                     <!-- Rendered dynamically by app.js -->
                   </div>
                 </div>
 
-                <!-- Tab 3: Studio Projects -->
+                <!-- Tab 3: Sessions & Live Build Clinics -->
+                <div id="dashTabSessions" class="dash-tab-panel">
+                  <div id="dashSessionsContainer">
+                    <!-- Rendered dynamically by app.js -->
+                  </div>
+                </div>
+
+                <!-- Tab 4: Achievements & VibeCert Credentials -->
+                <div id="dashTabAchievements" class="dash-tab-panel">
+                  <div id="dashAchievementsContainer">
+                    <!-- Rendered dynamically by app.js -->
+                  </div>
+                </div>
+
+                <!-- Tab 5: Discussions / Message Q&A -->
+                <div id="dashTabDiscussions" class="dash-tab-panel">
+                  <div id="dashDiscussionsContainer">
+                    <!-- Rendered dynamically by app.js -->
+                  </div>
+                </div>
+
+                <!-- Tab 6: Study Centers & Community -->
+                <div id="dashTabCommunity" class="dash-tab-panel">
+                  <div id="dashCommunityContainer">
+                    <!-- Rendered dynamically by app.js -->
+                  </div>
+                </div>
+
+                <!-- Tab 7: Support Tickets & Mentorship -->
+                <div id="dashTabSupport" class="dash-tab-panel">
+                  <div id="dashSupportContainer">
+                    <!-- Rendered dynamically by app.js -->
+                  </div>
+                </div>
+
+                <!-- Tab 8: Studio Projects -->
                 <div id="dashTabStudio" class="dash-tab-panel">
                   <div id="dashStudioContainer">
                     <!-- Rendered dynamically by app.js -->
                   </div>
                 </div>
 
-                <!-- Tab 4: VibeScan Security -->
+                <!-- Tab 9: VibeScan Security -->
                 <div id="dashTabVibescan" class="dash-tab-panel">
                   <div id="dashVibescanContainer">
                     <!-- Rendered dynamically by app.js -->
                   </div>
                 </div>
 
-                <!-- Tab 5: Billing & Invoices -->
+                <!-- Tab 10: Billing & Invoices -->
                 <div id="dashTabBilling" class="dash-tab-panel">
                   <div id="dashBillingContainer">
                     <!-- Rendered dynamically by app.js -->
                   </div>
                 </div>
 
-                <!-- Tab 6: Account Settings -->
+                <!-- Tab 11: Account Settings -->
                 <div id="dashTabSettings" class="dash-tab-panel">
                   <div style="background:rgba(12, 17, 26, 0.85); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:1.75rem; max-width:640px;">
                     <h4 style="color:#FFF; font-size:1.15rem; margin-bottom:1.25rem; display:flex; align-items:center; gap:0.5rem;">
@@ -3703,25 +3773,25 @@ const isValid = crypto.timingSafeEqual(
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="https://js.paystack.co/v1/inline.js"></script>
-  <script src="js/toast.js?v=20260819v1"></script>
-  <script src="js/firebase-config.js?v=20260819v1"></script>
-  <script src="js/db.js?v=20260819v1"></script>
-  <script src="js/auth.js?v=20260819v1"></script>
-  <script src="js/emails.js?v=20260819v1"></script>
-  <script src="js/notifications.js?v=20260819v1"></script>
-  <script src="js/payments.js?v=20260819v1"></script>
-  <script src="js/lms.js?v=20260819v1"></script>
-  <script src="js/vibescanReview.js?v=20260819v1"></script>
-  <script src="js/vibescanLiveEngine.js?v=20260819v1"></script>
-  <script src="js/roiCalculator.js?v=20260819v1"></script>
-  <script src="js/encryptionVisualizer.js?v=20260819v1"></script>
-  <script src="js/knowledgeBase.js?v=20260819v1"></script>
-  <script src="js/blog.js?v=20260819v1"></script>
-  <script src="js/admin.js?v=20260819v1"></script>
-  <script src="js/studio.js?v=20260819v1"></script>
-  <script src="js/bookingModal.js?v=20260819v1"></script>
-  <script src="js/router.js?v=20260819v1"></script>
-  <script src="js/app.js?v=20260819v1"></script>
+  <script src="js/toast.js?v=20260819v2"></script>
+  <script src="js/firebase-config.js?v=20260819v2"></script>
+  <script src="js/db.js?v=20260819v2"></script>
+  <script src="js/auth.js?v=20260819v2"></script>
+  <script src="js/emails.js?v=20260819v2"></script>
+  <script src="js/notifications.js?v=20260819v2"></script>
+  <script src="js/payments.js?v=20260819v2"></script>
+  <script src="js/lms.js?v=20260819v2"></script>
+  <script src="js/vibescanReview.js?v=20260819v2"></script>
+  <script src="js/vibescanLiveEngine.js?v=20260819v2"></script>
+  <script src="js/roiCalculator.js?v=20260819v2"></script>
+  <script src="js/encryptionVisualizer.js?v=20260819v2"></script>
+  <script src="js/knowledgeBase.js?v=20260819v2"></script>
+  <script src="js/blog.js?v=20260819v2"></script>
+  <script src="js/admin.js?v=20260819v2"></script>
+  <script src="js/studio.js?v=20260819v2"></script>
+  <script src="js/bookingModal.js?v=20260819v2"></script>
+  <script src="js/router.js?v=20260819v2"></script>
+  <script src="js/app.js?v=20260819v2"></script>
 
 </body>
 </html>
