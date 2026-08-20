@@ -1609,10 +1609,24 @@ class DatabaseLayer {
 
   // --- Course & Curriculum Catalog Management ---
   async getCourses() {
-    const courses = this.getLocal('courses');
-    if (courses && courses.length > 0) return courses;
-    this.setLocal('courses', DEFAULT_COURSES);
-    return DEFAULT_COURSES;
+    let courses = this.getLocal('courses');
+    if (!courses || courses.length === 0) {
+      this.setLocal('courses', DEFAULT_COURSES);
+      return DEFAULT_COURSES;
+    }
+    const seen = new Set();
+    const unique = [];
+    for (const c of courses) {
+      const identifier = c.id || c.title;
+      if (identifier && !seen.has(identifier)) {
+        seen.add(identifier);
+        unique.push(c);
+      }
+    }
+    if (unique.length !== courses.length) {
+      this.setLocal('courses', unique);
+    }
+    return unique;
   }
 
   async getAllCourses() {
@@ -1712,13 +1726,29 @@ class DatabaseLayer {
 
   async saveCourse(updatedCourse) {
     const courses = await this.getCourses();
-    const idx = courses.findIndex(c => c.id === updatedCourse.id);
+    const idx = courses.findIndex(c => 
+      c.id === updatedCourse.id || 
+      (c.slug && updatedCourse.slug && c.slug === updatedCourse.slug) ||
+      (c.title && updatedCourse.title && c.title.toLowerCase() === updatedCourse.title.toLowerCase())
+    );
     if (idx >= 0) {
-      courses[idx] = updatedCourse;
+      courses[idx] = { ...courses[idx], ...updatedCourse };
     } else {
       courses.unshift(updatedCourse);
     }
-    this.setLocal('courses', courses);
+    
+    // Deduplicate any duplicate objects in storage
+    const seen = new Set();
+    const clean = [];
+    for (const c of courses) {
+      const key = c.id || c.title;
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        clean.push(c);
+      }
+    }
+
+    this.setLocal('courses', clean);
     return updatedCourse;
   }
 

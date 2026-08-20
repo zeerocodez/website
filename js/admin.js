@@ -998,25 +998,34 @@ class AdminConsoleManager {
   }
 
   async handleSaveEditedCourse(e) {
-    e.preventDefault();
-    const id = document.getElementById('editCourseId').value;
-    const title = document.getElementById('editCourseTitle').value.trim();
-    const subtitle = document.getElementById('editCourseSubtitle').value.trim();
-    const category = document.getElementById('editCourseCategory').value;
-    const priceNGN = parseInt(document.getElementById('editCoursePriceNGN').value) || 95000;
-    const duration = document.getElementById('editCourseDuration').value.trim();
-    const instructor = document.getElementById('editCourseInstructor').value.trim();
-    const description = document.getElementById('editCourseDesc').value.trim();
-    const featuredImage = document.getElementById('editCourseImageUrl').value.trim() || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000';
+    if (e && e.preventDefault) e.preventDefault();
+    const id = document.getElementById('editCourseId')?.value || this.selectedCourseId;
+    const title = document.getElementById('editCourseTitle')?.value.trim();
+    const subtitle = document.getElementById('editCourseSubtitle')?.value.trim();
+    const category = document.getElementById('editCourseCategory')?.value || 'Full-Stack Vibe Coding';
+    const priceNGN = parseInt(document.getElementById('editCoursePriceNGN')?.value) || 95000;
+    const duration = document.getElementById('editCourseDuration')?.value.trim() || '2-Week Masterclass';
+    const instructor = document.getElementById('editCourseInstructor')?.value.trim() || 'Nuel Effiong';
+    const description = document.getElementById('editCourseDesc')?.value.trim() || '';
+    const featuredImage = document.getElementById('editCourseImageUrl')?.value.trim() || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000';
+
+    if (!title) {
+      if (window.toast) window.toast.error('Please enter a course title.');
+      return;
+    }
 
     let existingCourse = {};
     try {
-      existingCourse = (await window.db.getCourseById(id)) || {};
+      if (id) {
+        existingCourse = (await window.db.getCourseById(id)) || {};
+      }
     } catch (err) {}
+
+    const targetCourseId = id || existingCourse.id || this.selectedCourseId || ('course_' + Date.now());
 
     const updatedCourse = {
       ...existingCourse,
-      id,
+      id: targetCourseId,
       title,
       subtitle,
       tagline: subtitle,
@@ -1032,11 +1041,13 @@ class AdminConsoleManager {
     };
 
     await window.db.saveCourse(updatedCourse);
+    this.selectedCourseId = targetCourseId;
+
     window.toast?.success(`Course "${title}" updated successfully!`);
     if (window.modal) window.modal.closeAll();
 
     // Re-render admin console and LMS player catalog
-    this.renderAdminConsole();
+    await this.renderAdminConsole();
     if (window.lmsPlayer && window.lmsPlayer.renderCatalog) {
       window.lmsPlayer.renderCatalog();
     }
