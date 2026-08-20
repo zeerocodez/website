@@ -758,6 +758,82 @@ const DEFAULT_VIBESCAN_SUBMISSIONS = [
 
 const DEFAULT_BLOG_POSTS = [
   {
+    id: 'post-your-ai-career-starts-here',
+    title: '📘 YOUR AI CAREER STARTS HERE — The Complete Practical Roadmap for Nigerians',
+    slug: 'your-ai-career-starts-here-practical-roadmap-nigeria',
+    category: 'Free Lead Magnet Guide',
+    categoryBadge: 'badge-teal',
+    author: 'Zeerocodes Team',
+    authorRole: 'AI Career & Systems Coaches',
+    date: 'August 20, 2026',
+    readTime: '10 min read',
+    featuredImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop',
+    excerpt: 'You don\'t need to learn everything about AI. You need to know which AI skill to learn, in what order, and how to turn that skill into a career. Download your free 47-page roadmap!',
+    tags: ['AI Career', 'Nigeria Tech', 'Beginner Roadmap', 'AI Skills Map', 'Free PDF Guide'],
+    status: 'published',
+    pdfAttachment: {
+      name: 'YOUR_AI_CAREER_STARTS_HERE.pdf',
+      url: 'https://drive.google.com/file/d/1dc5-J1iS08o9mCj7CVnb13Kpy3xKUimQ/view?usp=drivesdk',
+      title: 'YOUR AI CAREER STARTS HERE (Free PDF Guide)',
+      size: 5242880,
+      sizeFormatted: 'FREE PDF',
+      description: 'A simple, practical roadmap for Nigerians who want to understand AI and build real skills.',
+      downloads: 512
+    },
+    content: `
+      <h2>You want to learn AI, but you don't know where to start?</h2>
+      <p>Let me tell you something as a teacher and coach: <strong>You don't need to learn everything about AI.</strong></p>
+      <p>You need to know which AI skill to learn, in what order, and how to turn that skill into a career.</p>
+
+      <p>That is why I created:</p>
+      <h3 style="color:var(--emerald-primary); font-size:1.4rem; margin:1rem 0;">📘 YOUR AI CAREER STARTS HERE</h3>
+      <p>A simple, practical roadmap for Nigerians who want to understand AI and build real skills.</p>
+
+      <div class="lead-magnet-callout-box" style="background:#040914; border:1px solid var(--emerald-primary); border-radius:var(--radius-sm); padding:1.75rem; margin:2rem 0; box-shadow: 0 0 35px rgba(16,185,129,0.15);">
+        <h4 style="color:#FFF; font-size:1.1rem; margin-bottom:0.75rem;">Inside, you'll discover:</h4>
+        <ul style="color:var(--text-cyber-muted); font-size:0.95rem; line-height:1.8; margin-bottom:1.5rem; list-style:none; padding-left:0;">
+          <li style="margin-bottom:0.5rem;">✅ <strong>The different AI career paths</strong></li>
+          <li style="margin-bottom:0.5rem;">✅ <strong>Where a beginner should start</strong></li>
+          <li style="margin-bottom:0.5rem;">✅ <strong>What skills to learn</strong></li>
+          <li style="margin-bottom:0.5rem;">✅ <strong>Where to learn — including FREE resources</strong></li>
+          <li style="margin-bottom:0.5rem;">✅ <strong>Practical projects to build</strong></li>
+          <li style="margin-bottom:0.5rem;">✅ <strong>Nigerian examples and case studies</strong></li>
+          <li style="margin-bottom:0.5rem;">✅ <strong>How to move from learning → building → getting paid</strong></li>
+        </ul>
+
+        <p style="color:#FFF; font-weight:600; font-size:0.95rem;">And you don't need to be a programmer to begin.</p>
+        <p style="color:var(--emerald-primary); font-weight:700; font-size:1.15rem; margin:0.75rem 0;">🎁 The guide is completely FREE.</p>
+
+        <p style="color:var(--text-cyber-muted); font-size:0.9rem; margin-bottom:1.25rem;">If you've been saying, <em>"I want to learn AI, but I don't know where to start,"</em> this was created for you.</p>
+
+        <div style="margin-top:1.25rem;">
+          <a href="https://drive.google.com/file/d/1dc5-J1iS08o9mCj7CVnb13Kpy3xKUimQ/view?usp=drivesdk" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:0.6rem; padding:0.8rem 1.5rem; font-weight:700; font-size:1rem;">
+            <i data-lucide="download"></i> DOWNLOAD YOUR FREE COPY HERE
+          </a>
+        </div>
+      </div>
+
+      <h2>Table of Contents</h2>
+      <ol style="color:var(--text-cyber-muted); line-height:1.8; font-size:0.95rem;">
+        <li><strong>Introduction</strong></li>
+        <li><strong>Part One</strong> — What Exactly Is AI?</li>
+        <li><strong>Part Two</strong> — The AI Skills Map</li>
+        <li><strong>Part Three</strong> — Which AI Path Should You Choose?</li>
+        <li><strong>Part Four</strong> — Where Should a Complete Beginner Start?</li>
+        <li><strong>Part Five</strong> — The 90-Day AI Career Plan</li>
+        <li><strong>Part Six</strong> — Project Ideas for Nigerian Learners</li>
+        <li><strong>Part Seven</strong> — Case Studies (The Teacher, The Young Graduate, The Entrepreneur, The Career Switcher, The Unemployed Graduate)</li>
+        <li><strong>Part Eight</strong> — Where to Learn AI (Microsoft Learn, Google AI, Kaggle, Coursera, YouTube, Zeerocodes Academy)</li>
+        <li><strong>Part Nine</strong> — Do You Need a University Degree?</li>
+        <li><strong>Part Ten</strong> — How to Build a Portfolio</li>
+      </ol>
+
+      <div style="margin-top:2.5rem; padding:1.5rem; background:rgba(16,185,129,0.08); border-left:4px solid var(--emerald-primary); border-radius:var(--radius-xs);">
+        <p style="font-size:1.1rem; color:#FFF; font-weight:700; margin:0;">Don't just learn AI. Learn how to use it to build your future.</p>
+      </div>
+    `
+  },
+  {
     id: 'post-whatsapp-paystack-automation',
     title: 'How We Built an Autonomous WhatsApp & Paystack Invoicing System That Processes ₦180M+',
     slug: 'autonomous-whatsapp-paystack-invoicing-automation-n8n',
@@ -773,7 +849,7 @@ const DEFAULT_BLOG_POSTS = [
     status: 'published',
     pdfAttachment: {
       name: 'Zeerocodes_Customer_Avatars_and_Marketing_Playbook.pdf',
-      url: 'Zeerocodes_Customer_Avatars_and_Marketing_Playbook.pdf',
+      url: '/uploads/pdf/Zeerocodes_Customer_Avatars_and_Marketing_Playbook.pdf',
       title: 'Zeerocodes Customer Avatars & Marketing Playbook (PDF Blueprint)',
       size: 487155,
       sizeFormatted: '475 KB',
