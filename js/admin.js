@@ -134,6 +134,19 @@ class AdminConsoleManager {
       testEmailForm.addEventListener('submit', (e) => this.handleSendTestEmail(e));
     }
 
+    const editCourseForm = document.getElementById('adminEditCourseForm');
+    if (editCourseForm) {
+      editCourseForm.addEventListener('submit', (e) => this.handleSaveEditedCourse(e));
+    }
+
+    const courseImgInput = document.getElementById('adminCourseImageFile');
+    if (courseImgInput) {
+      courseImgInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) this.handleCourseImageSelected(file);
+      });
+    }
+
     // PDF Attachment Upload & Drag-and-Drop
     const pdfFileInput = document.getElementById('adminPostPdfFile');
     if (pdfFileInput) {
@@ -647,7 +660,10 @@ class AdminConsoleManager {
               `).join('')}
             </select>
           </div>
-          <div style="display:flex; gap:0.6rem;">
+          <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+            <button class="btn btn-outline btn-sm" style="color:var(--emerald-light); border-color:rgba(16,185,129,0.4);" onclick="window.adminConsole.openEditCourseModal('${currentCourse.id}')" title="Edit course details, titles, contents & cover image">
+              <i data-lucide="edit"></i> ✏️ Edit Course & Cover Image
+            </button>
             <button class="btn btn-primary btn-sm" onclick="window.adminConsole.openCreateCourseModal()">
               <i data-lucide="plus-circle"></i> + Create New Course
             </button>
@@ -768,6 +784,108 @@ class AdminConsoleManager {
       } catch (err) {
         window.toast?.error(err.message);
       }
+    }
+  }
+
+  async openEditCourseModal(courseId) {
+    const targetId = courseId || this.selectedCourseId;
+    let course = null;
+    try {
+      course = await window.db.getCourseById(targetId);
+    } catch (e) {
+      console.warn('Failed to fetch course by ID:', e);
+    }
+    if (!course) {
+      const all = await window.db.getCourses();
+      course = all[0];
+    }
+    if (!course) return;
+
+    document.getElementById('editCourseId').value = course.id;
+    document.getElementById('editCourseTitle').value = course.title || '';
+    document.getElementById('editCourseSubtitle').value = course.subtitle || course.tagline || '';
+    document.getElementById('editCourseCategory').value = course.category || 'Full-Stack Vibe Coding';
+    document.getElementById('editCoursePriceNGN').value = course.priceNGN || 95000;
+    document.getElementById('editCourseDuration').value = course.duration || '6-Week Masterclass';
+    document.getElementById('editCourseInstructor').value = course.instructor || 'Nuel Effiong';
+    document.getElementById('editCourseDesc').value = course.description || course.overview || '';
+    
+    const coverUrl = course.featuredImage || course.heroImage || course.coverImage || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000';
+    document.getElementById('editCourseImageUrl').value = coverUrl;
+    this.previewCourseCover(coverUrl);
+
+    if (window.modal) window.modal.open('modal-admin-edit-course');
+  }
+
+  previewCourseCover(url) {
+    const img = document.getElementById('editCourseCoverPreviewImg');
+    if (img) img.src = url || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000';
+  }
+
+  setPresetCourseCover(url) {
+    const urlInput = document.getElementById('editCourseImageUrl');
+    if (urlInput) urlInput.value = url;
+    this.previewCourseCover(url);
+  }
+
+  handleCourseImageSelected(file) {
+    if (!file || !file.type.startsWith('image/')) {
+      if (window.toast) window.toast.error('Invalid file format. Please select an image file (.jpg, .png, .webp).');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      const urlInput = document.getElementById('editCourseImageUrl');
+      if (urlInput) urlInput.value = dataUrl;
+      this.previewCourseCover(dataUrl);
+      if (window.toast) window.toast.success('Course cover graphic uploaded & preview updated!');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async handleSaveEditedCourse(e) {
+    e.preventDefault();
+    const id = document.getElementById('editCourseId').value;
+    const title = document.getElementById('editCourseTitle').value.trim();
+    const subtitle = document.getElementById('editCourseSubtitle').value.trim();
+    const category = document.getElementById('editCourseCategory').value;
+    const priceNGN = parseInt(document.getElementById('editCoursePriceNGN').value) || 95000;
+    const duration = document.getElementById('editCourseDuration').value.trim();
+    const instructor = document.getElementById('editCourseInstructor').value.trim();
+    const description = document.getElementById('editCourseDesc').value.trim();
+    const featuredImage = document.getElementById('editCourseImageUrl').value.trim() || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000';
+
+    let existingCourse = {};
+    try {
+      existingCourse = (await window.db.getCourseById(id)) || {};
+    } catch (err) {}
+
+    const updatedCourse = {
+      ...existingCourse,
+      id,
+      title,
+      subtitle,
+      tagline: subtitle,
+      category,
+      priceNGN,
+      duration,
+      instructor,
+      description,
+      overview: description,
+      featuredImage,
+      heroImage: featuredImage,
+      coverImage: featuredImage
+    };
+
+    await window.db.saveCourse(updatedCourse);
+    window.toast?.success(`Course "${title}" updated successfully!`);
+    if (window.modal) window.modal.closeAll();
+
+    // Re-render admin console and LMS player catalog
+    this.renderAdminConsole();
+    if (window.lmsPlayer && window.lmsPlayer.renderCatalog) {
+      window.lmsPlayer.renderCatalog();
     }
   }
 
