@@ -787,7 +787,133 @@ class AdminConsoleManager {
     }
   }
 
+  ensureEditCourseModalInDom() {
+    if (document.getElementById('modal-admin-edit-course')) return;
+
+    const modalDiv = document.createElement('div');
+    modalDiv.id = 'modal-admin-edit-course';
+    modalDiv.className = 'modal-backdrop';
+    modalDiv.innerHTML = `
+      <div class="modal-card modal-lg" style="max-height:92vh; overflow-y:auto;">
+        <div class="modal-header">
+          <h3>✏️ Edit LMS Course Details, Content & Cover Image</h3>
+          <button class="modal-close-btn" onclick="window.modal?.close('modal-admin-edit-course')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="adminEditCourseForm">
+            <input type="hidden" id="editCourseId">
+            
+            <div class="form-group">
+              <label class="form-label" for="editCourseTitle">Course Title</label>
+              <input type="text" id="editCourseTitle" class="form-input" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="editCourseSubtitle">Course Subtitle / Tagline</label>
+              <input type="text" id="editCourseSubtitle" class="form-input" required>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+              <div class="form-group">
+                <label class="form-label" for="editCourseCategory">Track / Category</label>
+                <select id="editCourseCategory" class="form-select">
+                  <option value="Full-Stack Vibe Coding">Full-Stack Vibe Coding</option>
+                  <option value="Business Workflow Automation">Business Workflow Automation</option>
+                  <option value="Cybersecurity & AST Auditing">Cybersecurity & AST Auditing</option>
+                  <option value="Mobile & AI App Development">Mobile & AI App Development</option>
+                  <option value="Data & AI Engineering">Data & AI Engineering</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="editCoursePriceNGN">Tuition Fee (NGN)</label>
+                <input type="number" id="editCoursePriceNGN" class="form-input" required>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+              <div class="form-group">
+                <label class="form-label" for="editCourseDuration">Cohort Duration</label>
+                <input type="text" id="editCourseDuration" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="editCourseInstructor">Lead Instructor</label>
+                <input type="text" id="editCourseInstructor" class="form-input" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="editCourseDesc">Course Overview & Description</label>
+              <textarea id="editCourseDesc" class="form-input" rows="3" required></textarea>
+            </div>
+
+            <!-- COURSE COVER / PLACEHOLDER IMAGE SECTION -->
+            <div class="form-group" style="background:#04070D; border:1px solid var(--obsidian-border); padding:1.1rem; border-radius:var(--radius-xs);">
+              <label class="form-label" style="color:var(--emerald-light); font-weight:700; display:flex; align-items:center; gap:0.4rem; margin-bottom:0.75rem;">
+                <i data-lucide="image"></i> Course Cover / Placeholder Image Upload
+              </label>
+
+              <div style="display:grid; grid-template-columns:1fr 120px; gap:1rem; align-items:center;">
+                <div>
+                  <input type="file" id="adminCourseImageFile" accept="image/*" style="display:none;">
+                  <div id="adminCourseImageDropzone" style="border:1px dashed var(--emerald-primary); padding:1rem; border-radius:var(--radius-xs); text-align:center; cursor:pointer; background:rgba(16,185,129,0.04); transition:var(--transition-smooth);" onclick="document.getElementById('adminCourseImageFile').click()">
+                    <i data-lucide="upload-cloud" style="color:var(--emerald-light); width:24px; height:24px; margin-bottom:0.25rem;"></i>
+                    <div style="color:#FFF; font-size:0.82rem; font-weight:600;">Click or Drag & Drop Cover Image</div>
+                    <div style="color:var(--text-cyber-muted); font-size:0.72rem;">Upload custom graphic (.jpg, .png, .webp)</div>
+                  </div>
+
+                  <div style="margin-top:0.75rem;">
+                    <label class="form-label" for="editCourseImageUrl" style="font-size:0.75rem;">Or Image URL:</label>
+                    <input type="url" id="editCourseImageUrl" class="form-input" placeholder="https://images.unsplash.com/..." oninput="window.adminConsole?.previewCourseCover(this.value)">
+                  </div>
+                </div>
+
+                <div style="text-align:center;">
+                  <div style="font-size:0.72rem; color:var(--text-cyber-muted); margin-bottom:0.3rem;">Preview:</div>
+                  <div style="width:110px; height:75px; border-radius:4px; overflow:hidden; border:1px solid rgba(255,255,255,0.15); background:#000; position:relative; margin:0 auto;">
+                    <img id="editCourseCoverPreviewImg" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000'">
+                  </div>
+                </div>
+              </div>
+
+              <!-- PRESET COVER THUMBNAILS -->
+              <div style="margin-top:0.75rem; border-top:1px dashed rgba(255,255,255,0.1); padding-top:0.6rem;">
+                <span style="font-size:0.72rem; color:var(--text-cyber-muted); display:block; margin-bottom:0.4rem;">Or Choose 1-Click High-Res Cover Graphic:</span>
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                  <button type="button" class="btn btn-ghost btn-xs" style="font-size:0.7rem; border:1px solid rgba(255,255,255,0.1);" onclick="window.adminConsole?.setPresetCourseCover('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000')">AI Visual Coding</button>
+                  <button type="button" class="btn btn-ghost btn-xs" style="font-size:0.7rem; border:1px solid rgba(255,255,255,0.1);" onclick="window.adminConsole?.setPresetCourseCover('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000')">Security & AST</button>
+                  <button type="button" class="btn btn-ghost btn-xs" style="font-size:0.7rem; border:1px solid rgba(255,255,255,0.1);" onclick="window.adminConsole?.setPresetCourseCover('https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000')">Automation Engine</button>
+                  <button type="button" class="btn btn-ghost btn-xs" style="font-size:0.7rem; border:1px solid rgba(255,255,255,0.1);" onclick="window.adminConsole?.setPresetCourseCover('/uploads/your-ai-career-starts-here-cover.jpg')">AI Career Guide</button>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="padding:0.85rem; font-weight:700;">
+              <i data-lucide="check-circle"></i> Save & Update Course Details
+            </button>
+          </form>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modalDiv);
+
+    // Bind form listener
+    const editForm = document.getElementById('adminEditCourseForm');
+    if (editForm) {
+      editForm.addEventListener('submit', (e) => this.handleSaveEditedCourse(e));
+    }
+
+    const imgInput = document.getElementById('adminCourseImageFile');
+    if (imgInput) {
+      imgInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) this.handleCourseImageSelected(file);
+      });
+    }
+  }
+
   async openEditCourseModal(courseId) {
+    this.ensureEditCourseModalInDom();
+
     const targetId = courseId || this.selectedCourseId;
     let course = null;
     try {
@@ -796,25 +922,52 @@ class AdminConsoleManager {
       console.warn('Failed to fetch course by ID:', e);
     }
     if (!course) {
-      const all = await window.db.getCourses();
-      course = all[0];
+      try {
+        const all = await window.db.getCourses();
+        course = all ? all[0] : null;
+      } catch (e) {}
     }
-    if (!course) return;
+    if (!course) {
+      course = {
+        id: targetId || 'course-vibecode-labs',
+        title: 'FREE 2-Week Vibe Coding Mastery Course',
+        subtitle: 'From Complete Beginner to High-Paying Professional',
+        category: 'Full-Stack Vibe Coding',
+        priceNGN: 95000,
+        duration: '2-Week Masterclass',
+        instructor: 'Nuel Effiong',
+        description: 'Practical roadmap to learn AI skills, build real projects, and launch a career.'
+      };
+    }
 
-    document.getElementById('editCourseId').value = course.id;
-    document.getElementById('editCourseTitle').value = course.title || '';
-    document.getElementById('editCourseSubtitle').value = course.subtitle || course.tagline || '';
-    document.getElementById('editCourseCategory').value = course.category || 'Full-Stack Vibe Coding';
-    document.getElementById('editCoursePriceNGN').value = course.priceNGN || 95000;
-    document.getElementById('editCourseDuration').value = course.duration || '6-Week Masterclass';
-    document.getElementById('editCourseInstructor').value = course.instructor || 'Nuel Effiong';
-    document.getElementById('editCourseDesc').value = course.description || course.overview || '';
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.value = val !== undefined && val !== null ? val : '';
+    };
+
+    setVal('editCourseId', course.id);
+    setVal('editCourseTitle', course.title);
+    setVal('editCourseSubtitle', course.subtitle || course.tagline);
+    setVal('editCourseCategory', course.category || 'Full-Stack Vibe Coding');
+    setVal('editCoursePriceNGN', course.priceNGN || 95000);
+    setVal('editCourseDuration', course.duration || '2-Week Masterclass');
+    setVal('editCourseInstructor', course.instructor || 'Nuel Effiong');
+    setVal('editCourseDesc', course.description || course.overview);
     
     const coverUrl = course.featuredImage || course.heroImage || course.coverImage || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000';
-    document.getElementById('editCourseImageUrl').value = coverUrl;
+    setVal('editCourseImageUrl', coverUrl);
     this.previewCourseCover(coverUrl);
 
-    if (window.modal) window.modal.open('modal-admin-edit-course');
+    if (window.modal && window.modal.open) {
+      window.modal.open('modal-admin-edit-course');
+    } else {
+      const modalEl = document.getElementById('modal-admin-edit-course');
+      if (modalEl) {
+        modalEl.classList.add('active');
+        modalEl.style.display = 'flex';
+        document.body.classList.add('modal-open');
+      }
+    }
   }
 
   previewCourseCover(url) {
