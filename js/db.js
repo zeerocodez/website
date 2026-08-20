@@ -767,7 +767,7 @@ const DEFAULT_BLOG_POSTS = [
     authorRole: 'AI Career & Systems Coaches',
     date: 'August 20, 2026',
     readTime: '10 min read',
-    featuredImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop',
+    featuredImage: '/uploads/your-ai-career-starts-here-cover.jpg',
     excerpt: 'You don\'t need to learn everything about AI. You need to know which AI skill to learn, in what order, and how to turn that skill into a career. Download your free 47-page roadmap!',
     tags: ['AI Career', 'Nigeria Tech', 'Beginner Roadmap', 'AI Skills Map', 'Free PDF Guide'],
     status: 'published',
@@ -2314,8 +2314,8 @@ class DatabaseLayer {
         posts.unshift(defPost);
         updated = true;
       } else {
-        // Update stored post properties so cached localStorage gets latest content & pdfAttachment
-        posts[idx] = { ...posts[idx], ...defPost, pdfAttachment: defPost.pdfAttachment || posts[idx].pdfAttachment };
+        // Update stored post properties so cached localStorage gets latest content & pdfAttachment & featuredImage
+        posts[idx] = { ...posts[idx], ...defPost, featuredImage: defPost.featuredImage, pdfAttachment: defPost.pdfAttachment || posts[idx].pdfAttachment };
         updated = true;
       }
     });
