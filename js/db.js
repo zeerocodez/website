@@ -2309,15 +2309,25 @@ class DatabaseLayer {
     // Merge any missing default posts into stored posts so newly added default articles appear
     let updated = false;
     DEFAULT_BLOG_POSTS.forEach(defPost => {
-      const exists = posts.find(p => p.id === defPost.id || p.slug === defPost.slug);
-      if (!exists) {
-        posts.push(defPost);
+      const idx = posts.findIndex(p => p.id === defPost.id || p.slug === defPost.slug);
+      if (idx < 0) {
+        posts.unshift(defPost);
         updated = true;
-      } else if (!exists.pdfAttachment && defPost.pdfAttachment) {
-        exists.pdfAttachment = defPost.pdfAttachment;
+      } else {
+        // Update stored post properties so cached localStorage gets latest content & pdfAttachment
+        posts[idx] = { ...posts[idx], ...defPost, pdfAttachment: defPost.pdfAttachment || posts[idx].pdfAttachment };
         updated = true;
       }
     });
+
+    // Always pin 'post-your-ai-career-starts-here' to index 0 so it displays as the primary featured resource
+    const leadIndex = posts.findIndex(p => p.id === 'post-your-ai-career-starts-here' || p.slug === 'your-ai-career-starts-here-practical-roadmap-nigeria');
+    if (leadIndex > 0) {
+      const [leadPost] = posts.splice(leadIndex, 1);
+      posts.unshift(leadPost);
+      updated = true;
+    }
+
     if (updated) {
       this.setLocal('blogPosts', posts);
     }
