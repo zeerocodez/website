@@ -541,6 +541,10 @@ class AuthService {
       });
 
       userRoleBadges.forEach(el => {
+        if (el.closest && (el.closest('.nav-authenticated') || el.closest('.nav-actions'))) {
+          el.style.display = 'none';
+          return;
+        }
         if (!this.isUserVerified(this.currentUser)) {
           el.textContent = 'PENDING VERIFICATION';
           el.className = 'user-role-badge badge badge-warning';
